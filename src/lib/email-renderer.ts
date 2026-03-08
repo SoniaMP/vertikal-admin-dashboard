@@ -1,6 +1,6 @@
 import { render } from "@react-email/components";
 import { cloneElement } from "react";
-import { getEmailBranding } from "@/lib/email-branding";
+import { getEmailBranding, type EmailBrandingSettings } from "@/lib/email-branding";
 
 /**
  * Render a React Email component to an HTML string.
@@ -20,6 +20,6 @@ export async function renderBrandedEmail(
   component: React.ReactElement,
 ): Promise<string> {
   const branding = await getEmailBranding();
-  const branded = cloneElement(component, { branding });
+  const branded = cloneElement(component, { branding } as { branding: EmailBrandingSettings });
   return render(branded);
 }

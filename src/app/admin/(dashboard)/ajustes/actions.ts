@@ -71,5 +71,6 @@ export async function updateEmailBranding(
   );
 
   revalidatePath("/admin/ajustes");
+  revalidatePath("/api/email-preview", "layout");
   return { success: true };
 }
