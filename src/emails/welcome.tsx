@@ -19,7 +19,11 @@ export default function Welcome({
         Como miembro del club, podrás participar en las actividades organizadas
         y disfrutar de muchas más propuestas. Mantente atento al grupo de
         WhatsApp y al calendario de la web{" "}
-        <a href="https://www.clubvertikal.es/calendario-actividades">
+        <a
+          href="https://www.clubvertikal.es/calendario-actividades"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           clubvertikal.es
         </a>{" "}
         para no perderte nada. Y recuerda: estamos aquí para ayudarte en lo que
