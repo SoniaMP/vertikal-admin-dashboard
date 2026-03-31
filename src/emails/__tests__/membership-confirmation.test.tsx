@@ -19,6 +19,11 @@ describe("MembershipConfirmation", () => {
     expect(html).toContain("García");
   });
 
+  it("renders welcome message", async () => {
+    const html = await render(MembershipConfirmation(defaultProps));
+    expect(html).toContain("Bienvenido/a a Club Vertikal");
+  });
+
   it("renders license label and season", async () => {
     const html = await render(MembershipConfirmation(defaultProps));
     expect(html).toContain("Federativa — Adulto — Estándar");

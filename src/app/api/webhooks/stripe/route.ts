@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import {
+  sendMembershipConfirmationEmail,
+  sendCourseConfirmationEmail,
+} from "@/lib/send-email";
 import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
@@ -54,6 +58,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             : null,
       },
     });
+    await trySendEmail(() =>
+      sendCourseConfirmationEmail(courseRegistrationId),
+    );
   }
 
   if (membershipId) {
@@ -68,5 +75,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             : null,
       },
     });
+    await trySendEmail(() =>
+      sendMembershipConfirmationEmail(membershipId),
+    );
+  }
+}
+
+/** Send email without blocking the webhook response on failure. */
+async function trySendEmail(fn: () => Promise<void>): Promise<void> {
+  try {
+    await fn();
+  } catch (error) {
+    console.error("Failed to send confirmation email:", error);
   }
 }

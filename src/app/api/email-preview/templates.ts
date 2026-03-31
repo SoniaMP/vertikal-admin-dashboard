@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import Welcome from "@/emails/welcome";
 import MembershipConfirmation from "@/emails/membership-confirmation";
 import CourseConfirmation from "@/emails/course-confirmation";
 
@@ -11,11 +10,6 @@ export type TemplateEntry = {
 };
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  welcome: {
-    label: "Bienvenida",
-    component: Welcome,
-    props: Welcome.PreviewProps,
-  },
   "membership-confirmation": {
     label: "Confirmacion de inscripcion",
     component: MembershipConfirmation,

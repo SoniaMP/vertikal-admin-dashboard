@@ -23,12 +23,6 @@ export type CourseConfirmationProps = {
   amountCents: number;
 };
 
-export type WelcomeProps = {
-  branding?: EmailBrandingSettings;
-  firstName: string;
-  lastName: string;
-};
-
 /** Format cents as EUR price (e.g. 1500 -> "15,00 €"). */
 export function formatPrice(cents: number): string {
   return new Intl.NumberFormat("es-ES", {

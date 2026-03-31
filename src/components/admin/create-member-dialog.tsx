@@ -16,7 +16,7 @@ import {
   createMemberWithMembership,
   searchByDni,
   type DniSearchResult,
-} from "@/app/admin/(dashboard)/registros/membership-actions";
+} from "@/app/admin/(dashboard)/registros/create-member-actions";
 import type { LicenseCatalogType } from "@/types";
 import type { ActionResult } from "@/lib/actions";
 

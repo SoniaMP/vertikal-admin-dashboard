@@ -21,6 +21,9 @@ export default function MembershipConfirmation({
         Hola {firstName} {lastName},
       </Text>
       <Text className="text-gray-700 leading-6">
+        ¡Bienvenido/a a Club Vertikal! Nos alegra mucho tenerte con nosotros.
+      </Text>
+      <Text className="text-gray-700 leading-6">
         Tu inscripción para la temporada <strong>{seasonName}</strong> ha sido
         confirmada. Aquí tienes el resumen:
       </Text>
@@ -54,6 +57,19 @@ export default function MembershipConfirmation({
         </Row>
       </Section>
 
+      <Text className="text-gray-700 leading-6">
+        Como miembro del club, podrás participar en las actividades organizadas
+        y disfrutar de muchas más propuestas. Mantente atento al grupo de
+        WhatsApp y al calendario de la web{" "}
+        <a
+          href="https://www.clubvertikal.es/calendario-actividades"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          clubvertikal.es
+        </a>{" "}
+        para no perderte nada.
+      </Text>
       <Text className="text-gray-700">¡Nos vemos en la montaña!</Text>
     </EmailLayout>
   );
