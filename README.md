@@ -30,7 +30,22 @@ cp .env.example .env
 
 > **Important:** Copy to `.env`, not `.env.local`. Prisma reads `.env` via `dotenv/config` and does not support `.env.local`.
 
-See [`.env.example`](.env.example) for all available variables. For local development, the defaults for `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME`, and `DATABASE_URL` work out of the box. You only need to set the Stripe and Resend keys if you want to test payments or emails.
+See [`.env.example`](.env.example) for all available variables. Required variables:
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_APP_NAME` | Display name for the club |
+| `NEXT_PUBLIC_APP_URL` | Base URL of the app |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `RESEND_API_KEY` | Resend API key for sending emails |
+| `EMAIL_FROM` | Sender address for emails |
+| `AUTH_SECRET` | Secret used by Auth.js to sign JWTs |
+| `AUTH_URL` | Canonical URL of the app (used by Auth.js for CSRF protection) |
+| `DATABASE_URL` | SQLite database path |
+
+For local development, the defaults for `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_APP_NAME`, `AUTH_URL`, and `DATABASE_URL` work out of the box. You need to set the Stripe and Resend keys to test payments or emails, and `AUTH_SECRET` to use the admin panel.
 
 4. Generate the Prisma client and run migrations:
 
@@ -90,4 +105,4 @@ To test Stripe webhooks locally, use the [Stripe CLI](https://stripe.com/docs/st
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
-Copy the webhook signing secret it prints and set it as `STRIPE_WEBHOOK_SECRET` in your `.env.local`.
+Copy the webhook signing secret it prints and set it as `STRIPE_WEBHOOK_SECRET` in your `.env`.
