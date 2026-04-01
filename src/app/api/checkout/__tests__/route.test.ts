@@ -9,6 +9,8 @@ const mockGroupPriceFindMany = vi.fn();
 const mockMemberUpsert = vi.fn();
 const mockMembershipCreate = vi.fn();
 const mockMembershipUpdate = vi.fn();
+const mockMembershipFindUnique = vi.fn();
+const mockMembershipSupplementDeleteMany = vi.fn();
 const mockSessionCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -31,6 +33,11 @@ vi.mock("@/lib/prisma", () => ({
     membership: {
       create: (...args: unknown[]) => mockMembershipCreate(...args),
       update: (...args: unknown[]) => mockMembershipUpdate(...args),
+      findUnique: (...args: unknown[]) => mockMembershipFindUnique(...args),
+    },
+    membershipSupplement: {
+      deleteMany: (...args: unknown[]) =>
+        mockMembershipSupplementDeleteMany(...args),
     },
   },
 }));
@@ -47,7 +54,8 @@ vi.mock("@/lib/stripe", () => ({
 
 vi.mock("@/lib/settings", () => ({
   getMembershipFee: () => Promise.resolve(2000),
-  getActiveSeason: () => Promise.resolve({ id: "season-1", name: "2025-2026" }),
+  getActiveSeason: () =>
+    Promise.resolve({ id: "season-1", name: "2025-2026" }),
 }));
 
 function createRequest(body: unknown) {
@@ -104,6 +112,7 @@ function setupHappyPath() {
   ]);
   mockGroupPriceFindMany.mockResolvedValue([]);
   mockMemberUpsert.mockResolvedValue({ id: "member-1" });
+  mockMembershipFindUnique.mockResolvedValue(null);
   mockMembershipCreate.mockResolvedValue({ id: "ms-123" });
   mockMembershipUpdate.mockResolvedValue({});
   mockSessionCreate.mockResolvedValue({
@@ -201,6 +210,42 @@ describe("POST /api/checkout", () => {
         metadata: { membershipId: "ms-123" },
       }),
     );
+  });
+
+  it("returns 409 when member already has an active membership", async () => {
+    setupHappyPath();
+    mockMembershipFindUnique.mockResolvedValue({
+      id: "ms-existing",
+      status: "ACTIVE",
+    });
+
+    const request = createRequest(validBody);
+    const response = await POST(request);
+
+    expect(response.status).toBe(409);
+    const data = await response.json();
+    expect(data.error).toBe(
+      "Ya tienes una inscripción activa para esta temporada",
+    );
+    expect(mockMembershipCreate).not.toHaveBeenCalled();
+  });
+
+  it("reuses existing non-active membership instead of creating new one", async () => {
+    setupHappyPath();
+    mockMembershipFindUnique.mockResolvedValue({
+      id: "ms-old",
+      status: "CANCELLED",
+    });
+    mockMembershipUpdate.mockResolvedValue({ id: "ms-old" });
+
+    const request = createRequest(validBody);
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    expect(mockMembershipCreate).not.toHaveBeenCalled();
+    expect(mockMembershipSupplementDeleteMany).toHaveBeenCalledWith({
+      where: { membershipId: "ms-old" },
+    });
   });
 
   it("returns 502 and marks membership FAILED/CANCELLED when Stripe throws", async () => {

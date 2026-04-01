@@ -4,8 +4,23 @@ import { getStripe } from "@/lib/stripe";
 import { registrationSchema } from "@/validations/registration";
 import { getMembershipFee, getActiveSeason } from "@/lib/settings";
 import { normalizeDni } from "@/helpers/migration-helpers";
+import { findOrCreateMembership } from "@/lib/checkout";
 
 export async function POST(request: NextRequest) {
+  try {
+    return await handleCheckout(request);
+  } catch (err) {
+    if (err instanceof SupplementError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    const message =
+      err instanceof Error ? err.message : "Error interno del servidor";
+    console.error("Checkout error:", err);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+async function handleCheckout(request: NextRequest) {
   const stripe = getStripe();
   const body = await request.json();
   const parsed = registrationSchema.safeParse(body);
@@ -27,11 +42,7 @@ export async function POST(request: NextRequest) {
       subtypeId: data.subtypeId,
       categoryId: data.categoryId,
     },
-    include: {
-      type: true,
-      subtype: true,
-      category: true,
-    },
+    include: { type: true, subtype: true, category: true },
   });
 
   if (!offering) {
@@ -41,71 +52,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const selectedSupplements = await prisma.supplement.findMany({
-    where: {
-      id: { in: data.supplementIds },
-      active: true,
-    },
-    include: { supplementGroup: true },
-  });
-
-  if (selectedSupplements.length !== data.supplementIds.length) {
-    return NextResponse.json(
-      { error: "Suplementos inválidos" },
-      { status: 400 },
-    );
-  }
-
-  const supplementPrices = await prisma.supplementPrice.findMany({
-    where: {
-      seasonId: season.id,
-      supplementId: { in: data.supplementIds },
-    },
-  });
-  const priceBySupplementId = new Map(
-    supplementPrices.map((sp) => [sp.supplementId, sp.price]),
-  );
-
-  const groupIds = [
-    ...new Set(
-      selectedSupplements
-        .map((s) => s.supplementGroupId)
-        .filter((id): id is string => id !== null),
-    ),
-  ];
-
-  const groupPrices = await prisma.supplementGroupPrice.findMany({
-    where: { seasonId: season.id, groupId: { in: groupIds } },
-  });
-  const priceByGroupId = new Map(
-    groupPrices.map((gp) => [gp.groupId, gp.price]),
-  );
-
-  const membershipFee = await getMembershipFee();
-
-  let supplementsTotal = 0;
-  const supplementLineItems: { name: string; price: number }[] = [];
-  const seenGroupIds = new Set<string>();
-
-  for (const s of selectedSupplements) {
-    if (s.supplementGroupId && priceByGroupId.has(s.supplementGroupId)) {
-      if (!seenGroupIds.has(s.supplementGroupId)) {
-        seenGroupIds.add(s.supplementGroupId);
-        const groupPrice = priceByGroupId.get(s.supplementGroupId)!;
-        const groupName = s.supplementGroup?.name ?? "Grupo";
-        supplementLineItems.push({ name: groupName, price: groupPrice });
-        supplementsTotal += groupPrice;
-      }
-    } else {
-      const price = priceBySupplementId.get(s.id) ?? 0;
-      supplementLineItems.push({ name: s.name, price });
-      supplementsTotal += price;
-    }
-  }
+  const { membershipFee, supplementsTotal, supplementLineItems, supplements } =
+    await resolveSupplements(data.supplementIds, season.id);
 
   const total = offering.price + membershipFee + supplementsTotal;
   const licenseLabel = `${offering.type.name} - ${offering.subtype.name} - ${offering.category.name}`;
-
   const normalizedDni = normalizeDni(data.dni);
 
   const member = await prisma.member.upsert({
@@ -135,27 +86,125 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const membership = await prisma.membership.create({
-    data: {
-      memberId: member.id,
-      seasonId: season.id,
-      typeId: data.typeId,
-      subtypeId: data.subtypeId,
-      categoryId: data.categoryId,
-      offeringId: offering.id,
-      licensePriceSnapshot: offering.price,
-      licenseLabelSnapshot: licenseLabel,
-      totalAmount: total,
-      paymentStatus: "PENDING",
-      consentedAt: new Date(),
-      supplements: {
-        create: selectedSupplements.map((s) => ({
-          supplementId: s.id,
-          priceAtTime: priceBySupplementId.get(s.id) ?? 0,
-        })),
-      },
-    },
+  const { membership, isAlreadyActive } = await findOrCreateMembership({
+    memberId: member.id,
+    seasonId: season.id,
+    typeId: data.typeId,
+    subtypeId: data.subtypeId,
+    categoryId: data.categoryId,
+    offeringId: offering.id,
+    licensePriceSnapshot: offering.price,
+    licenseLabelSnapshot: licenseLabel,
+    totalAmount: total,
+    supplements,
   });
+
+  if (isAlreadyActive) {
+    return NextResponse.json(
+      { error: "Ya tienes una inscripción activa para esta temporada" },
+      { status: 409 },
+    );
+  }
+
+  return await createStripeSession({
+    stripe,
+    membership: membership!,
+    licenseLabel,
+    offering,
+    membershipFee,
+    supplementLineItems,
+    email: data.email,
+    appUrl: process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin,
+  });
+}
+
+async function resolveSupplements(supplementIds: string[], seasonId: string) {
+  const membershipFee = await getMembershipFee();
+
+  if (supplementIds.length === 0) {
+    return {
+      membershipFee,
+      supplementsTotal: 0,
+      supplementLineItems: [] as { name: string; price: number }[],
+      supplements: [] as { supplementId: string; priceAtTime: number }[],
+    };
+  }
+
+  const selectedSupplements = await prisma.supplement.findMany({
+    where: { id: { in: supplementIds }, active: true },
+    include: { supplementGroup: true },
+  });
+
+  if (selectedSupplements.length !== supplementIds.length) {
+    throw new SupplementError("Suplementos inválidos");
+  }
+
+  const supplementPrices = await prisma.supplementPrice.findMany({
+    where: { seasonId, supplementId: { in: supplementIds } },
+  });
+  const priceBySupplementId = new Map(
+    supplementPrices.map((sp) => [sp.supplementId, sp.price]),
+  );
+
+  const groupIds = [
+    ...new Set(
+      selectedSupplements
+        .map((s) => s.supplementGroupId)
+        .filter((id): id is string => id !== null),
+    ),
+  ];
+
+  const groupPrices = await prisma.supplementGroupPrice.findMany({
+    where: { seasonId, groupId: { in: groupIds } },
+  });
+  const priceByGroupId = new Map(
+    groupPrices.map((gp) => [gp.groupId, gp.price]),
+  );
+
+  let supplementsTotal = 0;
+  const supplementLineItems: { name: string; price: number }[] = [];
+  const seenGroupIds = new Set<string>();
+
+  for (const s of selectedSupplements) {
+    if (s.supplementGroupId && priceByGroupId.has(s.supplementGroupId)) {
+      if (!seenGroupIds.has(s.supplementGroupId)) {
+        seenGroupIds.add(s.supplementGroupId);
+        const groupPrice = priceByGroupId.get(s.supplementGroupId)!;
+        const groupName = s.supplementGroup?.name ?? "Grupo";
+        supplementLineItems.push({ name: groupName, price: groupPrice });
+        supplementsTotal += groupPrice;
+      }
+    } else {
+      const price = priceBySupplementId.get(s.id) ?? 0;
+      supplementLineItems.push({ name: s.name, price });
+      supplementsTotal += price;
+    }
+  }
+
+  const supplements = selectedSupplements.map((s) => ({
+    supplementId: s.id,
+    priceAtTime: priceBySupplementId.get(s.id) ?? 0,
+  }));
+
+  return { membershipFee, supplementsTotal, supplementLineItems, supplements };
+}
+
+interface StripeSessionInput {
+  stripe: ReturnType<typeof getStripe>;
+  membership: { id: string };
+  licenseLabel: string;
+  offering: { price: number };
+  membershipFee: number;
+  supplementLineItems: { name: string; price: number }[];
+  email: string;
+  appUrl: string;
+}
+
+async function createStripeSession(input: StripeSessionInput) {
+  const {
+    stripe, membership, licenseLabel, offering,
+    membershipFee, supplementLineItems, email, appUrl,
+  } = input;
 
   const lineItems = [
     {
@@ -184,15 +233,12 @@ export async function POST(request: NextRequest) {
     })),
   ];
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
-
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
       line_items: lineItems,
-      customer_email: data.email,
+      customer_email: email,
       metadata: { membershipId: membership.id },
       success_url: `${appUrl}/registro/exito?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/registro/cancelado?membership_id=${membership.id}`,
@@ -218,5 +264,12 @@ export async function POST(request: NextRequest) {
       { error: `Error al conectar con la pasarela de pago: ${message}` },
       { status: 502 },
     );
+  }
+}
+
+class SupplementError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SupplementError";
   }
 }
