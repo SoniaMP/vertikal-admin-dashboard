@@ -1,8 +1,12 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { createHash } from "node:crypto";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+});
+const prisma = new PrismaClient({ adapter });
 
 const [email, password, name] = process.argv.slice(2);
 
