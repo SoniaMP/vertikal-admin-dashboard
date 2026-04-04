@@ -5,6 +5,10 @@ import {
   sendMembershipConfirmationEmail,
   sendCourseConfirmationEmail,
 } from "@/lib/send-email";
+import {
+  sendClubMembershipNotification,
+  sendClubCourseNotification,
+} from "@/lib/send-notification-email";
 import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
@@ -61,6 +65,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     await trySendEmail(() =>
       sendCourseConfirmationEmail(courseRegistrationId),
     );
+    await trySendEmail(() =>
+      sendClubCourseNotification(courseRegistrationId),
+    );
   }
 
   if (membershipId) {
@@ -77,6 +84,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
     await trySendEmail(() =>
       sendMembershipConfirmationEmail(membershipId),
+    );
+    await trySendEmail(() =>
+      sendClubMembershipNotification(membershipId),
     );
   }
 }
