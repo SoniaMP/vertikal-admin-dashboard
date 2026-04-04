@@ -15,6 +15,35 @@ export async function getMembershipFee(): Promise<number> {
     : DEFAULT_MEMBERSHIP_FEE;
 }
 
+type NotificationType = "membership" | "course";
+
+export const NOTIFICATION_KEYS: Record<NotificationType, string> = {
+  membership: "MEMBERSHIP_NOTIFICATION_EMAILS",
+  course: "COURSE_NOTIFICATION_EMAILS",
+};
+
+/**
+ * Read the list of notification recipient emails for a given type.
+ * Returns [] on missing key or invalid JSON.
+ */
+export async function getNotificationEmails(
+  type: NotificationType,
+): Promise<string[]> {
+  const setting = await prisma.appSetting.findUnique({
+    where: { key: NOTIFICATION_KEYS[type] },
+  });
+
+  if (!setting) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(setting.value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((v): v is string => typeof v === "string");
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Get the currently active season, or throw if none exists.
  */
