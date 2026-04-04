@@ -1,6 +1,8 @@
 import type { ComponentType } from "react";
 import MembershipConfirmation from "@/emails/membership-confirmation";
 import CourseConfirmation from "@/emails/course-confirmation";
+import ClubMembershipNotification from "@/emails/club-membership-notification";
+import ClubCourseNotification from "@/emails/club-course-notification";
 
 export type TemplateEntry = {
   label: string;
@@ -19,5 +21,15 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
     label: "Confirmacion de curso",
     component: CourseConfirmation,
     props: CourseConfirmation.PreviewProps,
+  },
+  "club-membership-notification": {
+    label: "Notificacion de nueva inscripcion",
+    component: ClubMembershipNotification,
+    props: ClubMembershipNotification.PreviewProps,
+  },
+  "club-course-notification": {
+    label: "Notificacion de nueva inscripcion en curso",
+    component: ClubCourseNotification,
+    props: ClubCourseNotification.PreviewProps,
   },
 };
