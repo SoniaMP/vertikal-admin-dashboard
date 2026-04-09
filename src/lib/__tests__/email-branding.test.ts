@@ -12,8 +12,13 @@ vi.mock("@/lib/prisma", () => ({
 
 import { getEmailBranding, isValidHexColor, DEFAULT_BRANDING } from "../email-branding";
 
+const AUTH_URL = "https://app.clubvertikal.es";
+
 describe("getEmailBranding", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.AUTH_URL = AUTH_URL;
+  });
 
   it("returns defaults when no settings exist", async () => {
     mockFindMany.mockResolvedValue([]);
@@ -21,7 +26,7 @@ describe("getEmailBranding", () => {
     expect(result).toEqual(DEFAULT_BRANDING);
   });
 
-  it("returns stored values from DB", async () => {
+  it("returns stored values and resolves relative logo URL to absolute", async () => {
     mockFindMany.mockResolvedValue([
       { key: "EMAIL_LOGO_URL", value: "/api/uploads/branding/logo.png" },
       { key: "EMAIL_PRIMARY_COLOR", value: "#ff0000" },
@@ -31,11 +36,20 @@ describe("getEmailBranding", () => {
 
     const result = await getEmailBranding();
     expect(result).toEqual({
-      logoUrl: "/api/uploads/branding/logo.png",
+      logoUrl: `${AUTH_URL}/api/uploads/branding/logo.png`,
       primaryColor: "#ff0000",
       secondaryColor: "#00ff00",
       backgroundColor: "#0000ff",
     });
+  });
+
+  it("keeps absolute logo URL unchanged", async () => {
+    mockFindMany.mockResolvedValue([
+      { key: "EMAIL_LOGO_URL", value: "https://cdn.example.com/logo.png" },
+    ]);
+
+    const result = await getEmailBranding();
+    expect(result.logoUrl).toBe("https://cdn.example.com/logo.png");
   });
 
   it("falls back to defaults for missing keys", async () => {

@@ -6,7 +6,7 @@
 |---|---|---|
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
 | [Instructor Role](#feature-instructor-role) | COMPLETED | US-01 to US-09 |
-| [Email Branding](#feature-email-branding) | TODO | US-E1 |
+| [Email Branding](#feature-email-branding) | COMPLETED | US-E1 |
 | [Course Registration UX](#feature-course-registration-ux) | TODO | US-C1 |
 
 ---
@@ -226,7 +226,7 @@ but see a scoped view limited to their own courses.
 
 ## Feature: Email Branding
 
-**Status:** TODO
+**Status:** COMPLETED
 
 Ensure the club logo renders correctly in all transactional emails.
 
@@ -236,8 +236,8 @@ Ensure the club logo renders correctly in all transactional emails.
 > As a club member or enrollee, I want to see the club logo in confirmation
 > emails so that the communication looks professional and trustworthy.
 
-- [ ] Prefix `AUTH_URL` to relative logo path in `getEmailBranding()` so emails contain an absolute public URL
-- [ ] Verify `/api/uploads/branding/` is not blocked by auth middleware for external requests
+- [x] Prefix `AUTH_URL` to relative logo path in `getEmailBranding()` so emails contain an absolute public URL
+- [x] Verify `/api/uploads/branding/` is not blocked by auth middleware for external requests
 - [ ] Test with a real email client (Gmail, Outlook) to confirm image renders
 
 </details>

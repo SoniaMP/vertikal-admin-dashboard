@@ -27,9 +27,13 @@ export async function getEmailBranding(): Promise<EmailBrandingSettings> {
   });
 
   const map = new Map(settings.map((s) => [s.key, s.value]));
+  const rawLogoUrl = map.get("EMAIL_LOGO_URL") || null;
+  const logoUrl = rawLogoUrl?.startsWith("/")
+    ? `${process.env.AUTH_URL}${rawLogoUrl}`
+    : rawLogoUrl;
 
   return {
-    logoUrl: map.get("EMAIL_LOGO_URL") || null,
+    logoUrl,
     primaryColor: map.get("EMAIL_PRIMARY_COLOR") || DEFAULT_BRANDING.primaryColor,
     secondaryColor: map.get("EMAIL_SECONDARY_COLOR") || DEFAULT_BRANDING.secondaryColor,
     backgroundColor: map.get("EMAIL_BG_COLOR") || DEFAULT_BRANDING.backgroundColor,
