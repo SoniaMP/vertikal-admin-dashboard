@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CourseActiveToggle } from "./course-active-toggle";
+import { CourseStatusBadge } from "./course-status-badge";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption } from "./types";
@@ -42,10 +42,7 @@ export function CourseRowDesktop({ course, courseTypes }: Props) {
         )}
       </TableCell>
       <TableCell>
-        <CourseActiveToggle
-          courseId={course.id}
-          isActive={course.isActive}
-        />
+        <CourseStatusBadge status={course.status} />
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end">

@@ -52,16 +52,17 @@ export function CoursesToolbar({ courseTypes }: Props) {
       </Select>
 
       <Select
-        value={searchParams.get("isActive") ?? "all"}
-        onValueChange={(v) => updateParam("isActive", v)}
+        value={searchParams.get("status") ?? "all"}
+        onValueChange={(v) => updateParam("status", v)}
       >
         <SelectTrigger className="sm:w-36">
           <SelectValue placeholder="Estado" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Estado: Todos</SelectItem>
-          <SelectItem value="true">Activo</SelectItem>
-          <SelectItem value="false">Inactivo</SelectItem>
+          <SelectItem value="DRAFT">Borrador</SelectItem>
+          <SelectItem value="ACTIVE">Activo</SelectItem>
+          <SelectItem value="INACTIVE">Inactivo</SelectItem>
         </SelectContent>
       </Select>
 

@@ -102,12 +102,12 @@ but see a scoped view limited to their own courses.
 > As a developer, I need the data model to support instructors and course statuses
 > so that the rest of the feature can be built on solid foundations.
 
-- [ ] Add `INSTRUCTOR` to seeded roles
-- [ ] Add `instructorId` (nullable FK to `User`) on `CourseCatalog`
-- [ ] Replace `active` boolean on `CourseCatalog` with `status` enum (DRAFT, ACTIVE, INACTIVE)
-- [ ] Migrate existing courses: `active=true` -> ACTIVE, `active=false` -> INACTIVE
-- [ ] Update Prisma schema, generate client, create and apply migration
-- [ ] Update existing queries that reference `active` to use `status`
+- [x] Add `INSTRUCTOR` to seeded roles
+- [x] Add `instructorId` (nullable FK to `User`) on `CourseCatalog`
+- [x] Replace `active` boolean on `CourseCatalog` with `status` enum (DRAFT, ACTIVE, INACTIVE)
+- [x] Migrate existing courses: `active=true` -> ACTIVE, `active=false` -> INACTIVE
+- [x] Update Prisma schema, generate client, create and apply migration
+- [x] Update existing queries that reference `active` to use `status`
 
 </details>
 

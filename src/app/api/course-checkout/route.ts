@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const data = parsed.data;
 
   const course = await prisma.courseCatalog.findUnique({
-    where: { id: data.courseCatalogId, isActive: true, deletedAt: null },
+    where: { id: data.courseCatalogId, status: "ACTIVE", deletedAt: null },
     select: { id: true, title: true, maxCapacity: true },
   });
 

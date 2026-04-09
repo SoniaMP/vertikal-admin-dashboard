@@ -7,6 +7,6 @@ export {
 export {
   createCourse,
   updateCourse,
-  toggleCourseActive,
+  setCourseStatus,
   softDeleteCourse,
 } from "./actions/course-catalog-actions";

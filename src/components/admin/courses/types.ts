@@ -1,9 +1,11 @@
+export type CourseStatus = "DRAFT" | "ACTIVE" | "INACTIVE";
+
 export type CourseRow = {
   id: string;
   title: string;
   slug: string;
   courseDate: Date;
-  isActive: boolean;
+  status: string;
   maxCapacity: number;
   courseType: { id: string; name: string };
   prices: { id: string; name: string; amountCents: number }[];

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { CourseActiveToggle } from "./course-active-toggle";
+import { CourseStatusBadge } from "./course-status-badge";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption } from "./types";
@@ -27,10 +27,7 @@ export function CourseRowMobile({ course, courseTypes }: Props) {
             {formatCourseDate(course.courseDate)}
           </p>
         </div>
-        <CourseActiveToggle
-          courseId={course.id}
-          isActive={course.isActive}
-        />
+        <CourseStatusBadge status={course.status} />
       </div>
       <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
         <Badge variant="outline">{course.courseType.name}</Badge>

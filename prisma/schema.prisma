@@ -217,7 +217,8 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  roles UserRole[]
+  roles   UserRole[]
+  courses CourseCatalog[]
 }
 
 model Role {
@@ -259,18 +260,21 @@ model CourseCatalog {
   slug         String    @unique
   courseDate   DateTime
   courseTypeId String
-  isActive     Boolean   @default(true)
+  status       String    @default("ACTIVE")
+  instructorId String?
   maxCapacity  Int
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   deletedAt    DateTime?
 
   courseType     CourseType          @relation(fields: [courseTypeId], references: [id])
+  instructor    User?               @relation(fields: [instructorId], references: [id])
   prices        CoursePrice[]
   registrations CourseRegistration[]
 
   @@index([courseDate])
-  @@index([isActive, courseDate])
+  @@index([status, courseDate])
+  @@index([instructorId])
 }
 
 model CoursePrice {

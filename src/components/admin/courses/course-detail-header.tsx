@@ -7,9 +7,10 @@ import {
 } from "@/components/ui/card";
 import { formatCourseDate } from "./helpers";
 import { formatPrice } from "@/helpers/price-calculator";
+import { CourseStatusBadge } from "./course-status-badge";
 
 type CourseDetail = {
-  isActive: boolean;
+  status: string;
   courseDate: Date;
   maxCapacity: number;
   courseType: { name: string };
@@ -32,7 +33,7 @@ export function CourseDetailHeader({ course }: Props) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-3 text-lg">
           Información del curso
-          <StatusBadge isActive={course.isActive} />
+          <CourseStatusBadge status={course.status} />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -63,16 +64,6 @@ export function CourseDetailHeader({ course }: Props) {
 }
 
 // ── Small helpers ──
-
-function StatusBadge({ isActive }: { isActive: boolean }) {
-  return isActive ? (
-    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-      Activo
-    </Badge>
-  ) : (
-    <Badge variant="secondary">Inactivo</Badge>
-  );
-}
 
 function InfoItem({
   label,

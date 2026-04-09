@@ -20,6 +20,13 @@ async function main() {
     create: { name: "ADMIN" },
   });
 
+  // Ensure INSTRUCTOR role exists
+  await prisma.role.upsert({
+    where: { name: "INSTRUCTOR" },
+    update: {},
+    create: { name: "INSTRUCTOR" },
+  });
+
   // Create admin user if it does not exist (password: admin123 — change in production!)
   const existingAdmin = await prisma.user.findUnique({
     where: { email: "admin@vertikal.club" },

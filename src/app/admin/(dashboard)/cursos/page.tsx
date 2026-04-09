@@ -48,7 +48,7 @@ function parseParams(params: Record<string, string | string[] | undefined>) {
   return {
     search: str("search"),
     courseTypeId: str("courseTypeId"),
-    isActive: str("isActive"),
+    status: str("status"),
     page: Math.max(1, Number(str("page")) || 1),
   };
 }

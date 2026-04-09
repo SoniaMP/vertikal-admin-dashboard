@@ -5,7 +5,7 @@ const PAGE_SIZE = 15;
 export type CourseFilters = {
   search?: string;
   courseTypeId?: string;
-  isActive?: string; // "true" | "false" | undefined (all)
+  status?: string; // "DRAFT" | "ACTIVE" | "INACTIVE" | undefined (all)
   page: number;
 };
 
@@ -96,7 +96,7 @@ export async function fetchPublicCourseList() {
   return prisma.courseCatalog.findMany({
     where: {
       deletedAt: null,
-      isActive: true,
+      status: "ACTIVE",
       courseDate: { gte: now },
     },
     include: {
@@ -123,7 +123,7 @@ export async function fetchCourseBySlug(slug: string) {
     where: {
       slug,
       deletedAt: null,
-      isActive: true,
+      status: "ACTIVE",
     },
     include: {
       courseType: { select: { id: true, name: true } },
@@ -158,8 +158,8 @@ function buildCourseWhere(filters: CourseFilters) {
     conditions.push({ courseTypeId: filters.courseTypeId });
   }
 
-  if (filters.isActive === "true" || filters.isActive === "false") {
-    conditions.push({ isActive: filters.isActive === "true" });
+  if (filters.status) {
+    conditions.push({ status: filters.status });
   }
 
   return { AND: conditions };

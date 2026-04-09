@@ -99,16 +99,21 @@ export async function updateCourse(
   return { success: true };
 }
 
-export async function toggleCourseActive(
+export async function setCourseStatus(
   id: string,
-  isActive: boolean,
+  status: string,
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const validStatuses = ["DRAFT", "ACTIVE", "INACTIVE"];
+  if (!validStatuses.includes(status)) {
+    return { success: false, error: "Estado no válido" };
+  }
+
   await prisma.courseCatalog.update({
     where: { id },
-    data: { isActive },
+    data: { status },
   });
   revalidatePath("/admin/cursos");
   return { success: true };
@@ -120,7 +125,7 @@ export async function softDeleteCourse(id: string): Promise<ActionResult> {
 
   await prisma.courseCatalog.update({
     where: { id },
-    data: { deletedAt: new Date(), isActive: false },
+    data: { deletedAt: new Date(), status: "INACTIVE" },
   });
   revalidatePath("/admin/cursos");
   return { success: true };
