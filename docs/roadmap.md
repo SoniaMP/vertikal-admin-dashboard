@@ -2,12 +2,12 @@
 
 ## Table of Contents
 
-| Feature | Status | Stories |
-|---|---|---|
+| Feature                                                       | Status    | Stories        |
+| ------------------------------------------------------------- | --------- | -------------- |
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role) | COMPLETED | US-01 to US-10 |
-| [Email Branding](#feature-email-branding) | COMPLETED | US-E1 |
-| [Course Registration UX](#feature-course-registration-ux) | TODO | US-C1 |
+| [Instructor Role](#feature-instructor-role)                   | COMPLETED | US-01 to US-10 |
+| [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
+| [Course Registration UX](#feature-course-registration-ux)     | TODO      | US-C1          |
 
 ---
 
@@ -252,7 +252,7 @@ Ensure the club logo renders correctly in all transactional emails.
 
 - [x] Prefix `AUTH_URL` to relative logo path in `getEmailBranding()` so emails contain an absolute public URL
 - [x] Verify `/api/uploads/branding/` is not blocked by auth middleware for external requests
-- [ ] Test with a real email client (Gmail, Outlook) to confirm image renders
+- [x] Test with a real email client (Gmail, Outlook) to confirm image renders
 
 </details>
 
