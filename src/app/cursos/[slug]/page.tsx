@@ -29,7 +29,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const isFull = spotsLeft === 0;
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-2xl space-y-8">
       <section className="space-y-4">
         <h2 className="text-xl font-bold sm:text-2xl">{course.title}</h2>
 
@@ -62,7 +62,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       ) : (
         <section>
           <h3 className="mb-4 text-lg font-semibold">Inscripción</h3>
-          <Card className="mx-auto max-w-2xl">
+          <Card>
             <CardContent>
               <CourseRegistrationWizard
                 courseCatalogId={course.id}

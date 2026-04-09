@@ -24,7 +24,7 @@ export function CourseCard({ course }: { course: PublicCourse }) {
   return (
     <Link href={`/cursos/${course.slug}`} className="block">
       <Card className="h-full gap-0 overflow-hidden py-0 transition-shadow hover:shadow-md">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 pt-6">
           <div className="flex items-center justify-between">
             <Badge variant="secondary" className="w-fit">
               {course.courseType.name}

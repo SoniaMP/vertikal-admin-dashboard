@@ -5,7 +5,7 @@
 | Feature                                                       | Status    | Stories        |
 | ------------------------------------------------------------- | --------- | -------------- |
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role)                   | COMPLETED | US-01 to US-11 |
+| [Instructor Role](#feature-instructor-role)                   | IN PROGRESS | US-01 to US-12 |
 | [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
 | [Course Registration UX](#feature-course-registration-ux)     | COMPLETED | US-C1          |
 
@@ -75,7 +75,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** COMPLETED
+**Status:** IN PROGRESS
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -260,6 +260,19 @@ but see a scoped view limited to their own courses.
 - [x] Create `addEnrollee` server action with ownership guard + capacity check
 - [x] Create add-participant dialog with collapsible optional fields
 - [x] Tests for action, ownership guard, and capacity validation
+
+</details>
+
+<details>
+<summary>US-12: Instructor or admin can edit a course participant</summary>
+
+> As an instructor or admin, I want to edit a participant's data
+> so that I can correct mistakes or complete missing information.
+
+- [ ] Create `updateEnrollee` server action with ownership guard
+- [ ] Reuse add-participant dialog in edit mode (pre-filled with current data)
+- [ ] Edit button on each participant row (desktop + mobile)
+- [ ] Tests for update action and ownership guard
 
 </details>
 

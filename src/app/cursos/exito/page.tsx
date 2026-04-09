@@ -71,7 +71,11 @@ export default async function CursoExitoPage({
           <span>Nos vemos en las montañas</span>
         </div>
 
-        <p className="mt-6 text-xs text-muted-foreground">
+        <Button variant="outline" asChild className="mt-6">
+          <Link href="/cursos">Ver cursos</Link>
+        </Button>
+
+        <p className="mt-4 text-xs text-muted-foreground">
           Puedes cerrar esta página con seguridad.
         </p>
       </CardContent>
