@@ -6,6 +6,8 @@
 |---|---|---|
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
 | [Instructor Role](#feature-instructor-role) | COMPLETED | US-01 to US-09 |
+| [Email Branding](#feature-email-branding) | TODO | US-E1 |
+| [Course Registration UX](#feature-course-registration-ux) | TODO | US-C1 |
 
 ---
 
@@ -217,5 +219,48 @@ but see a scoped view limited to their own courses.
 - [x] Update `/cursos` page query: filter by `status = ACTIVE` (done in US-01)
 - [x] Stripe checkout creation rejects non-ACTIVE courses (done in US-01)
 - [x] Course detail page returns 404 for non-ACTIVE courses (done in US-01)
+
+</details>
+
+---
+
+## Feature: Email Branding
+
+**Status:** TODO
+
+Ensure the club logo renders correctly in all transactional emails.
+
+<details>
+<summary>US-E1: Logo visible in emails</summary>
+
+> As a club member or enrollee, I want to see the club logo in confirmation
+> emails so that the communication looks professional and trustworthy.
+
+- [ ] Prefix `AUTH_URL` to relative logo path in `getEmailBranding()` so emails contain an absolute public URL
+- [ ] Verify `/api/uploads/branding/` is not blocked by auth middleware for external requests
+- [ ] Test with a real email client (Gmail, Outlook) to confirm image renders
+
+</details>
+
+---
+
+## Feature: Course Registration UX
+
+**Status:** TODO
+
+Improve the course registration flow with a pre-payment review step, consistent
+with the membership registration wizard.
+
+<details>
+<summary>US-C1: Course registration wizard with summary step</summary>
+
+> As a course enrollee, I want to review my data and the selected price before
+> paying so that I can confirm everything is correct.
+
+- [ ] Convert single-step course form into a 2-step wizard (step 1: form, step 2: summary)
+- [ ] Summary displays: personal data, selected course, selected price tier, total amount
+- [ ] "Anterior" button to go back and edit
+- [ ] Privacy policy acceptance checkbox (RGPD) required before "Proceder al pago"
+- [ ] "Proceder al pago" button redirects to Stripe checkout (existing flow)
 
 </details>
