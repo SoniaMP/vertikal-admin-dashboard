@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu } from "lucide-react";
+import { CircleUser, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +21,7 @@ type Props = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN: "Admin",
+  ADMIN: "Administrador",
   INSTRUCTOR: "Instructor",
 };
 
@@ -65,7 +64,15 @@ export function MobileSidebar({ userName, userRole }: Props) {
                 height={28}
               />
             </SheetTitle>
-            <p className="text-xs text-sidebar-foreground/70">Administración</p>
+            <div className="mt-1 flex items-center gap-2">
+              <CircleUser className="h-4 w-4 text-sidebar-foreground/70 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-medium truncate">{userName}</p>
+                <p className="text-[10px] text-sidebar-foreground/50">
+                  {ROLE_LABELS[userRole] ?? userRole}
+                </p>
+              </div>
+            </div>
           </SheetHeader>
           <Separator />
           <nav className="flex-1 p-2 space-y-1">
@@ -83,14 +90,6 @@ export function MobileSidebar({ userName, userRole }: Props) {
           </nav>
           <Separator />
           <div className="p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs text-sidebar-foreground/70 truncate">
-                {userName}
-              </p>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                {ROLE_LABELS[userRole] ?? userRole}
-              </Badge>
-            </div>
             <LogoutButton />
           </div>
         </SheetContent>

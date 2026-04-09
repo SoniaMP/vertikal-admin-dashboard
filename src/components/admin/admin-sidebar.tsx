@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import { CircleUser } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "./logout-button";
 import { getNavItemsForRole } from "./nav-items";
@@ -11,7 +11,7 @@ type Props = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN: "Admin",
+  ADMIN: "Administrador",
   INSTRUCTOR: "Instructor",
 };
 
@@ -30,9 +30,15 @@ export function AdminSidebar({ userName, userRole }: Props) {
             priority
           />
         </Link>
-        <p className="text-xs text-sidebar-foreground/70 mt-1">
-          Administración
-        </p>
+        <div className="mt-3 flex items-center gap-2">
+          <CircleUser className="h-4 w-4 text-sidebar-foreground/70 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs font-medium truncate">{userName}</p>
+            <p className="text-[10px] text-sidebar-foreground/50">
+              {ROLE_LABELS[userRole] ?? userRole}
+            </p>
+          </div>
+        </div>
       </div>
       <Separator />
       <nav className="flex-1 p-2 space-y-1">
@@ -49,14 +55,6 @@ export function AdminSidebar({ userName, userRole }: Props) {
       </nav>
       <Separator />
       <div className="p-3">
-        <div className="flex items-center gap-2 mb-2">
-          <p className="text-xs text-sidebar-foreground/70 truncate">
-            {userName}
-          </p>
-          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-            {ROLE_LABELS[userRole] ?? userRole}
-          </Badge>
-        </div>
         <LogoutButton />
       </div>
     </aside>
