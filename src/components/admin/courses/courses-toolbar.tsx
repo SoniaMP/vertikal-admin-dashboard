@@ -15,10 +15,9 @@ import type { CourseTypeOption } from "./types";
 
 type Props = {
   courseTypes: CourseTypeOption[];
-  isInstructor?: boolean;
 };
 
-export function CoursesToolbar({ courseTypes, isInstructor }: Props) {
+export function CoursesToolbar({ courseTypes }: Props) {
   const { updateParam, updateParamDebounced, clearAll, searchParams } =
     useCoursesFilter();
 

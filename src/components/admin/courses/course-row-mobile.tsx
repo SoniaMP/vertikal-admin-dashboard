@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { CourseStatusBadge } from "./course-status-badge";
+import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption } from "./types";
@@ -28,10 +29,17 @@ export function CourseRowMobile({ course, courseTypes, isInstructor }: Props) {
             {formatCourseDate(course.courseDate)}
           </p>
         </div>
-        <CourseStatusBadge status={course.status} />
+        {isInstructor ? (
+          <CourseStatusBadge status={course.status} />
+        ) : (
+          <CourseStatusSelect courseId={course.id} status={course.status} />
+        )}
       </div>
       <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
         <Badge variant="outline">{course.courseType.name}</Badge>
+        {!isInstructor && course.instructor && (
+          <span>{course.instructor.name}</span>
+        )}
         <span className="tabular-nums">
           {course._count.registrations} / {course.maxCapacity}
         </span>

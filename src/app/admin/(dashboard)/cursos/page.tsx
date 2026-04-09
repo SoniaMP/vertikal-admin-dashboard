@@ -34,7 +34,7 @@ export default async function CoursesPage({
         </h1>
         <CreateCourseButton courseTypes={courseTypes} />
       </div>
-      <CoursesToolbar courseTypes={courseTypes} isInstructor={isInstructor} />
+      <CoursesToolbar courseTypes={courseTypes} />
       <CoursesTable
         courses={courses}
         courseTypes={courseTypes}

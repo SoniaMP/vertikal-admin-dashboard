@@ -47,6 +47,7 @@ export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
               <TableHead>Tipo</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Plazas</TableHead>
+              {!isInstructor && <TableHead>Instructor</TableHead>}
               <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>

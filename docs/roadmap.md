@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 to US-04 completed)
+**Status:** IN PROGRESS (US-01 to US-05 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -160,12 +160,10 @@ but see a scoped view limited to their own courses.
 > As an admin, I want to review and approve instructor-created courses
 > so that only vetted courses appear on the public site.
 
-- [ ] Admin course list shows all courses with status and instructor name
-- [ ] Filter/badge for DRAFT courses pending approval
-- [ ] "Approve" action: DRAFT -> ACTIVE
-- [ ] "Deactivate" action: ACTIVE -> INACTIVE
-- [ ] "Reactivate" action: INACTIVE -> ACTIVE
-- [ ] Admin can also edit any course regardless of instructor
+- [x] Admin course list shows all courses with status and instructor name
+- [x] Filter by status (DRAFT/ACTIVE/INACTIVE) available in toolbar
+- [x] Inline status select: approve (DRAFT -> ACTIVE), deactivate, reactivate
+- [x] Admin can edit any course regardless of instructor
 
 </details>
 

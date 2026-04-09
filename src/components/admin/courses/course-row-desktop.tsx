@@ -2,6 +2,7 @@ import Link from "next/link";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CourseStatusBadge } from "./course-status-badge";
+import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption } from "./types";
@@ -42,8 +43,17 @@ export function CourseRowDesktop({ course, courseTypes, isInstructor }: Props) {
           </Badge>
         )}
       </TableCell>
+      {!isInstructor && (
+        <TableCell className="text-muted-foreground text-sm">
+          {course.instructor?.name ?? "—"}
+        </TableCell>
+      )}
       <TableCell>
-        <CourseStatusBadge status={course.status} />
+        {isInstructor ? (
+          <CourseStatusBadge status={course.status} />
+        ) : (
+          <CourseStatusSelect courseId={course.id} status={course.status} />
+        )}
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end">

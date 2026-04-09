@@ -34,28 +34,35 @@ export function CourseActionsMenu({ course, courseTypes, isInstructor }: Props) 
     });
   }
 
+  const isActive = course.status === "ACTIVE";
+  const canEdit = !isInstructor || isActive;
+
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        asChild
-        aria-label="Ver página pública"
-      >
-        <a href={`/cursos/${course.slug}`} target="_blank" rel="noreferrer">
-          <ExternalLink className="h-4 w-4" />
-        </a>
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsEditOpen(true)}
-        aria-label="Editar"
-      >
-        <Pencil className="h-4 w-4" />
-      </Button>
+      {isActive && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          asChild
+          aria-label="Ver página pública"
+        >
+          <a href={`/cursos/${course.slug}`} target="_blank" rel="noreferrer">
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        </Button>
+      )}
+      {canEdit && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsEditOpen(true)}
+          aria-label="Editar"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
       {!isInstructor && (
         <AlertDialog>
           <AlertDialogTrigger asChild>

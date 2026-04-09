@@ -20,6 +20,7 @@ export async function fetchCourseList(filters: CourseFilters) {
       where,
       include: {
         courseType: { select: { id: true, name: true } },
+        instructor: { select: { id: true, name: true } },
         prices: {
           where: { isActive: true },
           select: { id: true, name: true, amountCents: true },
