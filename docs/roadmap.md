@@ -5,7 +5,7 @@
 | Feature | Status | Stories |
 |---|---|---|
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role) | COMPLETED | US-01 to US-09 |
+| [Instructor Role](#feature-instructor-role) | IN PROGRESS | US-01 to US-10 |
 | [Email Branding](#feature-email-branding) | COMPLETED | US-E1 |
 | [Course Registration UX](#feature-course-registration-ux) | TODO | US-C1 |
 
@@ -219,6 +219,20 @@ but see a scoped view limited to their own courses.
 - [x] Update `/cursos` page query: filter by `status = ACTIVE` (done in US-01)
 - [x] Stripe checkout creation rejects non-ACTIVE courses (done in US-01)
 - [x] Course detail page returns 404 for non-ACTIVE courses (done in US-01)
+
+</details>
+
+<details>
+<summary>US-10: Instructor can remove a course enrollee</summary>
+
+> As an instructor, I want to remove a participant from my course
+> so that I can manage enrollment when someone cancels or was registered by mistake.
+
+- [ ] Add delete action on enrollee row (confirmation dialog required)
+- [ ] Ownership guard: only the course instructor or an admin can delete
+- [ ] Handle Stripe refund consideration (inform user, no automatic refund)
+- [ ] Update enrollee count after deletion
+- [ ] Tests for delete action and ownership guard
 
 </details>
 
