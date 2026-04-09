@@ -5,7 +5,7 @@
 | Feature | Status | Stories |
 |---|---|---|
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role) | PENDING | US-01 to US-09 |
+| [Instructor Role](#feature-instructor-role) | IN PROGRESS | US-01 to US-09 |
 
 ---
 
@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** PENDING
+**Status:** IN PROGRESS (US-01 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
