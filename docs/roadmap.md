@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 to US-03 completed)
+**Status:** IN PROGRESS (US-01 to US-04 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -146,12 +146,11 @@ but see a scoped view limited to their own courses.
 > As an instructor, I want to create and fully manage my courses
 > so that I can set up offerings for the club's students.
 
-- [ ] "Mis Cursos" page listing only courses where `instructorId = currentUser`
-- [ ] Create course form (all fields: name, description, dates, location, capacity, prices)
-- [ ] New course defaults to DRAFT status
-- [ ] Edit course form (same fields, available in any status)
-- [ ] Deactivate course (set status to INACTIVE)
-- [ ] Visual indicator of course status (DRAFT, ACTIVE, INACTIVE)
+- [x] "Mis Cursos" page listing only courses where `instructorId = currentUser`
+- [x] Create course form (reuses existing form, instructorId set server-side)
+- [x] New course defaults to DRAFT status (instructor-created)
+- [x] Edit course form (same fields, available in any status, ownership enforced)
+- [x] Delete restricted to admin only (softDeleteCourse requires ADMIN)
 
 </details>
 

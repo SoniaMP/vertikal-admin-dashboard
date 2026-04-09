@@ -8,9 +8,10 @@ import type { CourseRow, CourseTypeOption } from "./types";
 type Props = {
   course: CourseRow;
   courseTypes: CourseTypeOption[];
+  isInstructor?: boolean;
 };
 
-export function CourseRowMobile({ course, courseTypes }: Props) {
+export function CourseRowMobile({ course, courseTypes, isInstructor }: Props) {
   const spots = course.maxCapacity - course._count.registrations;
 
   return (
@@ -39,7 +40,11 @@ export function CourseRowMobile({ course, courseTypes }: Props) {
         )}
       </div>
       <div className="mt-2 flex justify-end border-t pt-2">
-        <CourseActionsMenu course={course} courseTypes={courseTypes} />
+        <CourseActionsMenu
+          course={course}
+          courseTypes={courseTypes}
+          isInstructor={isInstructor}
+        />
       </div>
     </div>
   );

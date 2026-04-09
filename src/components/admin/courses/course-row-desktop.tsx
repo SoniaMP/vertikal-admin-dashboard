@@ -9,9 +9,10 @@ import type { CourseRow, CourseTypeOption } from "./types";
 type Props = {
   course: CourseRow;
   courseTypes: CourseTypeOption[];
+  isInstructor?: boolean;
 };
 
-export function CourseRowDesktop({ course, courseTypes }: Props) {
+export function CourseRowDesktop({ course, courseTypes, isInstructor }: Props) {
   const spots = course.maxCapacity - course._count.registrations;
 
   return (
@@ -46,7 +47,11 @@ export function CourseRowDesktop({ course, courseTypes }: Props) {
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end">
-          <CourseActionsMenu course={course} courseTypes={courseTypes} />
+          <CourseActionsMenu
+            course={course}
+            courseTypes={courseTypes}
+            isInstructor={isInstructor}
+          />
         </div>
       </TableCell>
     </TableRow>

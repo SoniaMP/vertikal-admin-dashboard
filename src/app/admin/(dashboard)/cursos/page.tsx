@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { fetchCourseList, fetchCourseTypes } from "@/lib/course-queries";
 import { CoursesToolbar } from "@/components/admin/courses/courses-toolbar";
 import { CoursesTable } from "@/components/admin/courses/courses-table";
@@ -11,8 +12,12 @@ export default async function CoursesPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const params = await searchParams;
-  const filters = parseParams(params);
+  const [params, session] = await Promise.all([searchParams, auth()]);
+  const isInstructor = session?.user?.role === "INSTRUCTOR";
+  const filters = {
+    ...parseParams(params),
+    ...(isInstructor && { instructorId: session.user.id }),
+  };
 
   const [{ courses, total, pageSize }, courseTypes] = await Promise.all([
     fetchCourseList(filters),
@@ -24,11 +29,17 @@ export default async function CoursesPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Cursos</h1>
+        <h1 className="text-2xl font-bold">
+          {isInstructor ? "Mis cursos" : "Cursos"}
+        </h1>
         <CreateCourseButton courseTypes={courseTypes} />
       </div>
-      <CoursesToolbar courseTypes={courseTypes} />
-      <CoursesTable courses={courses} courseTypes={courseTypes} />
+      <CoursesToolbar courseTypes={courseTypes} isInstructor={isInstructor} />
+      <CoursesTable
+        courses={courses}
+        courseTypes={courseTypes}
+        isInstructor={isInstructor}
+      />
       <Pagination
         currentPage={filters.page}
         totalPages={totalPages}

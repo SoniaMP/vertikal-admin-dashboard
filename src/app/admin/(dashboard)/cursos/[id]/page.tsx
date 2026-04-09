@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
 import { fetchCourseDetail } from "@/lib/course-queries";
 import {
   fetchCourseParticipants,
@@ -19,11 +20,19 @@ export default async function CourseDetailPage({
   params,
   searchParams,
 }: Props) {
-  const { id } = await params;
-  const rawParams = await searchParams;
+  const [{ id }, rawParams, session] = await Promise.all([
+    params,
+    searchParams,
+    auth(),
+  ]);
 
   const course = await fetchCourseDetail(id);
   if (!course) notFound();
+
+  const isInstructor = session?.user?.role === "INSTRUCTOR";
+  if (isInstructor && course.instructorId !== session.user.id) {
+    notFound();
+  }
 
   const filters = parseParticipantParams(rawParams, id);
   const { participants, total, pageSize } =

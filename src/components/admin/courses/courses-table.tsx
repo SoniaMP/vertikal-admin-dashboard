@@ -13,9 +13,10 @@ import type { CourseRow, CourseTypeOption } from "./types";
 type Props = {
   courses: CourseRow[];
   courseTypes: CourseTypeOption[];
+  isInstructor?: boolean;
 };
 
-export function CoursesTable({ courses, courseTypes }: Props) {
+export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
   if (courses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
@@ -33,6 +34,7 @@ export function CoursesTable({ courses, courseTypes }: Props) {
             key={c.id}
             course={c}
             courseTypes={courseTypes}
+            isInstructor={isInstructor}
           />
         ))}
       </div>
@@ -45,7 +47,7 @@ export function CoursesTable({ courses, courseTypes }: Props) {
               <TableHead>Tipo</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Plazas</TableHead>
-              <TableHead>Activo</TableHead>
+              <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -55,6 +57,7 @@ export function CoursesTable({ courses, courseTypes }: Props) {
                 key={c.id}
                 course={c}
                 courseTypes={courseTypes}
+                isInstructor={isInstructor}
               />
             ))}
           </TableBody>

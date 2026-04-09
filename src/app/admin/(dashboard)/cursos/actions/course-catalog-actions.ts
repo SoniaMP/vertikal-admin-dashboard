@@ -7,7 +7,11 @@ import {
   courseCatalogSchema,
   coursePriceEntrySchema,
 } from "@/validations/course";
-import { requireAuth, type ActionResult } from "@/lib/actions";
+import {
+  getAuthSession,
+  requireAdmin,
+  type ActionResult,
+} from "@/lib/actions";
 
 const pricesArraySchema = z.array(coursePriceEntrySchema);
 
@@ -35,8 +39,8 @@ export async function createCourse(
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const authError = await requireAuth();
-  if (authError) return authError;
+  const session = await getAuthSession();
+  if (!session) return { success: false, error: "No autorizado" };
 
   const parsed = parseCourseFormData(formData);
   if (!parsed.success) {
@@ -46,12 +50,14 @@ export async function createCourse(
 
   const prices = parsePricesJson(formData.get("pricesJson"));
   const { courseDate, maxCapacity, ...rest } = parsed.data;
+  const isInstructor = session.user.role === "INSTRUCTOR";
 
   await prisma.courseCatalog.create({
     data: {
       ...rest,
       courseDate: courseDate ?? new Date(),
       maxCapacity: maxCapacity ?? 0,
+      ...(isInstructor && { instructorId: session.user.id, status: "DRAFT" }),
       prices: {
         create: prices.map((p) => ({
           name: p.name,
@@ -70,8 +76,11 @@ export async function updateCourse(
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const authError = await requireAuth();
-  if (authError) return authError;
+  const session = await getAuthSession();
+  if (!session) return { success: false, error: "No autorizado" };
+
+  const ownershipError = await checkInstructorOwnership(session, id);
+  if (ownershipError) return ownershipError;
 
   const parsed = parseCourseFormData(formData);
   if (!parsed.success) {
@@ -103,7 +112,7 @@ export async function setCourseStatus(
   id: string,
   status: string,
 ): Promise<ActionResult> {
-  const authError = await requireAuth();
+  const authError = await requireAdmin();
   if (authError) return authError;
 
   const validStatuses = ["DRAFT", "ACTIVE", "INACTIVE"];
@@ -120,7 +129,7 @@ export async function setCourseStatus(
 }
 
 export async function softDeleteCourse(id: string): Promise<ActionResult> {
-  const authError = await requireAuth();
+  const authError = await requireAdmin();
   if (authError) return authError;
 
   await prisma.courseCatalog.update({
@@ -132,6 +141,26 @@ export async function softDeleteCourse(id: string): Promise<ActionResult> {
 }
 
 // ── Helpers ──
+
+type AuthSession = NonNullable<Awaited<ReturnType<typeof getAuthSession>>>;
+
+async function checkInstructorOwnership(
+  session: AuthSession,
+  courseId: string,
+): Promise<ActionResult | null> {
+  if (session.user.role !== "INSTRUCTOR") return null;
+
+  const course = await prisma.courseCatalog.findUnique({
+    where: { id: courseId },
+    select: { instructorId: true },
+  });
+
+  if (course?.instructorId !== session.user.id) {
+    return { success: false, error: "No autorizado" };
+  }
+
+  return null;
+}
 
 type PriceEntry = z.infer<typeof coursePriceEntrySchema>;
 type TxClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];

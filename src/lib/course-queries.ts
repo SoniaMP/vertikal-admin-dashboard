@@ -6,6 +6,7 @@ export type CourseFilters = {
   search?: string;
   courseTypeId?: string;
   status?: string; // "DRAFT" | "ACTIVE" | "INACTIVE" | undefined (all)
+  instructorId?: string;
   page: number;
 };
 
@@ -160,6 +161,10 @@ function buildCourseWhere(filters: CourseFilters) {
 
   if (filters.status) {
     conditions.push({ status: filters.status });
+  }
+
+  if (filters.instructorId) {
+    conditions.push({ instructorId: filters.instructorId });
   }
 
   return { AND: conditions };

@@ -21,9 +21,10 @@ import type { CourseRow, CourseTypeOption } from "./types";
 type Props = {
   course: CourseRow;
   courseTypes: CourseTypeOption[];
+  isInstructor?: boolean;
 };
 
-export function CourseActionsMenu({ course, courseTypes }: Props) {
+export function CourseActionsMenu({ course, courseTypes, isInstructor }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -55,35 +56,37 @@ export function CourseActionsMenu({ course, courseTypes }: Props) {
       >
         <Pencil className="h-4 w-4" />
       </Button>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={isPending}
-            aria-label="Eliminar"
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              ¿Eliminar &ldquo;{course.title}&rdquo;?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              El curso se marcará como eliminado y no será visible.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {!isInstructor && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={isPending}
+              aria-label="Eliminar"
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                ¿Eliminar &ldquo;{course.title}&rdquo;?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                El curso se marcará como eliminado y no será visible.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
       <CourseFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}

@@ -12,6 +12,12 @@ export async function requireAuth(): Promise<ActionResult | null> {
   return null;
 }
 
+export async function getAuthSession() {
+  const session = await auth();
+  if (!session?.user) return null;
+  return session;
+}
+
 export async function requireAdmin(): Promise<ActionResult | null> {
   const session = await auth();
   if (!session?.user) {
