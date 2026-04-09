@@ -16,6 +16,13 @@ export type ParticipantRow = {
   lastName: string;
   email: string;
   phone: string | null;
+  dni: string | null;
+  dateOfBirth: string | null;
+  address: string | null;
+  city: string | null;
+  postalCode: string | null;
+  province: string | null;
+  paymentStatus: string;
   createdAt: Date;
   coursePrice: { name: string };
 };
@@ -77,8 +84,29 @@ export function ParticipantsTable({
                 basePath={basePath}
               />
               <SortableHeader
+                field="dni"
+                label="DNI"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                basePath={basePath}
+              />
+              <SortableHeader
+                field="dateOfBirth"
+                label="Fecha nac."
+                currentSort={sortBy}
+                currentDir={sortDir}
+                basePath={basePath}
+              />
+              <SortableHeader
                 field="priceName"
                 label="Cat. pago"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                basePath={basePath}
+              />
+              <SortableHeader
+                field="paymentStatus"
+                label="Estado pago"
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}

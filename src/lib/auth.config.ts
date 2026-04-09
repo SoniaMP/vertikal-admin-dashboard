@@ -17,6 +17,9 @@ export const authConfig = {
       return token;
     },
     session({ session, token }) {
+      if (token.sub) {
+        session.user.id = token.sub;
+      }
       if (token.role) {
         session.user.role = token.role as string;
       }

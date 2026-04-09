@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 to US-05 completed)
+**Status:** IN PROGRESS (US-01 to US-06 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -173,10 +173,11 @@ but see a scoped view limited to their own courses.
 > As an instructor, I want to see who enrolled in my courses and export that data
 > so that I can handle federation paperwork and issue certificates.
 
-- [ ] Enrollee list per course (name, email, phone, DNI, address, DOB, payment status)
-- [ ] Only visible for courses where `instructorId = currentUser`
-- [ ] Export enrollees to CSV/Excel
-- [ ] Admin can also see enrollees for any course (existing behavior)
+- [x] Enrollee list per course (name, email, phone, DNI, DOB, payment status badge)
+- [x] Only visible for courses where `instructorId = currentUser` (ownership guard)
+- [x] Export enrollees to CSV (address, city, postal code, province, payment status added)
+- [x] Export route secured with auth + instructor ownership check
+- [x] Admin can see enrollees for any course (existing behavior)
 
 </details>
 

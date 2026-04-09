@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { fetchAllCourseParticipants } from "@/lib/course-participant-queries";
 import { buildCsv } from "@/lib/csv-utils";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: NextRequest, context: RouteContext) {
-  const { id } = await context.params;
+  const [{ id }, session] = await Promise.all([context.params, auth()]);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  if (session.user.role === "INSTRUCTOR") {
+    const course = await prisma.courseCatalog.findUnique({
+      where: { id },
+      select: { instructorId: true },
+    });
+    if (course?.instructorId !== session.user.id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+  }
 
   const participants = await fetchAllCourseParticipants(id);
 
@@ -16,7 +32,12 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     "Teléfono",
     "DNI",
     "Fecha nacimiento",
+    "Dirección",
+    "Ciudad",
+    "Código postal",
+    "Provincia",
     "Categoría de pago",
+    "Estado de pago",
     "Fecha inscripción",
   ];
 
@@ -27,7 +48,12 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     p.phone ?? "",
     p.dni ?? "",
     p.dateOfBirth ?? "",
+    p.address ?? "",
+    p.city ?? "",
+    p.postalCode ?? "",
+    p.province ?? "",
     p.coursePrice.name,
+    p.paymentStatus,
     p.createdAt.toISOString().slice(0, 10),
   ]);
 
