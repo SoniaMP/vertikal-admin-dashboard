@@ -7,6 +7,7 @@ const { auth } = NextAuth(authConfig);
 const INSTRUCTOR_ALLOWED_PREFIXES = [
   "/admin/login",
   "/admin/cursos",
+  "/admin/cuenta",
 ];
 
 function isInstructorAllowed(pathname: string): boolean {

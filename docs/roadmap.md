@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 to US-07 completed)
+**Status:** IN PROGRESS (US-01 to US-08 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -201,9 +201,10 @@ but see a scoped view limited to their own courses.
 > As an instructor, I want to change my password
 > so that I can secure my account after receiving a temporary password.
 
-- [ ] "Mi Cuenta" page accessible to both ADMIN and INSTRUCTOR roles
-- [ ] Change password form (current password + new password + confirm)
-- [ ] Display account info (name, email, role) — read-only
+- [x] "Mi Cuenta" page at `/admin/cuenta`, accessible to both roles
+- [x] Change password form (current password + new password + confirm)
+- [x] Display account info (name, email, role) — read-only
+- [x] Nav item visible to both roles, middleware allows instructor access
 
 </details>
 
