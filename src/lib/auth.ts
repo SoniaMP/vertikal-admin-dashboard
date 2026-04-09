@@ -2,13 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { authConfig } from "./auth.config";
-
-async function sha256(input: string): Promise<string> {
-  const data = new TextEncoder().encode(input);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const bytes = new Uint8Array(hashBuffer);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-}
+import { hashPassword } from "./hash-password";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -29,7 +23,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           include: { roles: { include: { role: true } } },
         });
 
-        const passwordHash = await sha256(password);
+        const passwordHash = await hashPassword(password);
         if (!user || passwordHash !== user.passwordHash) {
           return null;
         }

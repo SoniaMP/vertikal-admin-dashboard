@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 completed)
+**Status:** IN PROGRESS (US-01, US-02 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -117,12 +117,12 @@ but see a scoped view limited to their own courses.
 > As an admin, I want to create instructor accounts from the admin panel
 > so that instructors can log in without needing CLI access.
 
-- [ ] User management page in admin (`/admin/usuarios` or similar)
-- [ ] Form: name, email, password, role selection (ADMIN / INSTRUCTOR)
-- [ ] List of existing users with role badges
-- [ ] Edit user (name, email, role)
-- [ ] Reset password for a user
-- [ ] Delete / deactivate user
+- [x] User management page in admin (`/admin/usuarios`)
+- [x] Form: name, email, password, role selection (ADMIN / INSTRUCTOR)
+- [x] List of existing users with role badges
+- [x] Edit user (name, email, role)
+- [x] Reset password for a user (via edit form, optional password field)
+- [x] Delete user (with confirmation, self-deletion prevented)
 
 </details>
 
