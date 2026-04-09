@@ -28,7 +28,7 @@ export async function fetchCourseList(filters: CourseFilters) {
         },
         _count: {
           select: {
-            registrations: { where: { paymentStatus: "COMPLETED" } },
+            registrations: true,
           },
         },
       },
@@ -52,7 +52,7 @@ export async function fetchCourseDetail(id: string) {
       prices: { orderBy: { name: "asc" } },
       _count: {
         select: {
-          registrations: { where: { paymentStatus: "COMPLETED" } },
+          registrations: true,
         },
       },
     },
@@ -80,7 +80,9 @@ export async function getCourseAvailableSpots(
       maxCapacity: true,
       _count: {
         select: {
-          registrations: { where: { paymentStatus: "COMPLETED" } },
+          registrations: {
+            where: { paymentStatus: { in: ["COMPLETED", "MANUAL"] } },
+          },
         },
       },
     },
@@ -110,7 +112,9 @@ export async function fetchPublicCourseList() {
       },
       _count: {
         select: {
-          registrations: { where: { paymentStatus: "COMPLETED" } },
+          registrations: {
+            where: { paymentStatus: { in: ["COMPLETED", "MANUAL"] } },
+          },
         },
       },
     },
@@ -136,7 +140,9 @@ export async function fetchCourseBySlug(slug: string) {
       },
       _count: {
         select: {
-          registrations: { where: { paymentStatus: "COMPLETED" } },
+          registrations: {
+            where: { paymentStatus: { in: ["COMPLETED", "MANUAL"] } },
+          },
         },
       },
     },

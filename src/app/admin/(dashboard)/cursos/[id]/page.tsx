@@ -55,6 +55,11 @@ export default async function CourseDetailPage({
 
       <ParticipantsSection
         courseId={id}
+        prices={course.prices.map((p) => ({
+          id: p.id,
+          name: p.name,
+          amountCents: p.amountCents,
+        }))}
         participants={participants}
         total={total}
         totalPages={totalPages}

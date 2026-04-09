@@ -5,7 +5,7 @@
 | Feature                                                       | Status    | Stories        |
 | ------------------------------------------------------------- | --------- | -------------- |
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role)                   | IN PROGRESS | US-01 to US-11 |
+| [Instructor Role](#feature-instructor-role)                   | COMPLETED | US-01 to US-11 |
 | [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
 | [Course Registration UX](#feature-course-registration-ux)     | TODO      | US-C1          |
 
@@ -254,12 +254,12 @@ but see a scoped view limited to their own courses.
 - Ownership guard: course instructor or admin (same pattern as US-10)
 
 **Tasks:**
-- [ ] Update queries: remove paymentStatus filter, count MANUAL toward capacity
-- [ ] Add MANUAL badge style to participant rows (desktop + mobile)
-- [ ] Create validation schema for manual registration (minimal required fields)
-- [ ] Create `addEnrollee` server action with ownership guard + capacity check
-- [ ] Create add-participant dialog with collapsible optional fields
-- [ ] Tests for action, ownership guard, and capacity validation
+- [x] Update queries: remove paymentStatus filter, count MANUAL toward capacity
+- [x] Add MANUAL badge style to participant rows (desktop + mobile)
+- [x] Create validation schema for manual registration (minimal required fields)
+- [x] Create `addEnrollee` server action with ownership guard + capacity check
+- [x] Create add-participant dialog with collapsible optional fields
+- [x] Tests for action, ownership guard, and capacity validation
 
 </details>
 

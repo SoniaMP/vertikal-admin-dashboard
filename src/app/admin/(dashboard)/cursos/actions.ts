@@ -11,4 +11,4 @@ export {
   softDeleteCourse,
 } from "./actions/course-catalog-actions";
 
-export { deleteEnrollee } from "./actions/course-registration-actions";
+export { deleteEnrollee, addEnrollee } from "./actions/course-registration-actions";

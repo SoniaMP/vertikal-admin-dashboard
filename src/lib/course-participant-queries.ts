@@ -46,7 +46,7 @@ export async function fetchCourseParticipants(filters: ParticipantFilters) {
 
 export async function fetchAllCourseParticipants(courseId: string) {
   return prisma.courseRegistration.findMany({
-    where: { courseCatalogId: courseId, paymentStatus: "COMPLETED" },
+    where: { courseCatalogId: courseId },
     include: { coursePrice: { select: { name: true } } },
     orderBy: { createdAt: "desc" },
     take: MAX_EXPORT_ROWS,
@@ -88,7 +88,6 @@ function isValidSortField(value: unknown): value is ParticipantSortField {
 function buildParticipantWhere(filters: ParticipantFilters) {
   const conditions: Record<string, unknown>[] = [
     { courseCatalogId: filters.courseId },
-    { paymentStatus: "COMPLETED" },
   ];
 
   if (filters.search) {

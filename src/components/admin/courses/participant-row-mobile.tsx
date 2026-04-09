@@ -9,6 +9,7 @@ const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
   PENDING: { className: "bg-yellow-100 text-yellow-800", label: "Pendiente" },
   FAILED: { className: "bg-red-100 text-red-800", label: "Fallido" },
   REFUNDED: { className: "bg-gray-100 text-gray-800", label: "Reembolsado" },
+  MANUAL: { className: "bg-blue-100 text-blue-800", label: "Manual" },
 };
 
 export function ParticipantRowMobile({ participant: p, courseId }: Props) {

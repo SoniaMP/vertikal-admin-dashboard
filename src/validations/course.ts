@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { personalDataSchema } from "./registration";
+import { personalDataSchema, SPANISH_DNI_REGEX } from "./registration";
 
 export const courseTypeSchema = z.object({
   name: z
@@ -74,3 +74,29 @@ export const courseRegistrationCheckoutSchema = personalDataSchema.extend({
 export type CourseRegistrationCheckoutInput = z.infer<
   typeof courseRegistrationCheckoutSchema
 >;
+
+export const manualEnrolleeSchema = z.object({
+  firstName: z
+    .string()
+    .min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
+  lastName: z
+    .string()
+    .min(2, { message: "Los apellidos deben tener al menos 2 caracteres" }),
+  email: z.string().email({ message: "Introduce un email válido" }),
+  coursePriceId: z
+    .string()
+    .min(1, { message: "El precio es obligatorio" }),
+  phone: z.string().optional().default(""),
+  dni: z
+    .string()
+    .regex(SPANISH_DNI_REGEX, { message: "DNI no válido (ej: 12345678A)" })
+    .optional()
+    .or(z.literal("")),
+  dateOfBirth: z.string().optional().default(""),
+  address: z.string().optional().default(""),
+  city: z.string().optional().default(""),
+  postalCode: z.string().optional().default(""),
+  province: z.string().optional().default(""),
+});
+
+export type ManualEnrolleeInput = z.infer<typeof manualEnrolleeSchema>;

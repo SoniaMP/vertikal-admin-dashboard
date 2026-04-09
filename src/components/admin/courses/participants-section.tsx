@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Download } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/admin/pagination";
@@ -10,9 +10,14 @@ import {
   ParticipantsTable,
   type ParticipantRow,
 } from "./participants-table";
+import {
+  AddEnrolleeDialog,
+  type PriceOption,
+} from "./add-enrollee-dialog";
 
 type Props = {
   courseId: string;
+  prices: PriceOption[];
   participants: ParticipantRow[];
   total: number;
   totalPages: number;
@@ -24,6 +29,7 @@ type Props = {
 
 export function ParticipantsSection({
   courseId,
+  prices,
   participants,
   total,
   totalPages,
@@ -36,6 +42,7 @@ export function ParticipantsSection({
   const router = useRouter();
   const searchParams = useSearchParams();
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -67,6 +74,15 @@ export function ParticipantsSection({
             onChange={(e) => handleSearch(e.target.value)}
             className="sm:w-64"
           />
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setIsAddOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Añadir
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" asChild>
             <a href={`${basePath}/export`} download>
               <Download className="h-3.5 w-3.5" />
@@ -91,6 +107,13 @@ export function ParticipantsSection({
         pageSize={pageSize}
         basePath={basePath}
         itemLabel="participantes"
+      />
+
+      <AddEnrolleeDialog
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+        courseId={courseId}
+        prices={prices}
       />
     </section>
   );
