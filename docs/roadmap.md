@@ -5,7 +5,7 @@
 | Feature                                                       | Status    | Stories        |
 | ------------------------------------------------------------- | --------- | -------------- |
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role)                   | COMPLETED | US-01 to US-10 |
+| [Instructor Role](#feature-instructor-role)                   | IN PROGRESS | US-01 to US-11 |
 | [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
 | [Course Registration UX](#feature-course-registration-ux)     | TODO      | US-C1          |
 
@@ -233,6 +233,33 @@ but see a scoped view limited to their own courses.
 - [x] Handle Stripe refund consideration (inform user, no automatic refund)
 - [x] Update enrollee count after deletion (via `revalidatePath`)
 - [x] Tests for delete action and ownership guard
+
+</details>
+
+<details>
+<summary>US-11: Instructor or admin can add a course participant manually</summary>
+
+> As an instructor or admin, I want to manually add a participant to a course
+> so that I can register people who sign up in person, by phone, or outside the
+> online flow.
+
+**Decisions:**
+- New `paymentStatus` value `MANUAL` — distinguishes from PENDING (Stripe waiting) and COMPLETED (Stripe paid)
+- `getCourseAvailableSpots()` counts COMPLETED + MANUAL toward capacity
+- `fetchCourseParticipants()` and `fetchAllCourseParticipants()` remove `paymentStatus: "COMPLETED"` filter — show all statuses
+- Required fields: firstName, lastName, email, coursePriceId
+- Optional fields collapsed under "Datos adicionales": DNI, dateOfBirth, phone, address, city, postalCode, province, licenseType, licenseFileUrl
+- UI: dialog modal in participants section, next to "Exportar" button
+- No Stripe checkout, no confirmation email
+- Ownership guard: course instructor or admin (same pattern as US-10)
+
+**Tasks:**
+- [ ] Update queries: remove paymentStatus filter, count MANUAL toward capacity
+- [ ] Add MANUAL badge style to participant rows (desktop + mobile)
+- [ ] Create validation schema for manual registration (minimal required fields)
+- [ ] Create `addEnrollee` server action with ownership guard + capacity check
+- [ ] Create add-participant dialog with collapsible optional fields
+- [ ] Tests for action, ownership guard, and capacity validation
 
 </details>
 
