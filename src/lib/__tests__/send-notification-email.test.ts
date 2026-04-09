@@ -57,8 +57,16 @@ const COURSE_DATA = {
   dni: "87654321B",
   email: "carlos@example.com",
   phone: "698765432",
-  courseCatalog: { title: "Escalada deportiva" },
+  courseCatalog: { title: "Escalada deportiva", instructor: null },
   coursePrice: { name: "Socio", amountCents: 4500 },
+};
+
+const COURSE_DATA_WITH_INSTRUCTOR = {
+  ...COURSE_DATA,
+  courseCatalog: {
+    title: "Escalada deportiva",
+    instructor: { email: "instructor@test.com" },
+  },
 };
 
 describe("sendClubMembershipNotification", () => {
@@ -127,7 +135,7 @@ describe("sendClubCourseNotification", () => {
     );
   });
 
-  it("skips silently when no recipients are configured", async () => {
+  it("skips silently when no instructor and no global recipients", async () => {
     mockGetNotificationEmails.mockResolvedValue([]);
 
     const { sendClubCourseNotification } = await import(
@@ -136,6 +144,22 @@ describe("sendClubCourseNotification", () => {
     await sendClubCourseNotification("creg-1");
 
     expect(mockSend).not.toHaveBeenCalled();
-    expect(mockCourseFindUniqueOrThrow).not.toHaveBeenCalled();
+  });
+
+  it("sends to both global recipients and instructor when course has an instructor", async () => {
+    mockGetNotificationEmails.mockResolvedValue(["admin@test.com"]);
+    mockCourseFindUniqueOrThrow.mockResolvedValue(COURSE_DATA_WITH_INSTRUCTOR);
+
+    const { sendClubCourseNotification } = await import(
+      "../send-notification-email"
+    );
+    await sendClubCourseNotification("creg-1");
+
+    expect(mockSend).toHaveBeenCalledOnce();
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: ["admin@test.com", "instructor@test.com"],
+      }),
+    );
   });
 });

@@ -58,16 +58,21 @@ export async function sendClubMembershipNotification(
 export async function sendClubCourseNotification(
   registrationId: string,
 ): Promise<void> {
-  const recipients = await getNotificationEmails("course");
-  if (recipients.length === 0) return;
-
   const registration = await prisma.courseRegistration.findUniqueOrThrow({
     where: { id: registrationId },
     include: {
-      courseCatalog: true,
+      courseCatalog: { include: { instructor: { select: { email: true } } } },
       coursePrice: true,
     },
   });
+
+  const globalRecipients = await getNotificationEmails("course");
+  const instructorEmail = registration.courseCatalog.instructor?.email;
+  const recipients = [
+    ...globalRecipients,
+    ...(instructorEmail ? [instructorEmail] : []),
+  ];
+  if (recipients.length === 0) return;
 
   const html = await renderBrandedEmail(
     createElement(ClubCourseNotification, {

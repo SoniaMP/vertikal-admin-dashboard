@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01 to US-06 completed)
+**Status:** IN PROGRESS (US-01 to US-07 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -187,10 +187,11 @@ but see a scoped view limited to their own courses.
 > As an instructor, I want to receive an email when someone enrolls in my course
 > so that I stay informed without checking the panel constantly.
 
-- [ ] When a course has an instructor, send notification to `instructor.email`
-- [ ] Fall back to global `COURSE_NOTIFICATION_EMAILS` for courses without instructor
-- [ ] Email template: course name, enrollee name, enrollment date
-- [ ] Admin notification behavior unchanged (global list still works for memberships)
+- [x] When a course has an instructor, send notification to `instructor.email`
+- [x] Fall back to global `COURSE_NOTIFICATION_EMAILS` for courses without instructor
+- [x] Reuses existing email template (course name, enrollee name, amount)
+- [x] Admin membership notifications unchanged (global list)
+- [x] Tests updated: new test for instructor recipient, existing tests fixed
 
 </details>
 
