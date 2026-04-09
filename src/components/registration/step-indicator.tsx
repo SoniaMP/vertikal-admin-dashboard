@@ -2,7 +2,9 @@
 
 import { cn } from "@/lib/utils";
 
-const STEPS = [
+type Step = { number: number; label: string };
+
+const DEFAULT_STEPS: Step[] = [
   { number: 1, label: "Datos personales" },
   { number: 2, label: "Federativa" },
   { number: 3, label: "Resumen" },
@@ -10,13 +12,17 @@ const STEPS = [
 
 type StepIndicatorProps = {
   currentStep: number;
+  steps?: Step[];
 };
 
-export function StepIndicator({ currentStep }: StepIndicatorProps) {
+export function StepIndicator({
+  currentStep,
+  steps = DEFAULT_STEPS,
+}: StepIndicatorProps) {
   return (
     <nav aria-label="Progreso del registro" className="-mx-6 px-6 pb-6">
       <ol className="flex items-center justify-between">
-        {STEPS.map((step, index) => {
+        {steps.map((step, index) => {
           const isCompleted = currentStep > step.number;
           const isCurrent = currentStep === step.number;
 
@@ -45,7 +51,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                   {step.label}
                 </span>
               </div>
-              {index < STEPS.length - 1 && (
+              {index < steps.length - 1 && (
                 <div
                   className={cn(
                     "mx-2 mb-6 h-0.5 flex-1",

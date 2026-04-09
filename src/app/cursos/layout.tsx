@@ -17,9 +17,6 @@ export default function CursosLayout({
           priority
         />
         <h1 className="text-2xl font-bold sm:text-3xl">Cursos</h1>
-        <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Descubre nuestros cursos y apúntate
-        </p>
       </div>
       {children}
     </div>

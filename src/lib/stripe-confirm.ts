@@ -1,22 +1,31 @@
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
+export type CourseConfirmation = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  courseTitle: string;
+  priceName: string;
+  amountCents: number;
+};
+
 /**
  * Verify a Stripe checkout session and mark the related record as paid.
  * Safe to call multiple times (idempotent).
- * Returns true when the session was paid successfully.
+ * Returns registration details when the session was paid successfully.
  */
 export async function confirmCourseCheckout(
   sessionId: string,
-): Promise<boolean> {
+): Promise<CourseConfirmation | null> {
   const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
-  if (session.payment_status !== "paid") return false;
+  if (session.payment_status !== "paid") return null;
 
   const registrationId = session.metadata?.courseRegistrationId;
-  if (!registrationId) return false;
+  if (!registrationId) return null;
 
-  await prisma.courseRegistration.update({
+  const registration = await prisma.courseRegistration.update({
     where: { id: registrationId },
     data: {
       paymentStatus: "COMPLETED",
@@ -25,9 +34,20 @@ export async function confirmCourseCheckout(
           ? session.payment_intent
           : null,
     },
+    include: {
+      courseCatalog: { select: { title: true } },
+      coursePrice: { select: { name: true, amountCents: true } },
+    },
   });
 
-  return true;
+  return {
+    firstName: registration.firstName,
+    lastName: registration.lastName,
+    email: registration.email,
+    courseTitle: registration.courseCatalog.title,
+    priceName: registration.coursePrice.name,
+    amountCents: registration.coursePrice.amountCents,
+  };
 }
 
 export type MembershipConfirmation = {

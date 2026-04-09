@@ -7,7 +7,7 @@
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
 | [Instructor Role](#feature-instructor-role)                   | COMPLETED | US-01 to US-11 |
 | [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
-| [Course Registration UX](#feature-course-registration-ux)     | TODO      | US-C1          |
+| [Course Registration UX](#feature-course-registration-ux)     | COMPLETED | US-C1          |
 
 ---
 
@@ -287,7 +287,7 @@ Ensure the club logo renders correctly in all transactional emails.
 
 ## Feature: Course Registration UX
 
-**Status:** TODO
+**Status:** COMPLETED
 
 Improve the course registration flow with a pre-payment review step, consistent
 with the membership registration wizard.
@@ -298,10 +298,10 @@ with the membership registration wizard.
 > As a course enrollee, I want to review my data and the selected price before
 > paying so that I can confirm everything is correct.
 
-- [ ] Convert single-step course form into a 2-step wizard (step 1: form, step 2: summary)
-- [ ] Summary displays: personal data, selected course, selected price tier, total amount
-- [ ] "Anterior" button to go back and edit
-- [ ] Privacy policy acceptance checkbox (RGPD) required before "Proceder al pago"
-- [ ] "Proceder al pago" button redirects to Stripe checkout (existing flow)
+- [x] Convert single-step course form into a 2-step wizard (step 1: form, step 2: summary)
+- [x] Summary displays: personal data, selected course, selected price tier, total amount
+- [x] "Anterior" button to go back and edit
+- [x] Privacy policy acceptance checkbox (RGPD) required before "Proceder al pago"
+- [x] "Proceder al pago" button redirects to Stripe checkout (existing flow)
 
 </details>

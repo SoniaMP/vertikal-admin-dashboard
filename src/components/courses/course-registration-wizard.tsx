@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { CoursePersonalFields } from "./course-personal-fields";
-import { CourseLicenseUpload } from "./course-license-upload";
-import { CoursePriceSelector } from "./course-price-selector";
+import { StepIndicator } from "@/components/registration/step-indicator";
+import { CourseRegistrationStep } from "./course-registration-step";
+import { CourseRegistrationSummary } from "./course-registration-summary";
+
+const COURSE_STEPS = [
+  { number: 1, label: "Datos e inscripción" },
+  { number: 2, label: "Resumen" },
+];
 import {
   courseRegistrationCheckoutSchema,
   type CourseRegistrationCheckoutInput,
@@ -20,17 +22,20 @@ type PriceTier = {
   amountCents: number;
 };
 
-type CourseRegistrationFormProps = {
+type Props = {
   courseCatalogId: string;
+  courseTitle: string;
   prices: PriceTier[];
   isFull: boolean;
 };
 
-export function CourseRegistrationForm({
+export function CourseRegistrationWizard({
   courseCatalogId,
+  courseTitle,
   prices,
   isFull,
-}: CourseRegistrationFormProps) {
+}: Props) {
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,10 +59,12 @@ export function CourseRegistrationForm({
     },
   });
 
-  async function handleSubmit() {
+  async function handleNext() {
     const isValid = await form.trigger();
-    if (!isValid) return;
+    if (isValid) setStep(2);
+  }
 
+  async function handleCheckout() {
     setIsSubmitting(true);
     setError(null);
 
@@ -106,29 +113,28 @@ export function CourseRegistrationForm({
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-        {error && (
-          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error}
-          </div>
-        )}
+    <FormProvider {...form}>
+      <StepIndicator currentStep={step} steps={COURSE_STEPS} />
 
-        <CoursePersonalFields />
-        <CourseLicenseUpload />
-        <CoursePriceSelector prices={prices} />
-
-        <div className="flex justify-end pt-4">
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            {isSubmitting ? "Procesando..." : "Inscribirse y pagar"}
-          </Button>
+      {error && (
+        <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
         </div>
-      </form>
-    </Form>
+      )}
+
+      {step === 1 && (
+        <CourseRegistrationStep prices={prices} onNext={handleNext} />
+      )}
+
+      {step === 2 && (
+        <CourseRegistrationSummary
+          courseTitle={courseTitle}
+          prices={prices}
+          onBack={() => setStep(1)}
+          onSubmit={handleCheckout}
+          isSubmitting={isSubmitting}
+        />
+      )}
+    </FormProvider>
   );
 }

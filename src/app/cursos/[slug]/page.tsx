@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, Users } from "lucide-react";
 import { fetchCourseBySlug } from "@/lib/course-queries";
-import { CourseRegistrationForm } from "@/components/courses/course-registration-form";
+import { CourseRegistrationWizard } from "@/components/courses/course-registration-wizard";
 import { Card, CardContent } from "@/components/ui/card";
 
 type CoursePageProps = {
@@ -62,11 +62,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
       ) : (
         <section>
           <h3 className="mb-4 text-lg font-semibold">Inscripción</h3>
-          <CourseRegistrationForm
-            courseCatalogId={course.id}
-            prices={course.prices}
-            isFull={isFull}
-          />
+          <Card className="mx-auto max-w-2xl">
+            <CardContent>
+              <CourseRegistrationWizard
+                courseCatalogId={course.id}
+                courseTitle={course.title}
+                prices={course.prices}
+                isFull={isFull}
+              />
+            </CardContent>
+          </Card>
         </section>
       )}
     </div>
