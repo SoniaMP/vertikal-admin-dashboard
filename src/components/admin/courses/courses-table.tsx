@@ -8,15 +8,16 @@ import {
 import { SearchX } from "lucide-react";
 import { CourseRowDesktop } from "./course-row-desktop";
 import { CourseRowMobile } from "./course-row-mobile";
-import type { CourseRow, CourseTypeOption } from "./types";
+import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   courses: CourseRow[];
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
   isInstructor?: boolean;
 };
 
-export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
+export function CoursesTable({ courses, courseTypes, instructors, isInstructor }: Props) {
   if (courses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
@@ -34,6 +35,7 @@ export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
             key={c.id}
             course={c}
             courseTypes={courseTypes}
+            instructors={instructors}
             isInstructor={isInstructor}
           />
         ))}
@@ -47,7 +49,7 @@ export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
               <TableHead>Tipo</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Plazas</TableHead>
-              {!isInstructor && <TableHead>Instructor</TableHead>}
+              {!isInstructor && <TableHead>Director</TableHead>}
               <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -58,6 +60,7 @@ export function CoursesTable({ courses, courseTypes, isInstructor }: Props) {
                 key={c.id}
                 course={c}
                 courseTypes={courseTypes}
+                instructors={instructors}
                 isInstructor={isInstructor}
               />
             ))}

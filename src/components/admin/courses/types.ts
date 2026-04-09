@@ -17,3 +17,8 @@ export type CourseTypeOption = {
   id: string;
   name: string;
 };
+
+export type InstructorOption = {
+  id: string;
+  name: string;
+};

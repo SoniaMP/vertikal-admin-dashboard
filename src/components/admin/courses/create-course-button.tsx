@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseFormDialog } from "./course-form-dialog";
-import type { CourseTypeOption } from "./types";
+import type { CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
 };
 
-export function CreateCourseButton({ courseTypes }: Props) {
+export function CreateCourseButton({ courseTypes, instructors }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -23,6 +24,7 @@ export function CreateCourseButton({ courseTypes }: Props) {
         open={isOpen}
         onOpenChange={setIsOpen}
         courseTypes={courseTypes}
+        instructors={instructors}
       />
     </>
   );

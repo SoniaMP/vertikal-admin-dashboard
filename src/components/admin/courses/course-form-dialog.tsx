@@ -20,13 +20,14 @@ import {
 } from "@/app/admin/(dashboard)/cursos/actions";
 import { CourseFormFields } from "./course-form-fields";
 import { CoursePriceList, type PriceRow } from "./course-price-list";
-import type { CourseRow, CourseTypeOption } from "./types";
+import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   course?: CourseRow;
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -36,6 +37,7 @@ export function CourseFormDialog({
   onOpenChange,
   course,
   courseTypes,
+  instructors,
 }: Props) {
   const isEditing = !!course;
 
@@ -67,7 +69,11 @@ export function CourseFormDialog({
             name="pricesJson"
             value={JSON.stringify(prices)}
           />
-          <CourseFormFields course={course} courseTypes={courseTypes} />
+          <CourseFormFields
+            course={course}
+            courseTypes={courseTypes}
+            instructors={instructors}
+          />
           <CoursePriceList
             defaultPrices={course?.prices}
             onChange={setPrices}

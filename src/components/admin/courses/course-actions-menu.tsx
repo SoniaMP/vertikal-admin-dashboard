@@ -16,15 +16,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { softDeleteCourse } from "@/app/admin/(dashboard)/cursos/actions";
 import { CourseFormDialog } from "./course-form-dialog";
-import type { CourseRow, CourseTypeOption } from "./types";
+import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   course: CourseRow;
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
   isInstructor?: boolean;
 };
 
-export function CourseActionsMenu({ course, courseTypes, isInstructor }: Props) {
+export function CourseActionsMenu({ course, courseTypes, instructors, isInstructor }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -99,6 +100,7 @@ export function CourseActionsMenu({ course, courseTypes, isInstructor }: Props) 
         onOpenChange={setIsEditOpen}
         course={course}
         courseTypes={courseTypes}
+        instructors={instructors}
       />
     </div>
   );

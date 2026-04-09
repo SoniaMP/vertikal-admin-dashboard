@@ -12,20 +12,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { CourseTypeFormDialog } from "./course-type-form-dialog";
-import type { CourseRow, CourseTypeOption } from "./types";
+import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   course?: CourseRow;
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
 };
 
 function toDateInputValue(date: Date): string {
   return new Date(date).toISOString().slice(0, 16);
 }
 
-export function CourseFormFields({ course, courseTypes }: Props) {
+const NONE_VALUE = "__none__";
+
+export function CourseFormFields({ course, courseTypes, instructors }: Props) {
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
+  const [directorId, setDirectorId] = useState(
+    course?.instructor?.id ?? NONE_VALUE,
+  );
+  const [pendingDirectorId, setPendingDirectorId] = useState<string | null>(
+    null,
+  );
+
+  const hasExistingDirector = !!course?.instructor;
+
+  function handleDirectorChange(value: string) {
+    if (hasExistingDirector && value !== directorId) {
+      setPendingDirectorId(value);
+    } else {
+      setDirectorId(value);
+    }
+  }
+
+  function confirmDirectorChange() {
+    if (pendingDirectorId) {
+      setDirectorId(pendingDirectorId);
+      setPendingDirectorId(null);
+    }
+  }
 
   return (
     <>
@@ -103,6 +139,53 @@ export function CourseFormFields({ course, courseTypes }: Props) {
           defaultValue={course?.maxCapacity ?? ""}
         />
       </div>
+      {instructors && instructors.length > 0 && (
+        <>
+          <input
+            type="hidden"
+            name="instructorId"
+            value={directorId === NONE_VALUE ? "" : directorId}
+          />
+          <div className="space-y-2">
+            <Label htmlFor="instructorId">Director</Label>
+            <Select value={directorId} onValueChange={handleDirectorChange}>
+              <SelectTrigger id="instructorId">
+                <SelectValue placeholder="Sin director asignado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>Sin director</SelectItem>
+                {instructors.map((i) => (
+                  <SelectItem key={i.id} value={i.id}>
+                    {i.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialog
+            open={!!pendingDirectorId}
+            onOpenChange={(open) => {
+              if (!open) setPendingDirectorId(null);
+            }}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cambiar director</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Este curso ya tiene un director asignado ({course?.instructor?.name}).
+                  ¿Quieres cambiarlo?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDirectorChange}>
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
     </>
   );
 }

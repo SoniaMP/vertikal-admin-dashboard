@@ -52,12 +52,17 @@ export async function createCourse(
   const { courseDate, maxCapacity, ...rest } = parsed.data;
   const isInstructor = session.user.role === "INSTRUCTOR";
 
+  const instructorId = isInstructor
+    ? session.user.id
+    : (formData.get("instructorId") as string) || null;
+
   await prisma.courseCatalog.create({
     data: {
       ...rest,
       courseDate: courseDate ?? new Date(),
       maxCapacity: maxCapacity ?? 0,
-      ...(isInstructor && { instructorId: session.user.id, status: "DRAFT" }),
+      instructorId,
+      ...(isInstructor && { status: "DRAFT" }),
       prices: {
         create: prices.map((p) => ({
           name: p.name,
@@ -90,12 +95,19 @@ export async function updateCourse(
 
   const prices = parsePricesJson(formData.get("pricesJson"));
   const { courseDate, maxCapacity, ...rest } = parsed.data;
+  const isAdmin = session.user.role === "ADMIN";
+
+  const instructorIdRaw = formData.get("instructorId") as string | null;
+  const instructorUpdate = isAdmin
+    ? { instructorId: instructorIdRaw || null }
+    : {};
 
   await prisma.$transaction(async (tx) => {
     await tx.courseCatalog.update({
       where: { id },
       data: {
         ...rest,
+        ...instructorUpdate,
         ...(courseDate !== null && { courseDate }),
         ...(maxCapacity !== null && { maxCapacity }),
       },

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { fetchCourseList, fetchCourseTypes } from "@/lib/course-queries";
+import { fetchInstructors } from "@/lib/user-queries";
 import { CoursesToolbar } from "@/components/admin/courses/courses-toolbar";
 import { CoursesTable } from "@/components/admin/courses/courses-table";
 import { CreateCourseButton } from "@/components/admin/courses/create-course-button";
@@ -19,10 +20,12 @@ export default async function CoursesPage({
     ...(isInstructor && { instructorId: session.user.id }),
   };
 
-  const [{ courses, total, pageSize }, courseTypes] = await Promise.all([
-    fetchCourseList(filters),
-    fetchCourseTypes(),
-  ]);
+  const [{ courses, total, pageSize }, courseTypes, instructors] =
+    await Promise.all([
+      fetchCourseList(filters),
+      fetchCourseTypes(),
+      isInstructor ? Promise.resolve([]) : fetchInstructors(),
+    ]);
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -32,12 +35,16 @@ export default async function CoursesPage({
         <h1 className="text-2xl font-bold">
           {isInstructor ? "Mis cursos" : "Cursos"}
         </h1>
-        <CreateCourseButton courseTypes={courseTypes} />
+        <CreateCourseButton
+          courseTypes={courseTypes}
+          instructors={instructors}
+        />
       </div>
       <CoursesToolbar courseTypes={courseTypes} />
       <CoursesTable
         courses={courses}
         courseTypes={courseTypes}
+        instructors={instructors}
         isInstructor={isInstructor}
       />
       <Pagination

@@ -5,15 +5,16 @@ import { CourseStatusBadge } from "./course-status-badge";
 import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { formatCourseDate } from "./helpers";
-import type { CourseRow, CourseTypeOption } from "./types";
+import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
   course: CourseRow;
   courseTypes: CourseTypeOption[];
+  instructors?: InstructorOption[];
   isInstructor?: boolean;
 };
 
-export function CourseRowDesktop({ course, courseTypes, isInstructor }: Props) {
+export function CourseRowDesktop({ course, courseTypes, instructors, isInstructor }: Props) {
   const spots = course.maxCapacity - course._count.registrations;
 
   return (
@@ -60,6 +61,7 @@ export function CourseRowDesktop({ course, courseTypes, isInstructor }: Props) {
           <CourseActionsMenu
             course={course}
             courseTypes={courseTypes}
+            instructors={instructors}
             isInstructor={isInstructor}
           />
         </div>
