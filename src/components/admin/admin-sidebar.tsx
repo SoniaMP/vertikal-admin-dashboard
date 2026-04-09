@@ -1,14 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "./logout-button";
-import { ADMIN_NAV_ITEMS } from "./nav-items";
+import { getNavItemsForRole } from "./nav-items";
 
 type Props = {
   userName: string;
+  userRole: string;
 };
 
-export function AdminSidebar({ userName }: Props) {
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Admin",
+  INSTRUCTOR: "Instructor",
+};
+
+export function AdminSidebar({ userName, userRole }: Props) {
+  const navItems = getNavItemsForRole(userRole);
+
   return (
     <aside className="flex h-full w-56 flex-col border-r bg-sidebar text-sidebar-foreground">
       <div className="p-4">
@@ -27,7 +36,7 @@ export function AdminSidebar({ userName }: Props) {
       </div>
       <Separator />
       <nav className="flex-1 p-2 space-y-1">
-        {ADMIN_NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -40,9 +49,14 @@ export function AdminSidebar({ userName }: Props) {
       </nav>
       <Separator />
       <div className="p-3">
-        <p className="text-xs text-sidebar-foreground/70 mb-2 truncate">
-          {userName}
-        </p>
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-xs text-sidebar-foreground/70 truncate">
+            {userName}
+          </p>
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+            {ROLE_LABELS[userRole] ?? userRole}
+          </Badge>
+        </div>
         <LogoutButton />
       </div>
     </aside>

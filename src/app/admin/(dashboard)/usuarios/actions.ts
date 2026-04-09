@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { requireAuth, type ActionResult } from "@/lib/actions";
+import { requireAdmin, type ActionResult } from "@/lib/actions";
 import { hashPassword } from "@/lib/hash-password";
 import { createUserSchema, updateUserSchema } from "@/validations/user";
 import { auth } from "@/lib/auth";
@@ -11,7 +11,7 @@ export async function createUser(
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const authError = await requireAuth();
+  const authError = await requireAdmin();
   if (authError) return authError;
 
   const parsed = createUserSchema.safeParse({
@@ -58,7 +58,7 @@ export async function updateUser(
   _prevState: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const authError = await requireAuth();
+  const authError = await requireAdmin();
   if (authError) return authError;
 
   const parsed = updateUserSchema.safeParse({
@@ -108,7 +108,7 @@ export async function updateUser(
 }
 
 export async function deleteUser(id: string): Promise<ActionResult> {
-  const authError = await requireAuth();
+  const authError = await requireAdmin();
   if (authError) return authError;
 
   const session = await auth();

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -13,14 +14,21 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "./logout-button";
-import { ADMIN_NAV_ITEMS } from "./nav-items";
+import { getNavItemsForRole } from "./nav-items";
 
 type Props = {
   userName: string;
+  userRole: string;
 };
 
-export function MobileSidebar({ userName }: Props) {
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Admin",
+  INSTRUCTOR: "Instructor",
+};
+
+export function MobileSidebar({ userName, userRole }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const navItems = getNavItemsForRole(userRole);
 
   return (
     <>
@@ -61,7 +69,7 @@ export function MobileSidebar({ userName }: Props) {
           </SheetHeader>
           <Separator />
           <nav className="flex-1 p-2 space-y-1">
-            {ADMIN_NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -75,9 +83,14 @@ export function MobileSidebar({ userName }: Props) {
           </nav>
           <Separator />
           <div className="p-3">
-            <p className="text-xs text-sidebar-foreground/70 mb-2 truncate">
-              {userName}
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-xs text-sidebar-foreground/70 truncate">
+                {userName}
+              </p>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                {ROLE_LABELS[userRole] ?? userRole}
+              </Badge>
+            </div>
             <LogoutButton />
           </div>
         </SheetContent>

@@ -15,13 +15,14 @@ export default async function AdminDashboardLayout({
   }
 
   const userName = session.user.name ?? "Admin";
+  const userRole = session.user.role ?? "ADMIN";
 
   return (
     <div className="flex h-screen flex-col md:flex-row">
       <div className="hidden md:block">
-        <AdminSidebar userName={userName} />
+        <AdminSidebar userName={userName} userRole={userRole} />
       </div>
-      <MobileSidebar userName={userName} />
+      <MobileSidebar userName={userName} userRole={userRole} />
       <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
     </div>
   );

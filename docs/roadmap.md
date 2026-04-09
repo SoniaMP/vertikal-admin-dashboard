@@ -73,7 +73,7 @@ Admin notification system for membership and course enrollments.
 
 ## Feature: Instructor Role
 
-**Status:** IN PROGRESS (US-01, US-02 completed)
+**Status:** IN PROGRESS (US-01 to US-03 completed)
 
 Instructors are course directors who use the club's platform to create, manage,
 and track their courses and enrollees. They log in through the same admin panel
@@ -132,11 +132,11 @@ but see a scoped view limited to their own courses.
 > As a user (admin or instructor), I want to see only the nav items relevant to
 > my role so that the interface is not confusing.
 
-- [ ] Update middleware to check role and allow access accordingly
-- [ ] Admin nav: full menu (as today) + new "Usuarios" section
-- [ ] Instructor nav: "Mis Cursos" + "Mi Cuenta"
-- [ ] Redirect instructor away from admin-only routes (registros, ajustes, etc.)
-- [ ] Show current user name and role in sidebar/header
+- [x] Update middleware to check role and allow access accordingly
+- [x] Admin nav: full menu (as today) + "Usuarios" section
+- [x] Instructor nav: only "Cursos" visible (Mis Cursos and Mi Cuenta come in US-04/US-08)
+- [x] Redirect instructor away from admin-only routes (registros, ajustes, etc.)
+- [x] Show current user name and role badge in sidebar
 
 </details>
 
