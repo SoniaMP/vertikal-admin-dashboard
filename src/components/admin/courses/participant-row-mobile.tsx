@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
+import { DeleteEnrolleeButton } from "./delete-enrollee-button";
 import type { ParticipantRow } from "./participants-table";
 
-type Props = { participant: ParticipantRow };
+type Props = { participant: ParticipantRow; courseId: string };
 
 const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
   COMPLETED: { className: "bg-green-100 text-green-800", label: "Completado" },
@@ -10,7 +11,7 @@ const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
   REFUNDED: { className: "bg-gray-100 text-gray-800", label: "Reembolsado" },
 };
 
-export function ParticipantRowMobile({ participant: p }: Props) {
+export function ParticipantRowMobile({ participant: p, courseId }: Props) {
   const payment = PAYMENT_STYLES[p.paymentStatus];
 
   return (
@@ -22,11 +23,18 @@ export function ParticipantRowMobile({ participant: p }: Props) {
           </p>
           <p className="text-sm text-muted-foreground truncate">{p.email}</p>
         </div>
-        {payment ? (
-          <Badge className={payment.className}>{payment.label}</Badge>
-        ) : (
-          <Badge variant="secondary">{p.paymentStatus}</Badge>
-        )}
+        <div className="flex items-center gap-1">
+          {payment ? (
+            <Badge className={payment.className}>{payment.label}</Badge>
+          ) : (
+            <Badge variant="secondary">{p.paymentStatus}</Badge>
+          )}
+          <DeleteEnrolleeButton
+            registrationId={p.id}
+            courseId={courseId}
+            participantName={`${p.firstName} ${p.lastName}`}
+          />
+        </div>
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
         {p.dni && <span>DNI: {p.dni}</span>}

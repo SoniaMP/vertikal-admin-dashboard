@@ -5,7 +5,7 @@
 | Feature | Status | Stories |
 |---|---|---|
 | [Club Notification Emails](#feature-club-notification-emails) | COMPLETED | US-N1 to US-N4 |
-| [Instructor Role](#feature-instructor-role) | IN PROGRESS | US-01 to US-10 |
+| [Instructor Role](#feature-instructor-role) | COMPLETED | US-01 to US-10 |
 | [Email Branding](#feature-email-branding) | COMPLETED | US-E1 |
 | [Course Registration UX](#feature-course-registration-ux) | TODO | US-C1 |
 
@@ -228,11 +228,11 @@ but see a scoped view limited to their own courses.
 > As an instructor, I want to remove a participant from my course
 > so that I can manage enrollment when someone cancels or was registered by mistake.
 
-- [ ] Add delete action on enrollee row (confirmation dialog required)
-- [ ] Ownership guard: only the course instructor or an admin can delete
-- [ ] Handle Stripe refund consideration (inform user, no automatic refund)
-- [ ] Update enrollee count after deletion
-- [ ] Tests for delete action and ownership guard
+- [x] Add delete action on enrollee row (confirmation dialog required)
+- [x] Ownership guard: only the course instructor or an admin can delete
+- [x] Handle Stripe refund consideration (inform user, no automatic refund)
+- [x] Update enrollee count after deletion (via `revalidatePath`)
+- [x] Tests for delete action and ownership guard
 
 </details>
 

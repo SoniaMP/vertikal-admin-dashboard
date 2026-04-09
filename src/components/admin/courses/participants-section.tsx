@@ -78,6 +78,7 @@ export function ParticipantsSection({
 
       <ParticipantsTable
         participants={participants}
+        courseId={courseId}
         sortBy={sortBy}
         sortDir={sortDir}
         basePath={basePath}

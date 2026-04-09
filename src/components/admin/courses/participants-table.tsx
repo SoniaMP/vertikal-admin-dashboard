@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TableHead } from "@/components/ui/table";
 import { SortableHeader } from "@/components/admin/sortable-header";
 import { ParticipantRowDesktop } from "./participant-row-desktop";
 import { ParticipantRowMobile } from "./participant-row-mobile";
@@ -29,6 +30,7 @@ export type ParticipantRow = {
 
 type Props = {
   participants: ParticipantRow[];
+  courseId: string;
   sortBy: string;
   sortDir: "asc" | "desc";
   basePath: string;
@@ -36,6 +38,7 @@ type Props = {
 
 export function ParticipantsTable({
   participants,
+  courseId,
   sortBy,
   sortDir,
   basePath,
@@ -118,11 +121,12 @@ export function ParticipantsTable({
                 currentDir={sortDir}
                 basePath={basePath}
               />
+              <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {participants.map((p) => (
-              <ParticipantRowDesktop key={p.id} participant={p} />
+              <ParticipantRowDesktop key={p.id} participant={p} courseId={courseId} />
             ))}
           </TableBody>
         </Table>
@@ -131,7 +135,7 @@ export function ParticipantsTable({
       {/* Mobile */}
       <div className="space-y-3 md:hidden">
         {participants.map((p) => (
-          <ParticipantRowMobile key={p.id} participant={p} />
+          <ParticipantRowMobile key={p.id} participant={p} courseId={courseId} />
         ))}
       </div>
     </>

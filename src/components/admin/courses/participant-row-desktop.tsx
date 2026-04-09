@@ -1,8 +1,9 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { DeleteEnrolleeButton } from "./delete-enrollee-button";
 import type { ParticipantRow } from "./participants-table";
 
-type Props = { participant: ParticipantRow };
+type Props = { participant: ParticipantRow; courseId: string };
 
 const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
   COMPLETED: { className: "bg-green-100 text-green-800", label: "Completado" },
@@ -11,7 +12,7 @@ const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
   REFUNDED: { className: "bg-gray-100 text-gray-800", label: "Reembolsado" },
 };
 
-export function ParticipantRowDesktop({ participant: p }: Props) {
+export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
   const payment = PAYMENT_STYLES[p.paymentStatus];
 
   return (
@@ -32,6 +33,13 @@ export function ParticipantRowDesktop({ participant: p }: Props) {
       </TableCell>
       <TableCell className="text-muted-foreground">
         {formatDate(p.createdAt)}
+      </TableCell>
+      <TableCell>
+        <DeleteEnrolleeButton
+          registrationId={p.id}
+          courseId={courseId}
+          participantName={`${p.firstName} ${p.lastName}`}
+        />
       </TableCell>
     </TableRow>
   );

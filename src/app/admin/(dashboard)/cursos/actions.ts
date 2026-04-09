@@ -10,3 +10,5 @@ export {
   setCourseStatus,
   softDeleteCourse,
 } from "./actions/course-catalog-actions";
+
+export { deleteEnrollee } from "./actions/course-registration-actions";
