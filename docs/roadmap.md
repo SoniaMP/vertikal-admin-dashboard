@@ -8,6 +8,8 @@
 | [Instructor Role](#feature-instructor-role)                   | IN PROGRESS | US-01 to US-12 |
 | [Email Branding](#feature-email-branding)                     | COMPLETED | US-E1          |
 | [Course Registration UX](#feature-course-registration-ux)     | COMPLETED | US-C1          |
+| [License Files Security](#feature-license-files-security)     | PENDING   | US-S1 to US-S6 |
+| [Pending Payment Recovery](#feature-pending-payment-recovery) | PENDING   | US-P1 to US-P3 |
 
 ---
 
@@ -316,5 +318,188 @@ with the membership registration wizard.
 - [x] "Anterior" button to go back and edit
 - [x] Privacy policy acceptance checkbox (RGPD) required before "Proceder al pago"
 - [x] "Proceder al pago" button redirects to Stripe checkout (existing flow)
+
+</details>
+
+---
+
+## Feature: License Files Security
+
+**Status:** PENDING
+
+Course enrollees upload a federation license PDF during the public registration
+wizard. Today the upload endpoint is unauthenticated and the download endpoint
+is also public — anyone with a UUID URL can read sensitive personal data (DNI,
+date of birth, photo). This feature closes that gap and aligns the storage and
+lifecycle of these files with GDPR principles.
+
+<details>
+<summary>Decisions</summary>
+
+**Access and authorization**
+- Enrollees never re-download their own PDF. Once uploaded, the file is strictly internal.
+- Download URL is keyed by `CourseRegistration.id`, not by file name: `GET /api/admin/course-registrations/<id>/license`.
+- DB field `licenseFileUrl` is renamed to `licenseFileKey` and stores only the physical filename (`<uuid>.pdf`), never a public URL.
+- Authorization on each download: valid session AND (role ADMIN) OR (role INSTRUCTOR AND `course.instructorId === session.user.id`). No historical access — if an instructor loses a course, they lose access immediately.
+- No download audit log (out of scope for a small association).
+
+**Upload endpoint hardening (stays public)**
+- Rate limit: 5 uploads per IP per 10 minutes, in-memory (single VPS instance, no external dependency).
+- Max file size lowered from 10 MB to 5 MB.
+- Magic number validation: first bytes must be `%PDF-`, not just the client-declared MIME type.
+
+**Storage**
+- Physical files live outside the repo, under a path configured by env var `UPLOADS_DIR` (e.g. `/var/lib/vertikal/uploads` in production, `data/uploads/` in local).
+
+**Download UI**
+- "Ver adjunto" button in the participants table on the course detail page, visible only when the participant has a file.
+- Preview in a new tab (`Content-Disposition: inline`), not forced download.
+- Response includes `X-Content-Type-Options: nosniff`.
+
+**Lifecycle and GDPR**
+- Cascade delete: when a `CourseRegistration` is deleted, its PDF is removed from disk.
+- Retention: PDFs are deleted automatically 6 months after the course end date.
+- Nightly cron job on the VPS handles two cleanups: orphan files (>24 h on disk with no associated `CourseRegistration`) and expired files (>6 months past course end date).
+
+**Out of scope (deferred)**
+- PDFs attached to `PENDING_PAYMENT` registrations that never complete are handled by the Pending Payment Recovery feature (US-P3), not here.
+
+</details>
+
+<details>
+<summary>US-S1: Refactor schema and download URL to id-based authorization</summary>
+
+> As a developer, I need the download flow to be keyed by registration id and
+> protected by session-based authorization so that file location stops being a
+> secret and access control becomes natural.
+
+- [ ] Rename `CourseRegistration.licenseFileUrl` to `licenseFileKey` in Prisma schema (Prisma migration)
+- [ ] Update `/api/upload` to return `{ key }` instead of `{ url }`
+- [ ] Update `course-license-upload.tsx` and `validations/course.ts` to handle the new field
+- [ ] Create `GET /api/admin/course-registrations/[id]/license` route with session + role + ownership checks
+- [ ] Delete the old `/api/uploads/licenses/[filename]` route
+- [ ] Tests for the new download route (admin OK, instructor own course OK, instructor other course 403, anonymous 401)
+
+</details>
+
+<details>
+<summary>US-S2: Harden the public upload endpoint</summary>
+
+> As an admin, I want the public upload endpoint to resist abuse and content
+> spoofing so that the disk cannot be filled and no malicious file can be
+> served back to the browser.
+
+- [ ] In-memory rate limiter: 5 requests per IP per 10 min in `/api/upload`
+- [ ] Lower max file size from 10 MB to 5 MB
+- [ ] Validate magic number `%PDF-` on the first bytes of the uploaded buffer
+- [ ] Reject with clear error messages when any check fails
+- [ ] Tests for rate limit, size cap, and magic number validation
+
+</details>
+
+<details>
+<summary>US-S3: Move file storage outside the repo</summary>
+
+> As an admin, I want uploaded files to live outside the project directory so
+> that deployments do not interfere with user data and backups can target a
+> single known location.
+
+- [ ] Add `UPLOADS_DIR` env var (default `data/uploads` for local)
+- [ ] Replace hardcoded path in upload and download routes with the env var
+- [ ] Document the production path (`/var/lib/vertikal/uploads`) and required permissions in README or `.env.example`
+- [ ] Verify the directory is excluded from `.gitignore` and any deploy bundle
+
+</details>
+
+<details>
+<summary>US-S4: "Ver adjunto" button in the participants table</summary>
+
+> As an instructor or admin, I want to preview a participant's uploaded license
+> directly from the course participants table so that I can verify federation
+> paperwork without leaving the panel.
+
+- [ ] Add "Ver adjunto" button on each participant row, visible only when `licenseFileKey` is set
+- [ ] Button opens the download URL in a new tab
+- [ ] Set `Content-Disposition: inline` and `X-Content-Type-Options: nosniff` on the response
+- [ ] Visible in both desktop and mobile layouts
+- [ ] Tests for visibility logic and link target
+
+</details>
+
+<details>
+<summary>US-S5: Cascade delete of PDF when a registration is removed</summary>
+
+> As an admin, I want a participant's PDF to be deleted from disk when their
+> registration is removed so that no orphan personal data remains.
+
+- [ ] Update the delete-participant server action to remove the file from disk after the DB row is deleted
+- [ ] Handle the case where the file is already missing (idempotent, no error)
+- [ ] Tests for cascade delete (file present, file missing)
+
+</details>
+
+<details>
+<summary>US-S6: Nightly cleanup job (orphans and expired files)</summary>
+
+> As an admin, I want abandoned and expired PDFs to be cleaned up automatically
+> so that personal data does not accumulate beyond its retention period.
+
+- [ ] Create `npm run cleanup-uploads` script that performs two passes:
+  - Orphans: files in `UPLOADS_DIR` older than 24 h with no matching `licenseFileKey` in any `CourseRegistration`
+  - Expired: files whose associated course ended more than 6 months ago (delete the DB row too, or just the file — to be decided in implementation)
+- [ ] Document the cron entry to run nightly on the VPS
+- [ ] Dry-run mode for safe verification (`--dry-run` flag)
+- [ ] Tests for both passes against a temp directory
+
+</details>
+
+---
+
+## Feature: Pending Payment Recovery
+
+**Status:** PENDING
+
+Today, course registrations that fail or abandon Stripe checkout stay in
+`PENDING_PAYMENT` forever. Instructors have no way to rescue them and no signal
+that something went wrong. This feature gives instructors the tools to recover
+those enrollments and cleans up the ones that cannot be recovered.
+
+<details>
+<summary>US-P1: Manually mark a course registration as paid</summary>
+
+> As an instructor or admin, I want to manually mark a pending course
+> registration as paid so that I can recover enrollments where the participant
+> failed the online payment but settled it offline.
+
+- [ ] `markRegistrationAsPaid` server action with ownership guard (course instructor or admin)
+- [ ] Action button on participant rows in `PENDING_PAYMENT` state
+- [ ] Confirmation dialog before marking
+- [ ] Tests for action and ownership guard
+
+</details>
+
+<details>
+<summary>US-P2: Notify instructor when a payment fails or is abandoned</summary>
+
+> As an instructor, I want to receive an email when a participant's payment
+> fails or is abandoned so that I can reach out and resolve it before the
+> registration is auto-deleted.
+
+- [ ] Detect failed/abandoned Stripe sessions (webhook event `checkout.session.expired` or equivalent)
+- [ ] Send email to course instructor with participant data and failure reason
+- [ ] Reuse existing notification email infrastructure
+- [ ] Tests for the new notification
+
+</details>
+
+<details>
+<summary>US-P3: Auto-cleanup of unrecovered pending registrations</summary>
+
+> As an admin, I want unresolved pending registrations to be cleaned up
+> automatically after 5 days so that they do not accumulate indefinitely.
+
+- [ ] Nightly job: delete `CourseRegistration` rows in `PENDING_PAYMENT` older than 5 days
+- [ ] Cascade delete the associated license PDF (covered by the License Files Security feature)
+- [ ] Tests for the cleanup logic
 
 </details>
