@@ -48,7 +48,7 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
     <div className="flex items-center gap-1">
       <Button
         type="button"
-        variant="ghost"
+        variant="ghost-info"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar subtipo"
@@ -71,7 +71,7 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
         <AlertDialogTrigger asChild>
           <Button
             type="button"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             disabled={isPending || hasMemberships}
             aria-label="Eliminar subtipo"
@@ -82,7 +82,7 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
             }
             className="h-7 w-7"
           >
-            <Trash2 className="h-3 w-3 text-destructive" />
+            <Trash2 className="h-3 w-3" />
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>

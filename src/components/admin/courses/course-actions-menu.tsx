@@ -43,7 +43,7 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
       {isActive && (
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-info"
           size="icon"
           asChild
           aria-label="Ver página pública"
@@ -56,7 +56,7 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
       {canEdit && (
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-info"
           size="icon"
           onClick={() => setIsEditOpen(true)}
           aria-label="Editar"
@@ -69,12 +69,12 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
           <AlertDialogTrigger asChild>
             <Button
               type="button"
-              variant="ghost"
+              variant="ghost-destructive"
               size="icon"
               disabled={isPending}
               aria-label="Eliminar"
             >
-              <Trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

@@ -48,7 +48,7 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
     <div className="flex items-center gap-1">
       <Button
         type="button"
-        variant="ghost"
+        variant="ghost-info"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar"
@@ -69,7 +69,7 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
         <AlertDialogTrigger asChild>
           <Button
             type="button"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             disabled={isPending || hasMemberships}
             aria-label="Eliminar"
@@ -79,7 +79,7 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
                 : "Eliminar"
             }
           >
-            <Trash2 className="h-4 w-4 text-destructive" />
+            <Trash2 className="h-4 w-4" />
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>

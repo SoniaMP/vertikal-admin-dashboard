@@ -40,12 +40,12 @@ export function DeleteEnrolleeButton({
       <AlertDialogTrigger asChild>
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-destructive"
           size="icon"
           disabled={isPending}
           aria-label="Eliminar participante"
         >
-          <Trash2 className="h-4 w-4 text-destructive" />
+          <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

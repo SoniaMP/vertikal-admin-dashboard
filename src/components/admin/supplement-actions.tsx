@@ -30,7 +30,7 @@ export function SupplementActions({ supplement, supplementGroups }: Props) {
     <div className="flex items-center gap-1">
       <Button
         type="button"
-        variant="ghost"
+        variant="ghost-info"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar suplemento"

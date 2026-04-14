@@ -57,7 +57,7 @@ export function MembershipActions({ membership }: Props) {
     <div className="flex items-center gap-1">
       <Button
         type="button"
-        variant="ghost"
+        variant="ghost-info"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar"
@@ -77,13 +77,13 @@ export function MembershipActions({ membership }: Props) {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-destructive"
           size="icon"
           disabled={isPending}
           aria-label="Eliminar"
           onClick={() => setIsDeleteOpen(true)}
         >
-          <Trash2 className="h-4 w-4 text-destructive" />
+          <Trash2 className="h-4 w-4" />
         </Button>
         <AlertDialogContent>
           <AlertDialogHeader>

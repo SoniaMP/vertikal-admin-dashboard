@@ -120,7 +120,7 @@ function GroupRow({
         </div>
         <div className="flex items-center gap-1">
           <Button
-            variant="ghost"
+            variant="ghost-info"
             size="icon"
             onClick={() => setIsEditOpen(true)}
             aria-label="Editar grupo"
@@ -129,12 +129,12 @@ function GroupRow({
             <Pencil className="h-3 w-3" />
           </Button>
           <Button
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={handleDelete}
             disabled={isPending}
             aria-label="Eliminar grupo"
-            className="h-7 w-7 text-destructive"
+            className="h-7 w-7"
           >
             <Trash2 className="h-3 w-3" />
           </Button>
