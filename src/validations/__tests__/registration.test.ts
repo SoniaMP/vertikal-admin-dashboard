@@ -64,18 +64,51 @@ describe("personalDataSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects invalid DNI format", () => {
+  it("normalizes Spanish DNI with dots and dashes", () => {
     const result = personalDataSchema.safeParse({
       ...validPersonalData,
-      dni: "1234567",
+      dni: "12.345.678-a",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.dni).toBe("12345678A");
+  });
+
+  it("accepts NIE format", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dni: "X1234567L",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts numeric-only foreign passport", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dni: "123456789",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects DNI shorter than 5 characters", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dni: "1234",
     });
     expect(result.success).toBe(false);
   });
 
-  it("rejects DNI without letter", () => {
+  it("rejects DNI longer than 20 characters", () => {
     const result = personalDataSchema.safeParse({
       ...validPersonalData,
-      dni: "123456789",
+      dni: "123456789012345678901",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects DNI with invalid characters", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dni: "ABC@123",
     });
     expect(result.success).toBe(false);
   });

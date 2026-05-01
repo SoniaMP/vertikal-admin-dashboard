@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { registrationSchema } from "@/validations/registration";
 import { getMembershipFee, getActiveSeason } from "@/lib/settings";
-import { normalizeDni } from "@/helpers/migration-helpers";
 import { findOrCreateMembership } from "@/lib/checkout";
 
 export async function POST(request: NextRequest) {
@@ -57,10 +56,9 @@ async function handleCheckout(request: NextRequest) {
 
   const total = offering.price + membershipFee + supplementsTotal;
   const licenseLabel = `${offering.type.name} - ${offering.subtype.name} - ${offering.category.name}`;
-  const normalizedDni = normalizeDni(data.dni);
 
   const member = await prisma.member.upsert({
-    where: { dni: normalizedDni },
+    where: { dni: data.dni },
     update: {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -73,7 +71,7 @@ async function handleCheckout(request: NextRequest) {
       province: data.province,
     },
     create: {
-      dni: normalizedDni,
+      dni: data.dni,
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,

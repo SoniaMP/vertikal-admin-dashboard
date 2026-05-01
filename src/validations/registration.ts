@@ -1,8 +1,15 @@
 import { z } from "zod";
+import { normalizeDni } from "@/helpers/dni";
 
-export const SPANISH_DNI_REGEX = /^\d{8}[A-Za-z]$/;
+const DNI_PATTERN = /^[A-Z0-9]{5,20}$/;
+const DNI_MESSAGE = "Documento no válido (5-20 caracteres alfanuméricos)";
 const SPANISH_PHONE_REGEX = /^(\+34)?[6-9]\d{8}$/;
 const SPANISH_POSTAL_CODE_REGEX = /^\d{5}$/;
+
+export const dniSchema = z
+  .string()
+  .transform(normalizeDni)
+  .pipe(z.string().regex(DNI_PATTERN, { message: DNI_MESSAGE }));
 
 export const personalDataSchema = z.object({
   firstName: z
@@ -17,11 +24,7 @@ export const personalDataSchema = z.object({
     .regex(SPANISH_PHONE_REGEX, {
       message: "Introduce un teléfono válido (ej: 612345678)",
     }),
-  dni: z
-    .string()
-    .regex(SPANISH_DNI_REGEX, {
-      message: "Introduce un DNI válido (ej: 12345678A)",
-    }),
+  dni: dniSchema,
   dateOfBirth: z
     .string()
     .min(1, { message: "La fecha de nacimiento es obligatoria" }),

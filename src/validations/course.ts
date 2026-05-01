@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { personalDataSchema, SPANISH_DNI_REGEX } from "./registration";
+import { personalDataSchema, dniSchema } from "./registration";
 
 export const courseTypeSchema = z.object({
   name: z
@@ -87,11 +87,7 @@ export const manualEnrolleeSchema = z.object({
     .string()
     .min(1, { message: "El precio es obligatorio" }),
   phone: z.string().optional().default(""),
-  dni: z
-    .string()
-    .regex(SPANISH_DNI_REGEX, { message: "DNI no válido (ej: 12345678A)" })
-    .optional()
-    .or(z.literal("")),
+  dni: dniSchema.optional().or(z.literal("")),
   dateOfBirth: z.string().optional().default(""),
   address: z.string().optional().default(""),
   city: z.string().optional().default(""),

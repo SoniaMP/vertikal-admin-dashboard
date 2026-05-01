@@ -1,8 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { normalizeDni } from "@/helpers/migration-helpers";
-import { SPANISH_DNI_REGEX } from "@/validations/registration";
+import { dniSchema } from "@/validations/registration";
 
 export type RenewalSearchResult = {
   firstName: string;
@@ -24,12 +23,11 @@ export type RenewalSearchResult = {
 export async function findMemberByDni(
   dni: string,
 ): Promise<RenewalSearchResult | null> {
-  if (!SPANISH_DNI_REGEX.test(dni)) {
-    return null;
-  }
+  const parsed = dniSchema.safeParse(dni);
+  if (!parsed.success) return null;
 
   const member = await prisma.member.findUnique({
-    where: { dni: normalizeDni(dni) },
+    where: { dni: parsed.data },
     include: {
       memberships: {
         orderBy: { createdAt: "desc" },

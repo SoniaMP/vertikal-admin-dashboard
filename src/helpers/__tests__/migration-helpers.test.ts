@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  inferMembershipStatus,
-  normalizeDni,
-} from "../migration-helpers";
+import { inferMembershipStatus } from "../migration-helpers";
 
 describe("inferMembershipStatus", () => {
   it("returns ACTIVE when active and payment COMPLETED", () => {
@@ -42,27 +39,5 @@ describe("inferMembershipStatus", () => {
     expect(
       inferMembershipStatus({ active: false, paymentStatus: "REFUNDED" }),
     ).toBe("CANCELLED");
-  });
-});
-
-describe("normalizeDni", () => {
-  it("uppercases lowercase input", () => {
-    expect(normalizeDni("12345678a")).toBe("12345678A");
-  });
-
-  it("trims leading and trailing whitespace", () => {
-    expect(normalizeDni("  12345678A  ")).toBe("12345678A");
-  });
-
-  it("handles already normalized input", () => {
-    expect(normalizeDni("12345678A")).toBe("12345678A");
-  });
-
-  it("handles mixed case and whitespace", () => {
-    expect(normalizeDni(" x1234567b ")).toBe("X1234567B");
-  });
-
-  it("handles empty string", () => {
-    expect(normalizeDni("")).toBe("");
   });
 });

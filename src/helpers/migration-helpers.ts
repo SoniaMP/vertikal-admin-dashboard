@@ -17,10 +17,3 @@ export function inferMembershipStatus(
   if (reg.paymentStatus === "FAILED") return "CANCELLED";
   return "PENDING_PAYMENT";
 }
-
-/**
- * Normalize a DNI string: trim whitespace and uppercase.
- */
-export function normalizeDni(dni: string): string {
-  return dni.trim().toUpperCase();
-}

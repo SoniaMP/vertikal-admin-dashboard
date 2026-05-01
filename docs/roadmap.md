@@ -785,10 +785,10 @@ slip in even under client-side bypass or concurrency.
 > being rejected by a Spanish-DNI-only regex, while ensuring my document number
 > is stored in a consistent format.
 
-- [ ] Add a `normalizeDni()` helper (trim, uppercase, strip whitespace and `-`, `_`, `.`)
-- [ ] Replace `SPANISH_DNI_REGEX` usage with `normalizeDni` + `/^[A-Z0-9]{5,20}$/`
-- [ ] Apply in `personalDataSchema`, `manualEnrolleeSchema`, and any other entry point that accepts DNI
-- [ ] Tests for normalization edge cases (mixed case, internal spaces, dashes, dots, length boundaries)
+- [x] Add a `normalizeDni()` helper (trim, uppercase, strip whitespace and `-`, `_`, `.`)
+- [x] Replace `SPANISH_DNI_REGEX` usage with `normalizeDni` + `/^[A-Z0-9]{5,20}$/`
+- [x] Apply in `personalDataSchema`, `manualEnrolleeSchema`, and any other entry point that accepts DNI
+- [x] Tests for normalization edge cases (mixed case, internal spaces, dashes, dots, length boundaries)
 
 </details>
 

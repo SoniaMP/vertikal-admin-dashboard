@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { SPANISH_DNI_REGEX } from "@/validations/registration";
+import { dniSchema } from "@/validations/registration";
 import {
   findMemberByDni,
   type RenewalSearchResult,
@@ -23,7 +23,7 @@ export function RenewalLookup({ onFound }: RenewalLookupProps) {
   const [dni, setDni] = useState("");
   const [state, setState] = useState<LookupState>("idle");
 
-  const isDniValid = SPANISH_DNI_REGEX.test(dni);
+  const isDniValid = dniSchema.safeParse(dni).success;
 
   async function handleSearch() {
     if (!isDniValid) return;
