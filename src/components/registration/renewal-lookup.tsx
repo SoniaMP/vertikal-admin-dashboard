@@ -60,9 +60,14 @@ export function RenewalLookup({ onFound }: RenewalLookupProps) {
         </div>
 
         {state === "not-found" && (
-          <p className="text-sm text-destructive">
-            No se ha encontrado ningún registro con este DNI
-          </p>
+          <div className="space-y-3">
+            <p className="text-sm text-destructive">
+              No se ha encontrado ningún registro con este DNI
+            </p>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/registro/alta">Hacer alta nueva</Link>
+            </Button>
+          </div>
         )}
 
         {state === "error" && (

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -9,13 +10,13 @@ import { PersonalDataForm } from "./personal-data-form";
 import { FederationStep } from "./federation-step";
 import { RegistrationSummary } from "./registration-summary";
 import { RenewalBanner } from "./renewal-banner";
-import { useFormPersistence } from "@/hooks/use-form-persistence";
 import {
   personalDataSchema,
   licenseSelectionSchema,
   registrationSchema,
   type RegistrationInput,
 } from "@/validations/registration";
+import { checkDni } from "@/app/registro/actions";
 import type { LicenseCatalogType } from "@/types";
 
 type RegistrationWizardProps = {
@@ -50,32 +51,53 @@ export function RegistrationWizard({
 }: RegistrationWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ReactNode>(null);
 
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
     defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
   });
 
-  const isRenewal = mode === "renewal";
-
-  const { clearSavedData } = useFormPersistence({
-    form,
-    currentStep,
-    onRestoreStep: setCurrentStep,
-    enabled: !isRenewal,
-    resetOnRestore: {
-      typeId: "",
-      subtypeId: "",
-      categoryId: "",
-      supplementIds: [],
-    },
-  });
-
   async function handleNextStep() {
+    setError(null);
+
     if (currentStep === 1) {
       const isValid = await form.trigger(personalDataSchema.keyof().options);
-      if (isValid) setCurrentStep(2);
+      if (!isValid) return;
+
+      if (mode === "new") {
+        const check = await checkDni(form.getValues("dni"));
+
+        if (check.reason === "dni_existe_con_membresia_temporada") {
+          setError(
+            "Ya tienes una membresía para esta temporada. Si tienes alguna duda, contacta con el club.",
+          );
+          return;
+        }
+
+        if (check.reason === "dni_existe_sin_membresia_temporada") {
+          setError(
+            <>
+              Encontramos un socio con este DNI. Para continuar,{" "}
+              <Link
+                href="/registro/renovacion"
+                className="font-semibold underline"
+              >
+                ve a renovación
+              </Link>
+              .
+            </>,
+          );
+          return;
+        }
+
+        if (check.reason === "dni_invalido") {
+          setError("DNI no válido. Revisa el campo.");
+          return;
+        }
+      }
+
+      setCurrentStep(2);
     } else if (currentStep === 2) {
       const isValid = await form.trigger(
         licenseSelectionSchema.keyof().options,
@@ -117,7 +139,6 @@ export function RegistrationWizard({
         return;
       }
 
-      clearSavedData();
       window.location.href = result.url;
     } catch {
       setError("Error de conexión. Comprueba tu conexión e inténtalo de nuevo.");

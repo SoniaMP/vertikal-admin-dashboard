@@ -799,12 +799,12 @@ slip in even under client-side bypass or concurrency.
 > whether my DNI conflicts with an existing membership, so that I can take the
 > correct action (renew, contact admin, etc.) without retyping data.
 
-- [ ] New `POST /api/registration/check-dni` endpoint (or server action)
-- [ ] Returns `{ ok, reason }` distinguishing: `ok`, `dni_existe_con_membresia_temporada`, `dni_existe_sin_membresia_temporada`, `dni_no_existe`
-- [ ] Wizard calls it on step transition; blocks navigation if there is a conflict
-- [ ] Alta flow: redirect to renovation when DNI exists without current-season membership
-- [ ] Renovation flow: reject when DNI does not exist
-- [ ] Tests for each `reason` and each flow direction
+- [x] New `checkDni` server action in `src/app/registro/actions.ts`
+- [x] Returns `{ reason }` discriminated union: `dni_invalido`, `dni_no_existe`, `dni_existe_sin_membresia_temporada`, `dni_existe_con_membresia_temporada`
+- [x] Wizard calls it on step 1 → 2 transition (only in `mode = "new"`); blocks navigation if there is a conflict
+- [x] Alta flow: blocks with message + link to renovation when DNI exists without current-season membership (chose "block + link" over auto-redirect to keep URL clean and avoid passing DNI as query param)
+- [x] Renovation flow: lookup already returns null when DNI does not exist; "Hacer alta nueva" button added in `renewal-lookup.tsx`
+- [x] Tests for each `reason` (6 tests in `src/app/registro/__tests__/actions.test.ts`)
 
 </details>
 
