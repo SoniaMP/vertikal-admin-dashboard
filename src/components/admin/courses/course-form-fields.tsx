@@ -35,6 +35,10 @@ function toDateInputValue(date: Date): string {
   return new Date(date).toISOString().slice(0, 16);
 }
 
+function toDateOnlyInputValue(date: Date): string {
+  return new Date(date).toISOString().slice(0, 10);
+}
+
 const NONE_VALUE = "__none__";
 
 export function CourseFormFields({ course, courseTypes, instructors }: Props) {
@@ -128,6 +132,23 @@ export function CourseFormFields({ course, courseTypes, instructors }: Props) {
             course?.courseDate ? toDateInputValue(course.courseDate) : ""
           }
         />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="registrationDeadline">Plazo de inscripción</Label>
+        <Input
+          id="registrationDeadline"
+          name="registrationDeadline"
+          type="date"
+          defaultValue={
+            course?.registrationDeadline
+              ? toDateOnlyInputValue(course.registrationDeadline)
+              : ""
+          }
+        />
+        <p className="text-xs text-muted-foreground">
+          Las inscripciones cierran a las 23:59 del día seleccionado. Debe ser
+          anterior o igual a la fecha del curso.
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="maxCapacity">Capacidad máxima</Label>

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CourseStatusBadge } from "./course-status-badge";
 import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
+import { CourseClosedBadge } from "@/components/courses/course-closed-badge";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
@@ -34,7 +35,12 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
         <Badge variant="outline">{course.courseType.name}</Badge>
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {formatCourseDate(course.courseDate)}
+        <div className="flex items-center gap-2">
+          {formatCourseDate(course.courseDate)}
+          <CourseClosedBadge
+            registrationDeadline={course.registrationDeadline}
+          />
+        </div>
       </TableCell>
       <TableCell className="tabular-nums">
         {course._count.registrations} / {course.maxCapacity}

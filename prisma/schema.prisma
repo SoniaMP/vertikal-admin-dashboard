@@ -255,17 +255,18 @@ model CourseType {
 }
 
 model CourseCatalog {
-  id           String    @id @default(cuid())
-  title        String
-  slug         String    @unique
-  courseDate   DateTime
-  courseTypeId String
-  status       String    @default("ACTIVE")
-  instructorId String?
-  maxCapacity  Int
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
+  id                   String    @id @default(cuid())
+  title                String
+  slug                 String    @unique
+  courseDate           DateTime
+  registrationDeadline DateTime
+  courseTypeId         String
+  status               String    @default("ACTIVE")
+  instructorId         String?
+  maxCapacity          Int
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
 
   courseType     CourseType          @relation(fields: [courseTypeId], references: [id])
   instructor    User?               @relation(fields: [instructorId], references: [id])
@@ -278,13 +279,11 @@ model CourseCatalog {
 }
 
 model CoursePrice {
-  id              String    @id @default(cuid())
+  id              String  @id @default(cuid())
   courseCatalogId String
   name            String
   amountCents     Int
-  isActive        Boolean   @default(true)
-  saleStart       DateTime?
-  saleEnd         DateTime?
+  isActive        Boolean @default(true)
 
   courseCatalog CourseCatalog        @relation(fields: [courseCatalogId], references: [id], onDelete: Cascade)
   registrations CourseRegistration[]

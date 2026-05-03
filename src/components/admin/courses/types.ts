@@ -5,6 +5,7 @@ export type CourseRow = {
   title: string;
   slug: string;
   courseDate: Date;
+  registrationDeadline: Date;
   status: string;
   maxCapacity: number;
   courseType: { id: string; name: string };

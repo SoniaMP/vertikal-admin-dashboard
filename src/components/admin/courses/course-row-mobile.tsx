@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { CourseStatusBadge } from "./course-status-badge";
 import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
+import { CourseClosedBadge } from "@/components/courses/course-closed-badge";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
@@ -47,6 +48,7 @@ export function CourseRowMobile({ course, courseTypes, instructors, isInstructor
         {spots <= 0 && (
           <Badge variant="destructive">Lleno</Badge>
         )}
+        <CourseClosedBadge registrationDeadline={course.registrationDeadline} />
       </div>
       <div className="mt-2 flex justify-end border-t pt-2">
         <CourseActionsMenu

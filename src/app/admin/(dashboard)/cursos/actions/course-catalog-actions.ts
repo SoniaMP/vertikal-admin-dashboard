@@ -12,6 +12,7 @@ import {
   requireAdmin,
   type ActionResult,
 } from "@/lib/actions";
+import { endOfLocalDay } from "@/helpers/registration-deadline";
 
 const pricesArraySchema = z.array(coursePriceEntrySchema);
 
@@ -30,6 +31,7 @@ function parseCourseFormData(formData: FormData) {
     title: formData.get("title"),
     slug: formData.get("slug"),
     courseDate: formData.get("courseDate") || undefined,
+    registrationDeadline: formData.get("registrationDeadline") || undefined,
     courseTypeId: formData.get("courseTypeId"),
     maxCapacity: toNumberOrNull(formData.get("maxCapacity")),
   });
@@ -49,17 +51,23 @@ export async function createCourse(
   }
 
   const prices = parsePricesJson(formData.get("pricesJson"));
-  const { courseDate, maxCapacity, ...rest } = parsed.data;
+  const { courseDate, registrationDeadline, maxCapacity, ...rest } = parsed.data;
   const isInstructor = session.user.role === "INSTRUCTOR";
 
   const instructorId = isInstructor
     ? session.user.id
     : (formData.get("instructorId") as string) || null;
 
+  const persistedCourseDate = courseDate ?? new Date();
+  const persistedDeadline = endOfLocalDay(
+    registrationDeadline ?? persistedCourseDate,
+  );
+
   await prisma.courseCatalog.create({
     data: {
       ...rest,
-      courseDate: courseDate ?? new Date(),
+      courseDate: persistedCourseDate,
+      registrationDeadline: persistedDeadline,
       maxCapacity: maxCapacity ?? 0,
       instructorId,
       ...(isInstructor && { status: "DRAFT" }),
@@ -94,21 +102,36 @@ export async function updateCourse(
   }
 
   const prices = parsePricesJson(formData.get("pricesJson"));
-  const { courseDate, maxCapacity, ...rest } = parsed.data;
+  const {
+    courseDate,
+    registrationDeadline,
+    maxCapacity,
+    courseTypeId,
+    ...rest
+  } = parsed.data;
   const isAdmin = session.user.role === "ADMIN";
-
   const instructorIdRaw = formData.get("instructorId") as string | null;
-  const instructorUpdate = isAdmin
-    ? { instructorId: instructorIdRaw || null }
-    : {};
 
+  // Use relation syntax for FKs: Prisma 7's XOR resolver between
+  // CourseCatalogUpdateInput and *UncheckedUpdateInput rejects bare
+  // scalar FKs (`courseTypeId`, `instructorId`) when mixed.
   await prisma.$transaction(async (tx) => {
     await tx.courseCatalog.update({
       where: { id },
       data: {
         ...rest,
-        ...instructorUpdate,
+        ...(courseTypeId && {
+          courseType: { connect: { id: courseTypeId } },
+        }),
+        ...(isAdmin && {
+          instructor: instructorIdRaw
+            ? { connect: { id: instructorIdRaw } }
+            : { disconnect: true },
+        }),
         ...(courseDate !== null && { courseDate }),
+        ...(registrationDeadline !== null && {
+          registrationDeadline: endOfLocalDay(registrationDeadline),
+        }),
         ...(maxCapacity !== null && { maxCapacity }),
       },
     });
