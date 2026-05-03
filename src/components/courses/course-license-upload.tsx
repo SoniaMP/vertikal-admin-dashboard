@@ -57,7 +57,7 @@ export function CourseLicenseUpload() {
         name="licenseType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tipo de licencia federativa</FormLabel>
+            <FormLabel>FEDERACIÓN + Tipo de federativa</FormLabel>
             <FormControl>
               <Input
                 placeholder="Ej: FERM PLUS A, FERM PLUS B, ..."

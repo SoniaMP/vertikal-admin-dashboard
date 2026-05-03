@@ -15,6 +15,7 @@ export default async function CoursesPage({
 }) {
   const [params, session] = await Promise.all([searchParams, auth()]);
   const isInstructor = session?.user?.role === "INSTRUCTOR";
+  const isAdmin = session?.user?.role === "ADMIN";
   const filters = {
     ...parseParams(params),
     ...(isInstructor && { instructorId: session.user.id }),
@@ -38,6 +39,7 @@ export default async function CoursesPage({
         <CreateCourseButton
           courseTypes={courseTypes}
           instructors={instructors}
+          isAdmin={isAdmin}
         />
       </div>
       <CoursesToolbar courseTypes={courseTypes} />

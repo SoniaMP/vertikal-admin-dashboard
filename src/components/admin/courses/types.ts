@@ -1,4 +1,4 @@
-export type CourseStatus = "DRAFT" | "ACTIVE" | "INACTIVE";
+export type CourseStatus = "DRAFT" | "ACTIVE";
 
 export type CourseRow = {
   id: string;

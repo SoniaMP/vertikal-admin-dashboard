@@ -51,7 +51,6 @@ export function CoursesTable({ courses, courseTypes, instructors, isInstructor }
               <TableHead>Plazo</TableHead>
               <TableHead>Plazas</TableHead>
               {!isInstructor && <TableHead>Director</TableHead>}
-              <TableHead>Estado</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>

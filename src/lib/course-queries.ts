@@ -5,7 +5,7 @@ const PAGE_SIZE = 15;
 export type CourseFilters = {
   search?: string;
   courseTypeId?: string;
-  status?: string; // "DRAFT" | "ACTIVE" | "INACTIVE" | undefined (all)
+  status?: string; // "DRAFT" | "ACTIVE" | undefined (all)
   instructorId?: string;
   page: number;
 };
@@ -166,7 +166,7 @@ function buildCourseWhere(filters: CourseFilters) {
     conditions.push({ courseTypeId: filters.courseTypeId });
   }
 
-  if (filters.status) {
+  if (filters.status === "DRAFT" || filters.status === "ACTIVE") {
     conditions.push({ status: filters.status });
   }
 

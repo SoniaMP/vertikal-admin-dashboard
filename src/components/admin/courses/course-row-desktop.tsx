@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CourseStatusBadge } from "./course-status-badge";
-import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { RegistrationClosedIcon } from "./registration-closed-icon";
+import { DraftCourseIcon } from "./draft-course-icon";
 import { isRegistrationClosed } from "@/helpers/registration-deadline";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
@@ -21,8 +20,10 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
   const spots = course.maxCapacity - course._count.registrations;
   const isPast = course.courseDate < now;
   const isClosed = isRegistrationClosed(course.registrationDeadline, now);
+  const isDraft = course.status === "DRAFT";
 
   const showClosedWarning = isClosed && !isPast;
+  const showDraftWarning = isDraft && !isPast;
 
   return (
     <TableRow
@@ -33,6 +34,7 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
     >
       <TableCell className="font-medium">
         <div className="flex items-center gap-2">
+          {showDraftWarning && <DraftCourseIcon />}
           {showClosedWarning && <RegistrationClosedIcon />}
           <Link
             href={`/admin/cursos/${course.id}`}
@@ -67,13 +69,6 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
           {course.instructor?.name ?? "—"}
         </TableCell>
       )}
-      <TableCell>
-        {isInstructor ? (
-          <CourseStatusBadge status={course.status} />
-        ) : (
-          <CourseStatusSelect courseId={course.id} status={course.status} />
-        )}
-      </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end">
           <CourseActionsMenu
