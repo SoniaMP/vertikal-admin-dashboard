@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { personalDataSchema, dniSchema } from "./registration";
+import { startOfLocalDay } from "@/helpers/registration-deadline";
 
 export const courseTypeSchema = z.object({
   name: z
@@ -34,7 +35,8 @@ export const courseCatalogSchema = z
     (data) =>
       !data.courseDate ||
       !data.registrationDeadline ||
-      data.registrationDeadline <= data.courseDate,
+      startOfLocalDay(data.registrationDeadline) <=
+        startOfLocalDay(data.courseDate),
     {
       message:
         "El plazo de inscripción debe ser anterior o igual a la fecha del curso",

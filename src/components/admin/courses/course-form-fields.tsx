@@ -31,10 +31,6 @@ type Props = {
   instructors?: InstructorOption[];
 };
 
-function toDateInputValue(date: Date): string {
-  return new Date(date).toISOString().slice(0, 16);
-}
-
 function toDateOnlyInputValue(date: Date): string {
   return new Date(date).toISOString().slice(0, 10);
 }
@@ -127,9 +123,9 @@ export function CourseFormFields({ course, courseTypes, instructors }: Props) {
         <Input
           id="courseDate"
           name="courseDate"
-          type="datetime-local"
+          type="date"
           defaultValue={
-            course?.courseDate ? toDateInputValue(course.courseDate) : ""
+            course?.courseDate ? toDateOnlyInputValue(course.courseDate) : ""
           }
         />
       </div>

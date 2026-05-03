@@ -257,7 +257,7 @@ model CourseType {
 model CourseCatalog {
   id                   String    @id @default(cuid())
   title                String
-  slug                 String    @unique
+  slug                 String
   courseDate           DateTime
   registrationDeadline DateTime
   courseTypeId         String

@@ -30,6 +30,7 @@ export default async function CourseDetailPage({
   if (!course) notFound();
 
   const isInstructor = session?.user?.role === "INSTRUCTOR";
+  const isAdmin = session?.user?.role === "ADMIN";
   if (isInstructor && course.instructorId !== session.user.id) {
     notFound();
   }
@@ -51,7 +52,7 @@ export default async function CourseDetailPage({
           </Button>
           <h1 className="text-xl font-bold sm:text-2xl">{course.title}</h1>
         </div>
-        <CourseDetailHeader course={course} />
+        <CourseDetailHeader course={course} isAdmin={isAdmin} />
       </div>
 
       <ParticipantsSection

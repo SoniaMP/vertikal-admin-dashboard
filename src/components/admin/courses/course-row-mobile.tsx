@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { CourseStatusBadge } from "./course-status-badge";
-import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { RegistrationClosedIcon } from "./registration-closed-icon";
+import { DraftCourseIcon } from "./draft-course-icon";
 import { isRegistrationClosed } from "@/helpers/registration-deadline";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
@@ -20,7 +19,9 @@ export function CourseRowMobile({ course, courseTypes, instructors, isInstructor
   const spots = course.maxCapacity - course._count.registrations;
   const isPast = course.courseDate < now;
   const isClosed = isRegistrationClosed(course.registrationDeadline, now);
+  const isDraft = course.status === "DRAFT";
   const showClosedWarning = isClosed && !isPast;
+  const showDraftWarning = isDraft && !isPast;
 
   return (
     <div
@@ -29,29 +30,23 @@ export function CourseRowMobile({ course, courseTypes, instructors, isInstructor
       }`}
       aria-label={isPast ? "Curso pasado" : undefined}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            {showClosedWarning && <RegistrationClosedIcon />}
-            <Link
-              href={`/admin/cursos/${course.id}`}
-              className="font-medium truncate hover:underline"
-            >
-              {course.title}
-            </Link>
-          </div>
-          <p className="text-sm text-muted-foreground truncate">
-            {formatCourseDate(course.courseDate)}
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            Plazo: {formatCourseDate(course.registrationDeadline)}
-          </p>
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          {showDraftWarning && <DraftCourseIcon />}
+          {showClosedWarning && <RegistrationClosedIcon />}
+          <Link
+            href={`/admin/cursos/${course.id}`}
+            className="font-medium truncate hover:underline"
+          >
+            {course.title}
+          </Link>
         </div>
-        {isInstructor ? (
-          <CourseStatusBadge status={course.status} />
-        ) : (
-          <CourseStatusSelect courseId={course.id} status={course.status} />
-        )}
+        <p className="text-sm text-muted-foreground truncate">
+          {formatCourseDate(course.courseDate)}
+        </p>
+        <p className="text-xs text-muted-foreground truncate">
+          Plazo: {formatCourseDate(course.registrationDeadline)}
+        </p>
       </div>
       <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
         <Badge variant="outline">{course.courseType.name}</Badge>

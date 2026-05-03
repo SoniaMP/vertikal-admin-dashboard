@@ -61,8 +61,7 @@ export function CoursesToolbar({ courseTypes }: Props) {
         <SelectContent>
           <SelectItem value="all">Estado: Todos</SelectItem>
           <SelectItem value="DRAFT">Borrador</SelectItem>
-          <SelectItem value="ACTIVE">Activo</SelectItem>
-          <SelectItem value="INACTIVE">Inactivo</SelectItem>
+          <SelectItem value="ACTIVE">Publicado</SelectItem>
         </SelectContent>
       </Select>
 

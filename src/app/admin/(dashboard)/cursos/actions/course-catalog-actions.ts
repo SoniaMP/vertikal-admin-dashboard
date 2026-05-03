@@ -12,7 +12,10 @@ import {
   requireAdmin,
   type ActionResult,
 } from "@/lib/actions";
-import { endOfLocalDay } from "@/helpers/registration-deadline";
+import {
+  endOfLocalDay,
+  startOfLocalDay,
+} from "@/helpers/registration-deadline";
 
 const pricesArraySchema = z.array(coursePriceEntrySchema);
 
@@ -53,32 +56,48 @@ export async function createCourse(
   const prices = parsePricesJson(formData.get("pricesJson"));
   const { courseDate, registrationDeadline, maxCapacity, ...rest } = parsed.data;
   const isInstructor = session.user.role === "INSTRUCTOR";
+  const isAdmin = session.user.role === "ADMIN";
 
   const instructorId = isInstructor
     ? session.user.id
     : (formData.get("instructorId") as string) || null;
 
-  const persistedCourseDate = courseDate ?? new Date();
+  const persistedCourseDate = startOfLocalDay(courseDate ?? new Date());
   const persistedDeadline = endOfLocalDay(
     registrationDeadline ?? persistedCourseDate,
   );
 
-  await prisma.courseCatalog.create({
-    data: {
-      ...rest,
-      courseDate: persistedCourseDate,
-      registrationDeadline: persistedDeadline,
-      maxCapacity: maxCapacity ?? 0,
-      instructorId,
-      ...(isInstructor && { status: "DRAFT" }),
-      prices: {
-        create: prices.map((p) => ({
-          name: p.name,
-          amountCents: p.amountCents,
-        })),
+  // Only admin's "published=true" promotes to ACTIVE; everyone else (and any
+  // tampered submission from instructor) defaults to DRAFT.
+  const status =
+    isAdmin && formData.get("published") === "true" ? "ACTIVE" : "DRAFT";
+
+  try {
+    await prisma.courseCatalog.create({
+      data: {
+        ...rest,
+        courseDate: persistedCourseDate,
+        registrationDeadline: persistedDeadline,
+        maxCapacity: maxCapacity ?? 0,
+        instructorId,
+        status,
+        prices: {
+          create: prices.map((p) => ({
+            name: p.name,
+            amountCents: p.amountCents,
+          })),
+        },
       },
-    },
-  });
+    });
+  } catch (err) {
+    if (isUniqueSlugViolation(err)) {
+      return {
+        success: false,
+        error: "Ya existe un curso con ese slug. Elige otro.",
+      };
+    }
+    throw err;
+  }
 
   revalidatePath("/admin/cursos");
   return { success: true };
@@ -115,49 +134,59 @@ export async function updateCourse(
   // Use relation syntax for FKs: Prisma 7's XOR resolver between
   // CourseCatalogUpdateInput and *UncheckedUpdateInput rejects bare
   // scalar FKs (`courseTypeId`, `instructorId`) when mixed.
-  await prisma.$transaction(async (tx) => {
-    await tx.courseCatalog.update({
-      where: { id },
-      data: {
-        ...rest,
-        ...(courseTypeId && {
-          courseType: { connect: { id: courseTypeId } },
-        }),
-        ...(isAdmin && {
-          instructor: instructorIdRaw
-            ? { connect: { id: instructorIdRaw } }
-            : { disconnect: true },
-        }),
-        ...(courseDate !== null && { courseDate }),
-        ...(registrationDeadline !== null && {
-          registrationDeadline: endOfLocalDay(registrationDeadline),
-        }),
-        ...(maxCapacity !== null && { maxCapacity }),
-      },
-    });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.courseCatalog.update({
+        where: { id },
+        data: {
+          ...rest,
+          ...(courseTypeId && {
+            courseType: { connect: { id: courseTypeId } },
+          }),
+          ...(isAdmin && {
+            instructor: instructorIdRaw
+              ? { connect: { id: instructorIdRaw } }
+              : { disconnect: true },
+          }),
+          ...(courseDate !== null && { courseDate: startOfLocalDay(courseDate) }),
+          ...(registrationDeadline !== null && {
+            registrationDeadline: endOfLocalDay(registrationDeadline),
+          }),
+          ...(maxCapacity !== null && { maxCapacity }),
+          // Only admin can change publish state via the form. Instructor's
+          // submission of "published" is ignored.
+          ...(isAdmin && {
+            status: formData.get("published") === "true" ? "ACTIVE" : "DRAFT",
+          }),
+        },
+      });
 
-    await syncCoursePrices(tx, id, prices);
-  });
+      await syncCoursePrices(tx, id, prices);
+    });
+  } catch (err) {
+    if (isUniqueSlugViolation(err)) {
+      return {
+        success: false,
+        error: "Ya existe un curso con ese slug. Elige otro.",
+      };
+    }
+    throw err;
+  }
 
   revalidatePath("/admin/cursos");
   return { success: true };
 }
 
-export async function setCourseStatus(
+export async function togglePublished(
   id: string,
-  status: string,
+  published: boolean,
 ): Promise<ActionResult> {
   const authError = await requireAdmin();
   if (authError) return authError;
 
-  const validStatuses = ["DRAFT", "ACTIVE", "INACTIVE"];
-  if (!validStatuses.includes(status)) {
-    return { success: false, error: "Estado no válido" };
-  }
-
   await prisma.courseCatalog.update({
     where: { id },
-    data: { status },
+    data: { status: published ? "ACTIVE" : "DRAFT" },
   });
   revalidatePath("/admin/cursos");
   return { success: true };
@@ -169,7 +198,7 @@ export async function softDeleteCourse(id: string): Promise<ActionResult> {
 
   await prisma.courseCatalog.update({
     where: { id },
-    data: { deletedAt: new Date(), status: "INACTIVE" },
+    data: { deletedAt: new Date() },
   });
   revalidatePath("/admin/cursos");
   return { success: true };
@@ -241,4 +270,15 @@ function toNumberOrNull(value: FormDataEntryValue | null): number | null {
   if (!value || value === "") return null;
   const num = Number(value);
   return Number.isNaN(num) ? null : num;
+}
+
+function isUniqueSlugViolation(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const code = "code" in err ? (err as { code?: unknown }).code : undefined;
+  if (code !== "P2002") return false;
+  const target =
+    "meta" in err && err.meta && typeof err.meta === "object"
+      ? (err.meta as { target?: unknown }).target
+      : undefined;
+  return Array.isArray(target) && target.includes("slug");
 }

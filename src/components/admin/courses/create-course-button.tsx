@@ -9,9 +9,10 @@ import type { CourseTypeOption, InstructorOption } from "./types";
 type Props = {
   courseTypes: CourseTypeOption[];
   instructors?: InstructorOption[];
+  isAdmin: boolean;
 };
 
-export function CreateCourseButton({ courseTypes, instructors }: Props) {
+export function CreateCourseButton({ courseTypes, instructors, isAdmin }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -25,6 +26,7 @@ export function CreateCourseButton({ courseTypes, instructors }: Props) {
         onOpenChange={setIsOpen}
         courseTypes={courseTypes}
         instructors={instructors}
+        isAdmin={isAdmin}
       />
     </>
   );

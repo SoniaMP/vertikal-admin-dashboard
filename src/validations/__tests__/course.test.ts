@@ -19,6 +19,17 @@ describe("courseCatalogSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts deadline and courseDate on the same calendar day with different hours", () => {
+    // Server-side normalization yields courseDate=00:00 and deadline=23:59
+    // for the same day; the refine must compare day-only, not timestamp.
+    const result = courseCatalogSchema.safeParse({
+      ...baseInput,
+      courseDate: new Date(2026, 5, 15, 0, 0, 0),
+      registrationDeadline: new Date(2026, 5, 15, 23, 59, 59),
+    });
+    expect(result.success).toBe(true);
+  });
+
   it("accepts a deadline before courseDate", () => {
     const result = courseCatalogSchema.safeParse({
       ...baseInput,

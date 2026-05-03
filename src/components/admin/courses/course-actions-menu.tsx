@@ -101,6 +101,7 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
         course={course}
         courseTypes={courseTypes}
         instructors={instructors}
+        isAdmin={!isInstructor}
       />
     </div>
   );

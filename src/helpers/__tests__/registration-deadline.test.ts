@@ -2,7 +2,34 @@ import { describe, it, expect } from "vitest";
 import {
   endOfLocalDay,
   isRegistrationClosed,
+  startOfLocalDay,
 } from "@/helpers/registration-deadline";
+
+describe("startOfLocalDay", () => {
+  it("sets the time to 00:00:00.000 in local time", () => {
+    const date = new Date(2026, 5, 15, 8, 30, 45);
+    const result = startOfLocalDay(date);
+    expect(result.getHours()).toBe(0);
+    expect(result.getMinutes()).toBe(0);
+    expect(result.getSeconds()).toBe(0);
+    expect(result.getMilliseconds()).toBe(0);
+  });
+
+  it("preserves the calendar day", () => {
+    const date = new Date(2026, 5, 15, 23, 59, 59);
+    const result = startOfLocalDay(date);
+    expect(result.getFullYear()).toBe(2026);
+    expect(result.getMonth()).toBe(5);
+    expect(result.getDate()).toBe(15);
+  });
+
+  it("does not mutate the input", () => {
+    const date = new Date(2026, 5, 15, 8, 0, 0);
+    const before = date.getTime();
+    startOfLocalDay(date);
+    expect(date.getTime()).toBe(before);
+  });
+});
 
 describe("endOfLocalDay", () => {
   it("sets the time to 23:59:59.000 in local time", () => {
