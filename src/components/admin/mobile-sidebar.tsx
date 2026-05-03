@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { CircleUser, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "./logout-button";
+import { NavLink } from "./nav-link";
 import { getNavItemsForRole } from "./nav-items";
 
 type Props = {
@@ -28,6 +28,7 @@ const ROLE_LABELS: Record<string, string> = {
 export function MobileSidebar({ userName, userRole }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const navItems = getNavItemsForRole(userRole);
+  const navHrefs = navItems.map((item) => item.href);
 
   return (
     <>
@@ -77,15 +78,14 @@ export function MobileSidebar({ userName, userRole }: Props) {
           <Separator />
           <nav className="flex-1 p-2 space-y-1">
             {navItems.map((item) => (
-              <Link
+              <NavLink
                 key={item.href}
                 href={item.href}
+                label={item.label}
+                icon={<item.icon className="h-4 w-4" />}
+                navHrefs={navHrefs}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
+              />
             ))}
           </nav>
           <Separator />
