@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { CourseStatusBadge } from "./course-status-badge";
 import { CourseStatusSelect } from "./course-status-select";
 import { CourseActionsMenu } from "./course-actions-menu";
-import { CourseClosedBadge } from "@/components/courses/course-closed-badge";
+import { RegistrationClosedIcon } from "./registration-closed-icon";
+import { isRegistrationClosed } from "@/helpers/registration-deadline";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
@@ -16,17 +17,30 @@ type Props = {
 };
 
 export function CourseRowDesktop({ course, courseTypes, instructors, isInstructor }: Props) {
+  const now = new Date();
   const spots = course.maxCapacity - course._count.registrations;
+  const isPast = course.courseDate < now;
+  const isClosed = isRegistrationClosed(course.registrationDeadline, now);
+
+  const showClosedWarning = isClosed && !isPast;
 
   return (
-    <TableRow>
+    <TableRow
+      className={
+        isPast ? "bg-muted-foreground/10 text-muted-foreground" : undefined
+      }
+      aria-label={isPast ? "Curso pasado" : undefined}
+    >
       <TableCell className="font-medium">
-        <Link
-          href={`/admin/cursos/${course.id}`}
-          className="hover:underline"
-        >
-          {course.title}
-        </Link>
+        <div className="flex items-center gap-2">
+          {showClosedWarning && <RegistrationClosedIcon />}
+          <Link
+            href={`/admin/cursos/${course.id}`}
+            className="hover:underline"
+          >
+            {course.title}
+          </Link>
+        </div>
       </TableCell>
       <TableCell className="text-muted-foreground text-xs font-mono">
         {course.slug}
@@ -35,12 +49,10 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
         <Badge variant="outline">{course.courseType.name}</Badge>
       </TableCell>
       <TableCell className="text-muted-foreground">
-        <div className="flex items-center gap-2">
-          {formatCourseDate(course.courseDate)}
-          <CourseClosedBadge
-            registrationDeadline={course.registrationDeadline}
-          />
-        </div>
+        {formatCourseDate(course.courseDate)}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {formatCourseDate(course.registrationDeadline)}
       </TableCell>
       <TableCell className="tabular-nums">
         {course._count.registrations} / {course.maxCapacity}
