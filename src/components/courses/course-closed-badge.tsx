@@ -8,5 +8,5 @@ type Props = {
 
 export function CourseClosedBadge({ registrationDeadline, now }: Props) {
   if (!isRegistrationClosed(registrationDeadline, now)) return null;
-  return <Badge variant="destructive">Cerrado</Badge>;
+  return <Badge variant="secondary">Cerrado</Badge>;
 }
