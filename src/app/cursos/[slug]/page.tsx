@@ -3,6 +3,7 @@ import { CalendarDays, Clock, Users } from "lucide-react";
 import { fetchCourseBySlug } from "@/lib/course-queries";
 import { CourseRegistrationWizard } from "@/components/courses/course-registration-wizard";
 import { Card, CardContent } from "@/components/ui/card";
+import { isRegistrationClosed } from "@/helpers/registration-deadline";
 
 type CoursePageProps = {
   params: Promise<{ slug: string }>;
@@ -24,9 +25,11 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!course) notFound();
 
   const isPast = course.courseDate < new Date();
+  const isClosed = isRegistrationClosed(course.registrationDeadline);
   const spotsUsed = course._count.registrations;
   const spotsLeft = Math.max(0, course.maxCapacity - spotsUsed);
   const isFull = spotsLeft === 0;
+  const showWizard = !isPast && !isClosed;
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -38,7 +41,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <CalendarDays className="size-4" />
             {formatCourseDate(course.courseDate)}
           </span>
-          {!isPast && (
+          {showWizard && (
             <span className="flex items-center gap-1.5">
               <Users className="size-4" />
               {isFull
@@ -56,6 +59,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <p className="text-sm text-muted-foreground">
               Este curso tuvo lugar el {formatCourseDate(course.courseDate)}. El
               formulario de inscripción ya no está disponible.
+            </p>
+          </CardContent>
+        </Card>
+      ) : isClosed ? (
+        <Card className="border-muted">
+          <CardContent className="flex items-center gap-3 pt-6">
+            <Clock className="size-5 shrink-0 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Inscripciones cerradas. Contacta con administración si necesitas
+              inscribirte.
             </p>
           </CardContent>
         </Card>

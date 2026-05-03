@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { courseRegistrationCheckoutSchema } from "@/validations/course";
 import { getCourseAvailableSpots } from "@/lib/course-queries";
+import { isRegistrationClosed } from "@/helpers/registration-deadline";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -19,13 +20,25 @@ export async function POST(request: NextRequest) {
 
   const course = await prisma.courseCatalog.findUnique({
     where: { id: data.courseCatalogId, status: "ACTIVE", deletedAt: null },
-    select: { id: true, title: true, maxCapacity: true },
+    select: {
+      id: true,
+      title: true,
+      maxCapacity: true,
+      registrationDeadline: true,
+    },
   });
 
   if (!course) {
     return NextResponse.json(
       { error: "Curso no encontrado o no disponible" },
       { status: 404 },
+    );
+  }
+
+  if (isRegistrationClosed(course.registrationDeadline)) {
+    return NextResponse.json(
+      { error: "El plazo de inscripción ha cerrado" },
+      { status: 409 },
     );
   }
 

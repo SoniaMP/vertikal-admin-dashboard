@@ -11,23 +11,36 @@ export type CourseTypeInput = z.infer<typeof courseTypeSchema>;
 
 const SLUG_REGEX = /^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$/;
 
-export const courseCatalogSchema = z.object({
-  title: z.string().default(""),
-  slug: z
-    .string()
-    .regex(SLUG_REGEX, {
-      message: "El slug solo puede contener letras, números y guiones (sin espacios)",
-    })
-    .default(""),
-  courseDate: z.coerce.date().nullable().default(null),
-  courseTypeId: z.string().default(""),
-  maxCapacity: z
-    .number()
-    .int({ message: "La capacidad debe ser un número entero" })
-    .positive({ message: "La capacidad debe ser mayor que 0" })
-    .nullable()
-    .default(null),
-});
+export const courseCatalogSchema = z
+  .object({
+    title: z.string().default(""),
+    slug: z
+      .string()
+      .regex(SLUG_REGEX, {
+        message: "El slug solo puede contener letras, números y guiones (sin espacios)",
+      })
+      .default(""),
+    courseDate: z.coerce.date().nullable().default(null),
+    registrationDeadline: z.coerce.date().nullable().default(null),
+    courseTypeId: z.string().default(""),
+    maxCapacity: z
+      .number()
+      .int({ message: "La capacidad debe ser un número entero" })
+      .positive({ message: "La capacidad debe ser mayor que 0" })
+      .nullable()
+      .default(null),
+  })
+  .refine(
+    (data) =>
+      !data.courseDate ||
+      !data.registrationDeadline ||
+      data.registrationDeadline <= data.courseDate,
+    {
+      message:
+        "El plazo de inscripción debe ser anterior o igual a la fecha del curso",
+      path: ["registrationDeadline"],
+    },
+  );
 
 export type CourseCatalogInput = z.infer<typeof courseCatalogSchema>;
 
@@ -41,20 +54,6 @@ export const coursePriceEntrySchema = z.object({
 });
 
 export type CoursePriceEntryInput = z.infer<typeof coursePriceEntrySchema>;
-
-export const coursePriceSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
-  amountCents: z
-    .number()
-    .int({ message: "El precio debe ser un número entero (céntimos)" })
-    .positive({ message: "El precio debe ser mayor que 0" }),
-  saleStart: z.coerce.date().nullable().optional(),
-  saleEnd: z.coerce.date().nullable().optional(),
-});
-
-export type CoursePriceInput = z.infer<typeof coursePriceSchema>;
 
 export const courseRegistrationCheckoutSchema = personalDataSchema.extend({
   courseCatalogId: z

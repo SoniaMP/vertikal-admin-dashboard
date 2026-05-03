@@ -3,6 +3,8 @@ import { CalendarDays, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/helpers/price-calculator";
+import { isRegistrationClosed } from "@/helpers/registration-deadline";
+import { CourseClosedBadge } from "./course-closed-badge";
 import type { fetchPublicCourseList } from "@/lib/course-queries";
 
 type PublicCourse = Awaited<ReturnType<typeof fetchPublicCourseList>>[number];
@@ -19,6 +21,7 @@ export function CourseCard({ course }: { course: PublicCourse }) {
   const spotsUsed = course._count.registrations;
   const spotsLeft = Math.max(0, course.maxCapacity - spotsUsed);
   const isFull = spotsLeft === 0;
+  const isClosed = isRegistrationClosed(course.registrationDeadline);
   const lowestPrice = course.prices[0]?.amountCents;
 
   return (
@@ -29,8 +32,12 @@ export function CourseCard({ course }: { course: PublicCourse }) {
             <Badge variant="secondary" className="w-fit">
               {course.courseType.name}
             </Badge>
-            {isFull && (
-              <Badge variant="destructive">Agotado</Badge>
+            {isClosed ? (
+              <CourseClosedBadge
+                registrationDeadline={course.registrationDeadline}
+              />
+            ) : (
+              isFull && <Badge variant="destructive">Agotado</Badge>
             )}
           </div>
           <CardTitle className="line-clamp-2 text-lg">
