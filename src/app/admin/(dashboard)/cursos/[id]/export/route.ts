@@ -38,6 +38,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     "Provincia",
     "Categoría de pago",
     "Estado de pago",
+    "Tipo licencia",
     "Fecha inscripción",
   ];
 
@@ -54,6 +55,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     p.province ?? "",
     p.coursePrice.name,
     p.paymentStatus,
+    p.licenseType ?? "",
     p.createdAt.toISOString().slice(0, 10),
   ]);
 

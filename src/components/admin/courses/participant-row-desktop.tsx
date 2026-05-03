@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { DeleteEnrolleeButton } from "./delete-enrollee-button";
@@ -30,6 +31,24 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
           <Badge className={payment.className}>{payment.label}</Badge>
         ) : (
           <Badge variant="secondary">{p.paymentStatus}</Badge>
+        )}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {p.licenseType ?? "—"}
+      </TableCell>
+      <TableCell>
+        {p.licenseFileUrl ? (
+          <a
+            href={p.licenseFileUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center text-muted-foreground hover:text-foreground"
+            aria-label="Descargar licencia (PDF)"
+          >
+            <Download className="size-4" />
+          </a>
+        ) : (
+          <span className="text-muted-foreground">—</span>
         )}
       </TableCell>
       <TableCell className="text-muted-foreground">

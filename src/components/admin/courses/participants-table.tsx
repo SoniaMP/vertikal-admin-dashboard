@@ -24,6 +24,8 @@ export type ParticipantRow = {
   postalCode: string | null;
   province: string | null;
   paymentStatus: string;
+  licenseType: string | null;
+  licenseFileUrl: string | null;
   createdAt: Date;
   coursePrice: { name: string };
 };
@@ -114,6 +116,8 @@ export function ParticipantsTable({
                 currentDir={sortDir}
                 basePath={basePath}
               />
+              <TableHead>Tipo licencia</TableHead>
+              <TableHead>PDF</TableHead>
               <SortableHeader
                 field="createdAt"
                 label="Fecha inscripcion"

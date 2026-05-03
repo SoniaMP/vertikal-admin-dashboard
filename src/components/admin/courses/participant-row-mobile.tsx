@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DeleteEnrolleeButton } from "./delete-enrollee-button";
 import type { ParticipantRow } from "./participants-table";
@@ -41,6 +42,19 @@ export function ParticipantRowMobile({ participant: p, courseId }: Props) {
         {p.dni && <span>DNI: {p.dni}</span>}
         {p.phone && <span>{p.phone}</span>}
         <span>{p.coursePrice.name}</span>
+        {p.licenseType && <span>Licencia: {p.licenseType}</span>}
+        {p.licenseFileUrl && (
+          <a
+            href={p.licenseFileUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+            aria-label="Descargar licencia (PDF)"
+          >
+            <Download className="size-4" />
+            PDF
+          </a>
+        )}
         <span className="ml-auto">{formatDate(p.createdAt)}</span>
       </div>
     </div>
