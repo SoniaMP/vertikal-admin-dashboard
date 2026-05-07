@@ -73,6 +73,7 @@ const validBody = {
   phone: "612345678",
   dni: "12345678A",
   dateOfBirth: "1990-01-15",
+  sex: "M",
   address: "Calle Mayor 1",
   city: "Madrid",
   postalCode: "28001",

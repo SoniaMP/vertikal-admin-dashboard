@@ -41,6 +41,7 @@ export function MobileCard({ membership: m }: Props) {
       </div>
       <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
         <span>{licenseLabel(m)}</span>
+        <span>{m.member.sex}</span>
         <span>{formatPrice(m.totalAmount)}</span>
         <span className="ml-auto">{formatDate(m.createdAt)}</span>
       </div>

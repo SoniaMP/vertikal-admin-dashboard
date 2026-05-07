@@ -11,6 +11,7 @@ function makeFilters(
     paymentStatus: "",
     membershipStatus: "",
     federated: "",
+    sex: "",
     typeId: "",
     subtypeId: "",
     categoryId: "",
@@ -66,6 +67,29 @@ describe("buildMembershipWhere", () => {
       makeFilters({ federated: "false" }),
     );
     expect(whereFalse.AND).toContainEqual({ isFederated: false });
+  });
+
+  it("adds sex filter scoped to member", () => {
+    const whereM = buildMembershipWhere(makeFilters({ sex: "M" }));
+    expect(whereM.AND).toContainEqual({ member: { sex: "M" } });
+
+    const whereF = buildMembershipWhere(makeFilters({ sex: "F" }));
+    expect(whereF.AND).toContainEqual({ member: { sex: "F" } });
+  });
+
+  it("ignores invalid or empty sex value", () => {
+    const whereEmpty = buildMembershipWhere(makeFilters({ sex: "" }));
+    const whereBogus = buildMembershipWhere(makeFilters({ sex: "X" }));
+    const hasSex = (where: { AND: Record<string, unknown>[] }) =>
+      where.AND.some(
+        (c) =>
+          "member" in c &&
+          typeof c.member === "object" &&
+          c.member !== null &&
+          "sex" in (c.member as object),
+      );
+    expect(hasSex(whereEmpty)).toBe(false);
+    expect(hasSex(whereBogus)).toBe(false);
   });
 
   it("ignores empty federated value", () => {

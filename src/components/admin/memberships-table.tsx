@@ -25,6 +25,7 @@ export type MembershipRow = {
     phone: string;
     dni: string;
     dateOfBirth: string;
+    sex: string;
     address: string;
     city: string;
     postalCode: string;
@@ -58,6 +59,7 @@ export function MembershipsTable({ memberships, sortBy, sortDir }: Props) {
             <TableRow>
               <SortableHeader field="memberName" label="Nombre" currentSort={sortBy} currentDir={sortDir} />
               <SortableHeader field="email" label="Email" currentSort={sortBy} currentDir={sortDir} />
+              <TableHead>Sexo</TableHead>
               <TableHead>Licencia</TableHead>
               <SortableHeader field="totalAmount" label="Total" currentSort={sortBy} currentDir={sortDir} />
               <SortableHeader field="status" label="Estado" currentSort={sortBy} currentDir={sortDir} />

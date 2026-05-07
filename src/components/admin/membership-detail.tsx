@@ -22,6 +22,7 @@ type MembershipDetailData = {
     phone: string;
     dni: string;
     dateOfBirth: string;
+    sex: string;
     address: string;
     city: string;
     postalCode: string;
@@ -71,6 +72,12 @@ const STATUS_VARIANTS: Record<
   CANCELLED: "destructive",
 };
 
+function formatSex(value: string): string {
+  if (value === "M") return "Hombre";
+  if (value === "F") return "Mujer";
+  return value;
+}
+
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("es-ES", {
     day: "2-digit",
@@ -112,6 +119,7 @@ function PersonalDataCard({ membership: m }: Props) {
         <Field label="Telefono" value={m.member.phone} />
         <Field label="DNI" value={m.member.dni} />
         <Field label="Fecha de nacimiento" value={m.member.dateOfBirth} />
+        <Field label="Sexo" value={formatSex(m.member.sex)} />
         <Field label="Direccion" value={m.member.address} />
         <Field label="Ciudad" value={m.member.city} />
         <Field label="Codigo postal" value={m.member.postalCode} />

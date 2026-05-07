@@ -3,6 +3,7 @@
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   FormField,
   FormItem,
@@ -29,6 +30,7 @@ export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
           <TextField name="dni" label="DNI" />
           <TextField name="dateOfBirth" label="Fecha de nacimiento" type="date" />
         </div>
+        <SexField />
       </fieldset>
 
       <fieldset className="space-y-4 rounded-lg border p-4">
@@ -55,6 +57,39 @@ export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function SexField() {
+  const form = useFormContext<RegistrationInput>();
+
+  return (
+    <FormField
+      control={form.control}
+      name="sex"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Sexo</FormLabel>
+          <FormControl>
+            <RadioGroup
+              value={typeof field.value === "string" ? field.value : ""}
+              onValueChange={field.onChange}
+              className="flex gap-6"
+            >
+              <label className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="M" />
+                Hombre
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="F" />
+                Mujer
+              </label>
+            </RadioGroup>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 }
 

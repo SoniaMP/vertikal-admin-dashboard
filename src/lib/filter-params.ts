@@ -36,6 +36,7 @@ export function parseFilterParams(
     paymentStatus: str("paymentStatus"),
     membershipStatus: str("membershipStatus"),
     federated: str("federated"),
+    sex: str("sex"),
     typeId: str("typeId"),
     subtypeId: str("subtypeId"),
     categoryId: str("categoryId"),
@@ -65,6 +66,7 @@ export function serializeFilters(
     "paymentStatus",
     "membershipStatus",
     "federated",
+    "sex",
     "typeId",
     "subtypeId",
     "categoryId",
@@ -101,6 +103,7 @@ const FILTER_LABELS: Record<string, string> = {
   paymentStatus: "Estado pago",
   membershipStatus: "Estado membresía",
   federated: "Federado",
+  sex: "Sexo",
   typeId: "Tipo",
   subtypeId: "Subtipo",
   categoryId: "Categoría",
@@ -116,6 +119,17 @@ const FEDERATED_LABELS: Record<string, string> = {
   false: "No",
 };
 
+const SEX_LABELS: Record<string, string> = {
+  M: "Hombre",
+  F: "Mujer",
+};
+
+function getDisplayValue(key: string, value: string): string {
+  if (key === "federated") return FEDERATED_LABELS[value] ?? value;
+  if (key === "sex") return SEX_LABELS[value] ?? value;
+  return value;
+}
+
 export function getActiveFilterEntries(
   filters: MembershipFilterState,
 ): FilterEntry[] {
@@ -125,9 +139,11 @@ export function getActiveFilterEntries(
   for (const key of keys) {
     const value = filters[key as keyof MembershipFilterState];
     if (typeof value === "string" && value) {
-      const displayValue =
-        key === "federated" ? (FEDERATED_LABELS[value] ?? value) : value;
-      entries.push({ key, label: FILTER_LABELS[key], value: displayValue });
+      entries.push({
+        key,
+        label: FILTER_LABELS[key],
+        value: getDisplayValue(key, value),
+      });
     }
   }
 

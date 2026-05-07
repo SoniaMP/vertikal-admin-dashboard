@@ -24,6 +24,10 @@ export function ConfirmationSummary({ data }: ConfirmationSummaryProps) {
           label="Fecha de nacimiento"
           value={member.dateOfBirth}
         />
+        <ConfirmationRow
+          label="Sexo"
+          value={member.sex === "M" ? "Hombre" : member.sex === "F" ? "Mujer" : ""}
+        />
         <ConfirmationRow label="Dirección" value={fullAddress} />
       </ConfirmationSection>
 

@@ -1,5 +1,12 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { MemberFormData } from "./member-form-dialog";
 
 type Props = {
@@ -38,6 +45,18 @@ export function MemberFormFields({ defaults = {} }: Props) {
           />
         </div>
       ))}
+      <div className="space-y-1">
+        <Label htmlFor="sex">Sexo</Label>
+        <Select name="sex" defaultValue={defaults.sex ?? ""} required>
+          <SelectTrigger id="sex">
+            <SelectValue placeholder="Selecciona" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="M">Hombre</SelectItem>
+            <SelectItem value="F">Mujer</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

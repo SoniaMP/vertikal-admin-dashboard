@@ -242,6 +242,10 @@ function buildMembershipWhere(filters: MembershipFilterState) {
     conditions.push({ isFederated: filters.federated === "true" });
   }
 
+  if (filters.sex === "M" || filters.sex === "F") {
+    conditions.push({ member: { sex: filters.sex } });
+  }
+
   if (filters.typeId) {
     conditions.push({ typeId: filters.typeId });
   }

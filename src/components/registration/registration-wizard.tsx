@@ -33,6 +33,7 @@ const EMPTY_DEFAULTS: RegistrationInput = {
   phone: "",
   dni: "",
   dateOfBirth: "",
+  sex: "",
   address: "",
   city: "",
   postalCode: "",

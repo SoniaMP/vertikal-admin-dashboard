@@ -40,6 +40,7 @@ export async function createMemberWithMembership(
     phone: formData.get("phone"),
     dni: formData.get("dni"),
     dateOfBirth: formData.get("dateOfBirth"),
+    sex: formData.get("sex"),
     address: formData.get("address"),
     city: formData.get("city"),
     postalCode: formData.get("postalCode"),
@@ -100,6 +101,7 @@ export type DniSearchResult = {
   phone: string;
   dni: string;
   dateOfBirth: string;
+  sex: string;
   address: string;
   city: string;
   postalCode: string;
@@ -140,6 +142,7 @@ export async function searchByDni(dni: string): Promise<DniSearchResult> {
     phone: member.phone,
     dni: member.dni,
     dateOfBirth: member.dateOfBirth,
+    sex: member.sex,
     address: member.address,
     city: member.city,
     postalCode: member.postalCode,
