@@ -46,6 +46,7 @@ export type PersonalData = {
   phone: string;
   dni: string;
   dateOfBirth: string;
+  sex: string;
   address: string;
   city: string;
   postalCode: string;
@@ -116,6 +117,7 @@ export type MemberRecord = {
   email: string;
   phone: string;
   dateOfBirth: string;
+  sex: string;
   address: string;
   city: string;
   postalCode: string;

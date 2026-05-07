@@ -12,6 +12,7 @@ const validPersonalData = {
   phone: "612345678",
   dni: "12345678A",
   dateOfBirth: "1990-01-15",
+  sex: "M",
   address: "Calle Mayor 10",
   city: "Madrid",
   postalCode: "28001",
@@ -127,6 +128,34 @@ describe("personalDataSchema", () => {
       dateOfBirth: "",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts F as sex", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      sex: "F",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects empty sex", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      sex: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects invalid sex value", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      sex: "X",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const sexError = result.error.issues.find((i) => i.path.includes("sex"));
+      expect(sexError?.message).toBe("Selecciona el sexo");
+    }
   });
 
   it("returns Spanish error messages", () => {

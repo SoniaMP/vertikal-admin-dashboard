@@ -14,6 +14,7 @@ export type MembershipFilterState = {
   paymentStatus: string;
   membershipStatus: string;
   federated: string;
+  sex: string;
   typeId: string;
   subtypeId: string;
   categoryId: string;

@@ -39,6 +39,7 @@ function buildFormData(overrides: Record<string, string | null> = {}): FormData 
     phone: "612345678",
     dni: "12345678A",
     dateOfBirth: "1990-01-15",
+    sex: "M",
     address: "Calle Mayor 10",
     city: "Madrid",
     postalCode: "28001",

@@ -61,6 +61,10 @@ export function RegistrationSummary({
         <SummaryRow label="DNI" value={data.dni} />
         <SummaryRow label="Fecha de nacimiento" value={data.dateOfBirth} />
         <SummaryRow
+          label="Sexo"
+          value={data.sex === "M" ? "Hombre" : data.sex === "F" ? "Mujer" : ""}
+        />
+        <SummaryRow
           label="Dirección"
           value={`${data.address}, ${data.postalCode} ${data.city} (${data.province})`}
         />

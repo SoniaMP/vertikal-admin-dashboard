@@ -17,6 +17,7 @@ function makeFilters(
     paymentStatus: "",
     membershipStatus: "",
     federated: "",
+    sex: "",
     typeId: "",
     subtypeId: "",
     categoryId: "",
@@ -160,6 +161,14 @@ describe("getActiveFilterEntries", () => {
       label: "Estado pago",
       value: "PENDING",
     });
+  });
+
+  it("resolves sex display value", () => {
+    const male = getActiveFilterEntries(makeFilters({ sex: "M" }));
+    expect(male[0]).toEqual({ key: "sex", label: "Sexo", value: "Hombre" });
+
+    const female = getActiveFilterEntries(makeFilters({ sex: "F" }));
+    expect(female[0].value).toBe("Mujer");
   });
 
   it("resolves federated display value", () => {

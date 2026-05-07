@@ -11,6 +11,7 @@ const FILTER_LABELS: Record<string, string> = {
   paymentStatus: "Estado pago",
   membershipStatus: "Estado",
   federated: "Federado",
+  sex: "Sexo",
   typeId: "Tipo",
   subtypeId: "Subtipo",
   categoryId: "Categoría",
@@ -70,6 +71,8 @@ function resolveDisplayValue(
       return STATUS_LABELS[value] ?? value;
     case "federated":
       return value === "true" ? "Sí" : "No";
+    case "sex":
+      return SEX_LABELS[value] ?? value;
     case "typeId":
       return options.types.find((t) => t.id === value)?.name ?? value;
     case "subtypeId":
@@ -82,6 +85,11 @@ function resolveDisplayValue(
       return value;
   }
 }
+
+const SEX_LABELS: Record<string, string> = {
+  M: "Hombre",
+  F: "Mujer",
+};
 
 const VIEW_LABELS: Record<string, string> = {
   not_renewed: "No renovados",

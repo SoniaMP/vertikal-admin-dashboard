@@ -138,6 +138,7 @@ model Member {
   email       String
   phone       String
   dateOfBirth String
+  sex         String
   address     String
   city        String
   postalCode  String

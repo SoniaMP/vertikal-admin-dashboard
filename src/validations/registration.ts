@@ -28,6 +28,9 @@ export const personalDataSchema = z.object({
   dateOfBirth: z
     .string()
     .min(1, { message: "La fecha de nacimiento es obligatoria" }),
+  sex: z
+    .string()
+    .refine((v) => ["M", "F"].includes(v), { message: "Selecciona el sexo" }),
   address: z
     .string()
     .min(5, { message: "La dirección debe tener al menos 5 caracteres" }),

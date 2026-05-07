@@ -58,6 +58,7 @@ export type MembershipConfirmation = {
     phone: string;
     dni: string;
     dateOfBirth: string;
+    sex: string;
     address: string;
     city: string;
     postalCode: string;

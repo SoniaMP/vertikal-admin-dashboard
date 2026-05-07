@@ -42,6 +42,7 @@ export type RenewalSearchResult = {
   phone: string;
   dni: string;
   dateOfBirth: string;
+  sex: string;
   address: string;
   city: string;
   postalCode: string;
@@ -80,6 +81,7 @@ export async function findMemberByDni(
     phone: member.phone,
     dni: member.dni,
     dateOfBirth: member.dateOfBirth,
+    sex: member.sex,
     address: member.address,
     city: member.city,
     postalCode: member.postalCode,

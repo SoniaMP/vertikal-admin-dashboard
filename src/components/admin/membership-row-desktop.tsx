@@ -24,6 +24,7 @@ export function DesktopRow({ membership: m }: Props) {
         </Link>
       </TableCell>
       <TableCell className="text-muted-foreground">{m.member.email}</TableCell>
+      <TableCell>{m.member.sex}</TableCell>
       <TableCell>{licenseLabel(m)}</TableCell>
       <TableCell>{formatPrice(m.totalAmount)}</TableCell>
       <TableCell>

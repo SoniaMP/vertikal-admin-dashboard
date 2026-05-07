@@ -31,6 +31,7 @@ export function AdvancedFiltersPanel({ filterOptions }: Props) {
   const typeId = searchParams.get("typeId") ?? "";
   const subtypeId = searchParams.get("subtypeId") ?? "";
   const categoryId = searchParams.get("categoryId") ?? "";
+  const sex = searchParams.get("sex") ?? "";
 
   const filteredSubtypes = typeId
     ? filterOptions.subtypes.filter((s) => s.typeId === typeId)
@@ -40,11 +41,17 @@ export function AdvancedFiltersPanel({ filterOptions }: Props) {
     "typeId",
     "subtypeId",
     "categoryId",
+    "sex",
     "province",
     "city",
     "dateFrom",
     "dateTo",
   ].some((key) => searchParams.has(key));
+
+  const sexOptions = [
+    { id: "M", name: "Hombre" },
+    { id: "F", name: "Mujer" },
+  ];
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -86,6 +93,13 @@ export function AdvancedFiltersPanel({ filterOptions }: Props) {
             value={categoryId}
             options={filterOptions.categories}
             onChange={(v) => updateParam("categoryId", v)}
+          />
+
+          <FilterSelect
+            label="Sexo"
+            value={sex}
+            options={sexOptions}
+            onChange={(v) => updateParam("sex", v)}
           />
 
           <div className="space-y-1.5">
