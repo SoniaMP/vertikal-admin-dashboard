@@ -5,12 +5,18 @@ const mockDelete = vi.fn();
 const mockDeleteMany = vi.fn();
 const mockCount = vi.fn();
 const mockMemberDelete = vi.fn();
+const mockMemberUpdate = vi.fn();
+const mockMembershipUpdate = vi.fn();
 const mockTransaction = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    membership: { findUnique: (...a: unknown[]) => mockFindUnique(...a) },
-    $transaction: (fn: (tx: unknown) => Promise<void>) => mockTransaction(fn),
+    membership: {
+      findUnique: (...a: unknown[]) => mockFindUnique(...a),
+      update: (...a: unknown[]) => mockMembershipUpdate(...a),
+    },
+    member: { update: (...a: unknown[]) => mockMemberUpdate(...a) },
+    $transaction: (arg: unknown) => mockTransaction(arg),
   },
 }));
 
@@ -66,5 +72,61 @@ describe("deleteMembership", () => {
     const result = await deleteMembership("ms-1");
 
     expect(result).toEqual({ success: false, error: "Error al eliminar la membresía" });
+  });
+});
+
+function buildMemberFormData(overrides: Record<string, string> = {}) {
+  const fd = new FormData();
+  const base: Record<string, string> = {
+    firstName: "Ana",
+    lastName: "García",
+    email: "ana@example.com",
+    phone: "600000000",
+    dni: "12345678A",
+    dateOfBirth: "1990-01-01",
+    sex: "F",
+    address: "Calle Falsa 123",
+    city: "Madrid",
+    postalCode: "28001",
+    province: "Madrid",
+    paymentStatus: "PENDING",
+    ...overrides,
+  };
+  for (const [k, v] of Object.entries(base)) fd.append(k, v);
+  return fd;
+}
+
+describe("updateMembership", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockTransaction.mockImplementation(async (ops: unknown) =>
+      Array.isArray(ops) ? Promise.all(ops) : undefined,
+    );
+    mockFindUnique.mockResolvedValue({ memberId: "m-1" });
+    mockMemberUpdate.mockResolvedValue({});
+    mockMembershipUpdate.mockResolvedValue({});
+  });
+
+  it("persists sex when present in form data", async () => {
+    const { updateMembership } = await import("../membership-actions");
+    const fd = buildMemberFormData({ sex: "M" });
+
+    const result = await updateMembership("ms-1", { success: false }, fd);
+
+    expect(result).toEqual({ success: true });
+    expect(mockMemberUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ sex: "M" }) }),
+    );
+  });
+
+  it("returns validation error when sex is missing", async () => {
+    const { updateMembership } = await import("../membership-actions");
+    const fd = buildMemberFormData();
+    fd.delete("sex");
+
+    const result = await updateMembership("ms-1", { success: false }, fd);
+
+    expect(result.success).toBe(false);
+    expect(mockMemberUpdate).not.toHaveBeenCalled();
   });
 });

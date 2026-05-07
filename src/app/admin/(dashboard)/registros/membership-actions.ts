@@ -33,6 +33,7 @@ export async function updateMembership(
     phone: formData.get("phone"),
     dni: formData.get("dni"),
     dateOfBirth: formData.get("dateOfBirth"),
+    sex: formData.get("sex"),
     address: formData.get("address"),
     city: formData.get("city"),
     postalCode: formData.get("postalCode"),
