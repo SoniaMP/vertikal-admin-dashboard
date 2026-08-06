@@ -57,20 +57,26 @@ export const coursePriceEntrySchema = z.object({
 
 export type CoursePriceEntryInput = z.infer<typeof coursePriceEntrySchema>;
 
-export const courseRegistrationCheckoutSchema = personalDataSchema.extend({
-  courseCatalogId: z
-    .string()
-    .min(1, { message: "El curso es obligatorio" }),
-  coursePriceId: z
-    .string()
-    .min(1, { message: "El precio es obligatorio" }),
-  licenseType: z
-    .string()
-    .min(1, { message: "El tipo de licencia es obligatorio" }),
-  licenseFileUrl: z
-    .string()
-    .min(1, { message: "La licencia es obligatoria" }),
-});
+// Course registration reuses the personal-data fields but does NOT capture the
+// member's sex: a course enrollee is not a `Member` and `CourseRegistration`
+// has no `sex` column. Omitting it keeps the required-field set aligned with the
+// form and prevents an invisible, unfillable field from blocking the wizard.
+export const courseRegistrationCheckoutSchema = personalDataSchema
+  .omit({ sex: true })
+  .extend({
+    courseCatalogId: z
+      .string()
+      .min(1, { message: "El curso es obligatorio" }),
+    coursePriceId: z
+      .string()
+      .min(1, { message: "El precio es obligatorio" }),
+    licenseType: z
+      .string()
+      .min(1, { message: "El tipo de licencia es obligatorio" }),
+    licenseFileUrl: z
+      .string()
+      .min(1, { message: "La licencia es obligatoria" }),
+  });
 
 export type CourseRegistrationCheckoutInput = z.infer<
   typeof courseRegistrationCheckoutSchema

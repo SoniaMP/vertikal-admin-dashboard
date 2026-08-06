@@ -59,10 +59,19 @@ export function CourseRegistrationWizard({
     },
   });
 
-  async function handleNext() {
-    const isValid = await form.trigger();
-    if (isValid) setStep(2);
-  }
+  // Using handleSubmit (not a bare trigger) so an invalid form never fails
+  // silently: RHF focuses the first field with an error and we surface a banner.
+  const handleNext = form.handleSubmit(
+    () => {
+      setError(null);
+      setStep(2);
+    },
+    () => {
+      setError(
+        "Revisa los campos marcados: faltan datos obligatorios o hay errores.",
+      );
+    },
+  );
 
   async function handleCheckout() {
     setIsSubmitting(true);

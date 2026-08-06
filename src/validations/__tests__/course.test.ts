@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { courseCatalogSchema } from "@/validations/course";
+import {
+  courseCatalogSchema,
+  courseRegistrationCheckoutSchema,
+} from "@/validations/course";
 
 describe("courseCatalogSchema", () => {
   const baseInput = {
@@ -69,5 +72,40 @@ describe("courseCatalogSchema", () => {
       registrationDeadline: new Date(2026, 5, 10),
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("courseRegistrationCheckoutSchema", () => {
+  const validInput = {
+    firstName: "Ana",
+    lastName: "García",
+    email: "ana@example.com",
+    phone: "612345678",
+    dni: "12345678Z",
+    dateOfBirth: "1990-01-01",
+    address: "Calle Mayor 1",
+    city: "Madrid",
+    postalCode: "28001",
+    province: "Madrid",
+    courseCatalogId: "course-1",
+    coursePriceId: "price-1",
+    licenseType: "FEDME",
+    licenseFileUrl: "https://example.com/license.pdf",
+  };
+
+  it("accepts a registration without a sex field (course flow does not capture it)", () => {
+    const result = courseRegistrationCheckoutSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+  });
+
+  it("ignores a sex field if present", () => {
+    const result = courseRegistrationCheckoutSchema.safeParse({
+      ...validInput,
+      sex: "whatever",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect("sex" in result.data).toBe(false);
+    }
   });
 });
