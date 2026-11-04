@@ -51,7 +51,15 @@ export function CourseTypeFormDialog({
               : "Nuevo tipo de curso"}
           </DialogTitle>
         </DialogHeader>
-        <form action={formAction} className="space-y-4">
+        <form
+          action={formAction}
+          // This dialog is portaled out of the DOM, but it is still a child of
+          // the course form in the React tree, and React bubbles events along
+          // that tree. Without this, saving a category would submit the course
+          // form instead and swallow this action.
+          onSubmit={(event) => event.stopPropagation()}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="name">Nombre</Label>
             <Input
