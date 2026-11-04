@@ -5,10 +5,16 @@ import { revalidatePath } from "next/cache";
 import { courseTypeSchema } from "@/validations/course";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 
+// `ActionResult` is shared by every action in the project, so the created
+// record travels in a type of its own instead of widening it.
+export type CreateCourseTypeResult = ActionResult & {
+  createdCourseType?: { id: string; name: string };
+};
+
 export async function createCourseType(
   _prevState: ActionResult,
   formData: FormData,
-): Promise<ActionResult> {
+): Promise<CreateCourseTypeResult> {
   const authError = await requireAuth();
   if (authError) return authError;
 
@@ -21,9 +27,12 @@ export async function createCourseType(
     return { success: false, error: firstError };
   }
 
-  await prisma.courseType.create({ data: parsed.data });
+  const createdCourseType = await prisma.courseType.create({
+    data: parsed.data,
+    select: { id: true, name: true },
+  });
   revalidatePath("/admin/cursos");
-  return { success: true };
+  return { success: true, createdCourseType };
 }
 
 export async function updateCourseType(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import type { CourseTypeOption } from "./types";
 import {
   Dialog,
@@ -15,11 +15,13 @@ import {
   createCourseType,
   updateCourseType,
 } from "@/app/admin/(dashboard)/cursos/actions";
+import type { CreateCourseTypeResult } from "@/app/admin/(dashboard)/cursos/actions";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   courseType?: CourseTypeOption;
+  onCreated?: (courseType: CourseTypeOption) => void;
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -28,6 +30,7 @@ export function CourseTypeFormDialog({
   open,
   onOpenChange,
   courseType,
+  onCreated,
 }: Props) {
   const isEditing = !!courseType;
 
@@ -35,11 +38,22 @@ export function CourseTypeFormDialog({
     ? updateCourseType.bind(null, courseType.id)
     : createCourseType;
 
-  const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
+  const [state, formAction, isPending] = useActionState<
+    CreateCourseTypeResult,
+    FormData
+  >(action, INITIAL_STATE);
+
+  // Each result is handled once. Without this guard, a caller passing a fresh
+  // `onCreated` on every render would re-trigger the effect through its own
+  // state update and loop forever.
+  const handledResult = useRef<CreateCourseTypeResult | null>(null);
 
   useEffect(() => {
-    if (state.success) onOpenChange(false);
-  }, [state, onOpenChange]);
+    if (!state.success || handledResult.current === state) return;
+    handledResult.current = state;
+    if (state.createdCourseType) onCreated?.(state.createdCourseType);
+    onOpenChange(false);
+  }, [state, onCreated, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

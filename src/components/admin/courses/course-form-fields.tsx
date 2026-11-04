@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { CourseTypeFormDialog } from "./course-type-form-dialog";
+import { CourseTypeField } from "./course-type-field";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
 type Props = {
@@ -38,7 +36,6 @@ function toDateOnlyInputValue(date: Date): string {
 const NONE_VALUE = "__none__";
 
 export function CourseFormFields({ course, courseTypes, instructors }: Props) {
-  const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
   const [directorId, setDirectorId] = useState(
     course?.instructor?.id ?? NONE_VALUE,
   );
@@ -85,39 +82,10 @@ export function CourseFormFields({ course, courseTypes, instructors }: Props) {
           Letras, números y guiones. Sin espacios. Se usa en la URL pública.
         </p>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="courseTypeId">Categoría</Label>
-        <div className="flex gap-2">
-          <Select
-            name="courseTypeId"
-            defaultValue={course?.courseType.id ?? ""}
-          >
-            <SelectTrigger id="courseTypeId">
-              <SelectValue placeholder="Seleccionar categoría" />
-            </SelectTrigger>
-            <SelectContent>
-              {courseTypes.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => setIsTypeDialogOpen(true)}
-            aria-label="Nueva categoría"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        <CourseTypeFormDialog
-          open={isTypeDialogOpen}
-          onOpenChange={setIsTypeDialogOpen}
-        />
-      </div>
+      <CourseTypeField
+        courseTypes={courseTypes}
+        defaultCourseTypeId={course?.courseType.id}
+      />
       <div className="space-y-2">
         <Label htmlFor="courseDate">Fecha</Label>
         <Input

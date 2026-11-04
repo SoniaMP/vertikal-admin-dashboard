@@ -4,6 +4,8 @@ export {
   toggleCourseTypeActive,
 } from "./actions/course-type-actions";
 
+export type { CreateCourseTypeResult } from "./actions/course-type-actions";
+
 export {
   createCourse,
   updateCourse,
