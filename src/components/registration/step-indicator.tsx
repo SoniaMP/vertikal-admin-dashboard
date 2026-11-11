@@ -6,8 +6,9 @@ type Step = { number: number; label: string };
 
 const DEFAULT_STEPS: Step[] = [
   { number: 1, label: "Datos personales" },
-  { number: 2, label: "Federativa" },
-  { number: 3, label: "Resumen" },
+  { number: 2, label: "Licencia" },
+  { number: 3, label: "Federativa" },
+  { number: 4, label: "Resumen" },
 ];
 
 type StepIndicatorProps = {

@@ -8,7 +8,7 @@ datasource db {
 
 model Season {
   id        String   @id @default(cuid())
-  name      String   // e.g. "2025-2026"
+  name      String // e.g. "2025-2026"
   startDate DateTime
   endDate   DateTime
   isActive  Boolean  @default(false)
@@ -43,7 +43,7 @@ model LicenseSubtype {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  licenseType LicenseType @relation(fields: [licenseTypeId], references: [id])
+  licenseType LicenseType       @relation(fields: [licenseTypeId], references: [id])
   offerings   LicenseOffering[]
   memberships Membership[]
 }
@@ -66,12 +66,12 @@ model LicenseOffering {
   typeId     String
   subtypeId  String
   categoryId String
-  price      Int    // Price in cents
+  price      Int // Price in cents
 
   season   Season         @relation(fields: [seasonId], references: [id])
   type     LicenseType    @relation(fields: [typeId], references: [id])
   subtype  LicenseSubtype @relation(fields: [subtypeId], references: [id])
-  category Category        @relation(fields: [categoryId], references: [id])
+  category Category       @relation(fields: [categoryId], references: [id])
 
   memberships Membership[]
 
@@ -98,7 +98,7 @@ model Supplement {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  supplementGroup       SupplementGroup?     @relation(fields: [supplementGroupId], references: [id])
+  supplementGroup       SupplementGroup?       @relation(fields: [supplementGroupId], references: [id])
   prices                SupplementPrice[]
   membershipSupplements MembershipSupplement[]
 }
@@ -107,21 +107,21 @@ model SupplementPrice {
   id           String @id @default(cuid())
   seasonId     String
   supplementId String
-  price        Int    // Price in cents
+  price        Int // Price in cents
 
-  season     Season       @relation(fields: [seasonId], references: [id])
+  season     Season     @relation(fields: [seasonId], references: [id])
   supplement Supplement @relation(fields: [supplementId], references: [id])
 
   @@unique([seasonId, supplementId])
 }
 
 model SupplementGroupPrice {
-  id      String @id @default(cuid())
+  id       String @id @default(cuid())
   seasonId String
   groupId  String
-  price    Int    // Price in cents (charged once for any combo in the group)
+  price    Int // Price in cents (charged once for any combo in the group)
 
-  season Season           @relation(fields: [seasonId], references: [id])
+  season Season          @relation(fields: [seasonId], references: [id])
   group  SupplementGroup @relation(fields: [groupId], references: [id])
 
   @@unique([seasonId, groupId])
@@ -159,33 +159,37 @@ model Member {
 // PaymentStatus: PENDING | COMPLETED | FAILED | REFUNDED
 // ──────────────────────────────────────────────
 model Membership {
-  id                   String    @id @default(cuid())
-  memberId             String
-  seasonId             String
-  status               String    @default("PENDING_PAYMENT")
-  typeId               String?
-  subtypeId            String?
-  categoryId           String
-  offeringId           String?
-  licensePriceSnapshot Int       @default(0)
-  licenseLabelSnapshot String    @default("")
-  isFederated          Boolean   @default(false)
-  totalAmount          Int
-  paymentStatus        String    @default("PENDING")
-  stripeSessionId      String?
-  stripePaymentId      String?
-  confirmationSent     Boolean   @default(false)
-  consentedAt          DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                        String    @id @default(cuid())
+  memberId                  String
+  seasonId                  String
+  status                    String    @default("PENDING_PAYMENT")
+  typeId                    String?
+  subtypeId                 String?
+  categoryId                String?
+  offeringId                String?
+  licensePriceSnapshot      Int       @default(0)
+  licenseLabelSnapshot      String    @default("")
+  isFederated               Boolean   @default(false)
+  hasClubLicense            Boolean   @default(true)
+  externalLicenseLabel      String?
+  externalLicenseFileUrl    String?
+  externalLicenseVerifiedAt DateTime?
+  totalAmount               Int
+  paymentStatus             String    @default("PENDING")
+  stripeSessionId           String?
+  stripePaymentId           String?
+  confirmationSent          Boolean   @default(false)
+  consentedAt               DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 
-  member            Member                 @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  season            Season                 @relation(fields: [seasonId], references: [id])
-  type              LicenseType?           @relation(fields: [typeId], references: [id])
-  subtype           LicenseSubtype?        @relation(fields: [subtypeId], references: [id])
-  offering          LicenseOffering?       @relation(fields: [offeringId], references: [id])
-  category          Category               @relation(fields: [categoryId], references: [id])
-  supplements       MembershipSupplement[]
+  member      Member                 @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  season      Season                 @relation(fields: [seasonId], references: [id])
+  type        LicenseType?           @relation(fields: [typeId], references: [id])
+  subtype     LicenseSubtype?        @relation(fields: [subtypeId], references: [id])
+  offering    LicenseOffering?       @relation(fields: [offeringId], references: [id])
+  category    Category?              @relation(fields: [categoryId], references: [id])
+  supplements MembershipSupplement[]
 
   @@unique([memberId, seasonId])
   @@index([seasonId, status])
@@ -269,8 +273,8 @@ model CourseCatalog {
   updatedAt            DateTime  @updatedAt
   deletedAt            DateTime?
 
-  courseType     CourseType          @relation(fields: [courseTypeId], references: [id])
-  instructor    User?               @relation(fields: [instructorId], references: [id])
+  courseType    CourseType           @relation(fields: [courseTypeId], references: [id])
+  instructor    User?                @relation(fields: [instructorId], references: [id])
   prices        CoursePrice[]
   registrations CourseRegistration[]
 

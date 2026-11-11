@@ -6,6 +6,12 @@ const DNI_MESSAGE = "Documento no válido (5-20 caracteres alfanuméricos)";
 const SPANISH_PHONE_REGEX = /^(\+34)?[6-9]\d{8}$/;
 const SPANISH_POSTAL_CODE_REGEX = /^\d{5}$/;
 
+// Only a path this app produced is accepted. The value is rendered as a link in
+// the admin panel, so letting a registrant post an arbitrary URL would turn the
+// members list into a one-click phishing vector.
+const EXTERNAL_LICENSE_URL_PATTERN =
+  /^\/api\/uploads\/licenses\/[a-f0-9-]+\.pdf$/;
+
 export const dniSchema = z
   .string()
   .transform(normalizeDni)
@@ -48,21 +54,78 @@ export const personalDataSchema = z.object({
 });
 
 export const licenseSelectionSchema = z.object({
-  typeId: z
-    .string()
-    .min(1, { message: "Selecciona un tipo de licencia" }),
-  subtypeId: z
-    .string()
-    .min(1, { message: "Selecciona un subtipo de licencia" }),
-  categoryId: z
-    .string()
-    .min(1, { message: "Selecciona una categoría" }),
+  hasClubLicense: z.boolean({
+    message: "Elige cómo quieres tramitar tu licencia",
+  }),
+  typeId: z.string(),
+  subtypeId: z.string(),
+  categoryId: z.string(),
   supplementIds: z.array(z.string()),
+  externalLicenseLabel: z.string(),
+  externalLicenseFileUrl: z.string(),
 });
 
-export const registrationSchema = personalDataSchema.merge(
-  licenseSelectionSchema,
-);
+type LicenseSelection = z.infer<typeof licenseSelectionSchema>;
+
+// Field names each wizard step validates before letting the member advance.
+// They are listed explicitly because the two license branches share one flat
+// object, so the step cannot derive them from the schema's own keys.
+export const MEMBERSHIP_MODE_FIELDS = ["hasClubLicense"] as const;
+
+export const CLUB_LICENSE_FIELDS = [
+  "typeId",
+  "subtypeId",
+  "categoryId",
+  "supplementIds",
+] as const;
+
+export const EXTERNAL_LICENSE_FIELDS = [
+  "externalLicenseLabel",
+  "externalLicenseFileUrl",
+] as const;
+
+function addRequired(
+  ctx: z.RefinementCtx,
+  field: keyof LicenseSelection,
+  message: string,
+) {
+  ctx.addIssue({ code: "custom", path: [field], message });
+}
+
+/**
+ * A membership either buys its federation license through the club or proves an
+ * in-force one obtained elsewhere. Each branch requires a different field set,
+ * so the fields belonging to the branch not taken are simply ignored.
+ */
+function validateLicenseBranch(data: LicenseSelection, ctx: z.RefinementCtx) {
+  if (data.hasClubLicense) {
+    if (!data.typeId) {
+      addRequired(ctx, "typeId", "Selecciona un tipo de licencia");
+    }
+    if (!data.subtypeId) {
+      addRequired(ctx, "subtypeId", "Selecciona un subtipo de licencia");
+    }
+    if (!data.categoryId) {
+      addRequired(ctx, "categoryId", "Selecciona una categoría");
+    }
+    return;
+  }
+
+  if (data.externalLicenseLabel.trim().length < 2) {
+    addRequired(
+      ctx,
+      "externalLicenseLabel",
+      "Indica la federación y el tipo de licencia",
+    );
+  }
+  if (!EXTERNAL_LICENSE_URL_PATTERN.test(data.externalLicenseFileUrl)) {
+    addRequired(ctx, "externalLicenseFileUrl", "Sube el PDF de tu licencia");
+  }
+}
+
+export const registrationSchema = personalDataSchema
+  .extend(licenseSelectionSchema.shape)
+  .superRefine(validateLicenseBranch);
 
 export type PersonalDataInput = z.infer<typeof personalDataSchema>;
 export type LicenseSelectionInput = z.infer<typeof licenseSelectionSchema>;

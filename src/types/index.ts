@@ -67,7 +67,9 @@ export type SupplementBreakdownItem = {
 };
 
 export type PriceBreakdown = {
-  categoryName: string;
+  // Null when the member joins without buying a license through the club:
+  // there is no license line to show, only the membership fee.
+  categoryName: string | null;
   categoryPrice: number;
   membershipFee: number;
   supplements: SupplementBreakdownItem[];
@@ -140,11 +142,15 @@ export type MembershipRecord = {
   status: MembershipStatus;
   typeId: string | null;
   subtypeId: string | null;
-  categoryId: string;
+  categoryId: string | null;
   offeringId: string | null;
   licensePriceSnapshot: number;
   licenseLabelSnapshot: string;
   isFederated: boolean;
+  hasClubLicense: boolean;
+  externalLicenseLabel: string | null;
+  externalLicenseFileUrl: string | null;
+  externalLicenseVerifiedAt: Date | null;
   totalAmount: number;
   paymentStatus: PaymentStatus;
   stripeSessionId: string | null;
@@ -156,6 +162,6 @@ export type MembershipRecord = {
   member: MemberRecord;
   type: LicenseTypeSummary | null;
   subtype: LicenseSubtypeSummary | null;
-  category: { id: string; name: string };
+  category: { id: string; name: string } | null;
   supplements: MembershipSupplementRecord[];
 };

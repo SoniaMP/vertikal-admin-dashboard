@@ -36,6 +36,20 @@ export function calculateTotal(
   };
 }
 
+/**
+ * A member who proves a license obtained elsewhere pays the membership fee and
+ * nothing else: no offering price and no license supplements.
+ */
+export function calculateMemberOnlyTotal(membershipFee: number): PriceBreakdown {
+  return {
+    categoryName: null,
+    categoryPrice: 0,
+    membershipFee,
+    supplements: [],
+    total: membershipFee,
+  };
+}
+
 export function formatPrice(cents: number): string {
   return new Intl.NumberFormat("es-ES", {
     style: "currency",

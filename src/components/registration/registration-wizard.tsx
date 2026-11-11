@@ -1,22 +1,21 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch, type DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { StepIndicator } from "./step-indicator";
 import { PersonalDataForm } from "./personal-data-form";
+import { MembershipModeStep } from "./membership-mode-step";
 import { FederationStep } from "./federation-step";
+import { ExternalLicenseStep } from "./external-license-step";
 import { RegistrationSummary } from "./registration-summary";
 import { RenewalBanner } from "./renewal-banner";
+import { useRegistrationSteps } from "@/hooks/use-registration-steps";
+import { useRegistrationSubmit } from "@/hooks/use-registration-submit";
 import {
-  personalDataSchema,
-  licenseSelectionSchema,
   registrationSchema,
   type RegistrationInput,
 } from "@/validations/registration";
-import { checkDni } from "@/app/registro/actions";
 import type { LicenseCatalogType } from "@/types";
 
 type RegistrationWizardProps = {
@@ -26,7 +25,9 @@ type RegistrationWizardProps = {
   defaultValues?: Partial<RegistrationInput>;
 };
 
-const EMPTY_DEFAULTS: RegistrationInput = {
+// `hasClubLicense` is deliberately absent: step 2 must start with neither card
+// selected so the member makes an explicit choice.
+const EMPTY_DEFAULTS: DefaultValues<RegistrationInput> = {
   firstName: "",
   lastName: "",
   email: "",
@@ -42,7 +43,18 @@ const EMPTY_DEFAULTS: RegistrationInput = {
   subtypeId: "",
   categoryId: "",
   supplementIds: [],
+  externalLicenseLabel: "",
+  externalLicenseFileUrl: "",
 };
+
+function buildSteps(hasClubLicense: boolean | undefined) {
+  return [
+    { number: 1, label: "Datos personales" },
+    { number: 2, label: "Licencia" },
+    { number: 3, label: hasClubLicense === false ? "Tu licencia" : "Federativa" },
+    { number: 4, label: "Resumen" },
+  ];
+}
 
 export function RegistrationWizard({
   licenseTypes,
@@ -50,109 +62,32 @@ export function RegistrationWizard({
   mode = "new",
   defaultValues,
 }: RegistrationWizardProps) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<ReactNode>(null);
-
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
     defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
   });
 
-  async function handleNextStep() {
-    setError(null);
+  const { currentStep, setCurrentStep, error, setError, goNext, goBack } =
+    useRegistrationSteps({ form, mode });
 
-    if (currentStep === 1) {
-      const isValid = await form.trigger(personalDataSchema.keyof().options);
-      if (!isValid) return;
+  const { isSubmitting, submit } = useRegistrationSubmit({
+    form,
+    onError: setError,
+  });
 
-      if (mode === "new") {
-        const check = await checkDni(form.getValues("dni"));
-
-        if (check.reason === "dni_existe_con_membresia_temporada") {
-          setError(
-            "Ya tienes una membresía para esta temporada. Si tienes alguna duda, contacta con el club.",
-          );
-          return;
-        }
-
-        if (check.reason === "dni_existe_sin_membresia_temporada") {
-          setError(
-            <>
-              Encontramos un socio con este DNI. Para continuar,{" "}
-              <Link
-                href="/registro/renovacion"
-                className="font-semibold underline"
-              >
-                ve a renovación
-              </Link>
-              .
-            </>,
-          );
-          return;
-        }
-
-        if (check.reason === "dni_invalido") {
-          setError("DNI no válido. Revisa el campo.");
-          return;
-        }
-      }
-
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
-      const isValid = await form.trigger(
-        licenseSelectionSchema.keyof().options,
-      );
-      if (isValid) setCurrentStep(3);
-    }
-  }
-
-  async function handleSubmit() {
-    const isValid = await form.trigger();
-    if (!isValid) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const data = form.getValues();
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      let result: { url?: string; error?: string };
-      try {
-        result = await response.json();
-      } catch {
-        setError("Error inesperado del servidor. Inténtalo de nuevo.");
-        return;
-      }
-
-      if (!response.ok) {
-        setError(result.error ?? "Error al procesar el registro");
-        return;
-      }
-
-      if (!result.url) {
-        setError("No se recibió la URL de pago. Inténtalo de nuevo.");
-        return;
-      }
-
-      window.location.href = result.url;
-    } catch {
-      setError("Error de conexión. Comprueba tu conexión e inténtalo de nuevo.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+  const hasClubLicense = useWatch({
+    control: form.control,
+    name: "hasClubLicense",
+  });
 
   return (
     <Form {...form}>
       <form onSubmit={(e) => e.preventDefault()}>
         {mode === "renewal" && <RenewalBanner />}
-        <StepIndicator currentStep={currentStep} />
+        <StepIndicator
+          currentStep={currentStep}
+          steps={buildSteps(hasClubLicense)}
+        />
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
@@ -160,25 +95,31 @@ export function RegistrationWizard({
           </div>
         )}
 
-        {currentStep === 1 && (
-          <PersonalDataForm onNext={handleNextStep} />
-        )}
+        {currentStep === 1 && <PersonalDataForm onNext={goNext} />}
 
         {currentStep === 2 && (
+          <MembershipModeStep onNext={goNext} onBack={goBack} />
+        )}
+
+        {currentStep === 3 && hasClubLicense && (
           <FederationStep
             licenseTypes={licenseTypes}
             membershipFee={membershipFee}
-            onNext={handleNextStep}
-            onBack={() => setCurrentStep(1)}
+            onNext={goNext}
+            onBack={goBack}
           />
         )}
 
-        {currentStep === 3 && (
+        {currentStep === 3 && !hasClubLicense && (
+          <ExternalLicenseStep onNext={goNext} onBack={goBack} />
+        )}
+
+        {currentStep === 4 && (
           <RegistrationSummary
             licenseTypes={licenseTypes}
             membershipFee={membershipFee}
             onEdit={setCurrentStep}
-            onSubmit={handleSubmit}
+            onSubmit={submit}
             isSubmitting={isSubmitting}
           />
         )}

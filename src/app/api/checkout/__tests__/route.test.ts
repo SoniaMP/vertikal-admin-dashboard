@@ -78,10 +78,13 @@ const validBody = {
   city: "Madrid",
   postalCode: "28001",
   province: "Madrid",
+  hasClubLicense: true,
   typeId: "type-1",
   subtypeId: "sub-1",
   categoryId: "cat-1",
   supplementIds: ["sup-1"],
+  externalLicenseLabel: "",
+  externalLicenseFileUrl: "",
 };
 
 const mockOffering = {

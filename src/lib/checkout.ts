@@ -3,12 +3,17 @@ import { prisma } from "@/lib/prisma";
 interface MembershipInput {
   memberId: string;
   seasonId: string;
-  typeId: string;
-  subtypeId: string;
-  categoryId: string;
-  offeringId: string;
+  // Null across the board when the member proves a license obtained elsewhere:
+  // there is no club offering behind that membership.
+  hasClubLicense: boolean;
+  typeId: string | null;
+  subtypeId: string | null;
+  categoryId: string | null;
+  offeringId: string | null;
   licensePriceSnapshot: number;
   licenseLabelSnapshot: string;
+  externalLicenseLabel: string | null;
+  externalLicenseFileUrl: string | null;
   totalAmount: number;
   supplements: { supplementId: string; priceAtTime: number }[];
 }
