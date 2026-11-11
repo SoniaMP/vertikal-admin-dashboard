@@ -132,3 +132,23 @@ export async function deleteMembership(id: string): Promise<ActionResult> {
   revalidatePath("/admin");
   return { success: true };
 }
+
+/**
+ * Stamps (or clears) the moment an admin checked the PDF of a license the
+ * member obtained outside the club. Only membership rows with
+ * `hasClubLicense = false` carry one.
+ */
+export async function verifyExternalLicense(
+  id: string,
+  isVerified: boolean,
+): Promise<ActionResult> {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  await prisma.membership.update({
+    where: { id },
+    data: { externalLicenseVerifiedAt: isVerified ? new Date() : null },
+  });
+  revalidatePath("/admin");
+  return { success: true };
+}

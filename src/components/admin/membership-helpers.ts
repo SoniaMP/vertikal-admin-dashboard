@@ -8,7 +8,14 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
+/**
+ * Members who federate elsewhere have no club license to name, so the row
+ * shows the federation they typed in instead of the club catalog entry.
+ */
 export function licenseLabel(m: MembershipRow): string {
+  if (!m.hasClubLicense) {
+    return m.externalLicenseLabel?.trim() || "Licencia externa";
+  }
   const parts = [m.type?.name, m.subtype?.name].filter(Boolean);
   return parts.length > 0 ? parts.join(" - ") : "Sin licencia";
 }

@@ -1,0 +1,123 @@
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { formatPrice } from "@/helpers/price-calculator";
+import { DetailField } from "./detail-field";
+import { ExternalLicenseBadge } from "./external-license-badge";
+import {
+  PAYMENT_LABELS,
+  PAYMENT_VARIANTS,
+  STATUS_VARIANTS,
+} from "./membership-status-badges";
+import type { MembershipDetailData } from "./membership-detail-types";
+
+type Props = { membership: MembershipDetailData };
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING_PAYMENT: "Pendiente de pago",
+  ACTIVE: "Activo",
+  EXPIRED: "Expirado",
+  CANCELLED: "Cancelado",
+};
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function clubLicenseLabel(m: MembershipDetailData): string {
+  return (
+    m.licenseLabelSnapshot ||
+    [m.type?.name, m.subtype?.name].filter(Boolean).join(" - ") ||
+    "Sin licencia"
+  );
+}
+
+function ExternalLicenseSection({ membership: m }: Props) {
+  return (
+    <div className="space-y-2">
+      <DetailField
+        label="Licencia tramitada fuera del club"
+        value={m.externalLicenseLabel?.trim() || "Sin indicar"}
+      />
+      <ExternalLicenseBadge
+        membershipId={m.id}
+        fileUrl={m.externalLicenseFileUrl}
+        verifiedAt={m.externalLicenseVerifiedAt}
+      />
+    </div>
+  );
+}
+
+export function MembershipPaymentCard({ membership: m }: Props) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Pago y licencia</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Estado de la membresia</span>
+          <Badge variant={STATUS_VARIANTS[m.status] ?? "outline"}>
+            {STATUS_LABELS[m.status] ?? m.status}
+          </Badge>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Estado del pago</span>
+          <Badge variant={PAYMENT_VARIANTS[m.paymentStatus] ?? "outline"}>
+            {PAYMENT_LABELS[m.paymentStatus] ?? m.paymentStatus}
+          </Badge>
+        </div>
+        <Separator />
+        {m.hasClubLicense ? (
+          <DetailField
+            label="Licencia"
+            value={`${clubLicenseLabel(m)} — ${formatPrice(m.licensePriceSnapshot)}`}
+          />
+        ) : (
+          <ExternalLicenseSection membership={m} />
+        )}
+        {m.supplements.length > 0 && (
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Suplementos</p>
+            <ul className="space-y-1">
+              {m.supplements.map((s) => (
+                <li
+                  key={s.supplement.name}
+                  className="text-sm flex justify-between"
+                >
+                  <span>{s.supplement.name}</span>
+                  <span className="text-muted-foreground">
+                    {formatPrice(s.priceAtTime)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <Separator />
+        <div className="flex justify-between font-semibold">
+          <span>Total</span>
+          <span>{formatPrice(m.totalAmount)}</span>
+        </div>
+        <Separator />
+        <DetailField
+          label="Email de confirmacion enviado"
+          value={m.confirmationSent ? "Si" : "No"}
+        />
+        {m.stripePaymentId && (
+          <DetailField label="Stripe Payment ID" value={m.stripePaymentId} />
+        )}
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <DetailField label="Creado" value={formatDate(m.createdAt)} />
+          <DetailField label="Actualizado" value={formatDate(m.updatedAt)} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

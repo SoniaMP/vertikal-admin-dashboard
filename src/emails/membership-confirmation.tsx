@@ -7,6 +7,7 @@ export default function MembershipConfirmation({
   firstName,
   lastName,
   licenseLabel,
+  externalLicenseLabel,
   totalAmountCents,
   supplements,
   seasonName,
@@ -28,13 +29,25 @@ export default function MembershipConfirmation({
         confirmada. Aquí tienes el resumen:
       </Text>
 
+      {!licenseLabel && (
+        <Text className="text-gray-700 leading-6">
+          Tramitas tu licencia federativa por tu cuenta
+          {externalLicenseLabel ? ` (${externalLicenseLabel})` : ""}, así que
+          solo te hemos cobrado la cuota de socio. Hemos recibido el PDF que
+          nos has enviado y lo revisaremos; si hubiera algún problema, te
+          avisamos.
+        </Text>
+      )}
+
       <Section className="bg-gray-50 rounded-lg p-4 my-4">
-        <Row>
-          <Column className="text-gray-600 text-sm">Licencia</Column>
-          <Column className="text-right text-gray-900 font-medium text-sm">
-            {licenseLabel}
-          </Column>
-        </Row>
+        {licenseLabel && (
+          <Row>
+            <Column className="text-gray-600 text-sm">Licencia</Column>
+            <Column className="text-right text-gray-900 font-medium text-sm">
+              {licenseLabel}
+            </Column>
+          </Row>
+        )}
 
         {supplements.length > 0 && (
           <>
@@ -80,6 +93,7 @@ MembershipConfirmation.PreviewProps = {
   lastName: "García",
   email: "maria@example.com",
   licenseLabel: "Federativa — Adulto — Estándar",
+  externalLicenseLabel: null,
   totalAmountCents: 8500,
   supplements: ["Seguro RC extra", "Alquiler taquilla"],
   seasonName: "2025-2026",

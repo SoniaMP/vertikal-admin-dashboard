@@ -3,7 +3,7 @@ import { formatPrice } from "@/helpers/price-calculator";
 import { cn } from "@/lib/utils";
 import { MEMBERSHIP_STATUS } from "@/types";
 import { MembershipActions } from "./membership-actions";
-import { FederatedToggle } from "./federated-toggle";
+import { FederationCell } from "./membership-federation-cell";
 import { StatusBadges } from "./membership-status-badges";
 import type { MembershipRow } from "./memberships-table";
 import { formatDate, licenseLabel } from "./membership-helpers";
@@ -36,7 +36,7 @@ export function MobileCard({ membership: m }: Props) {
             paymentStatus={m.paymentStatus}
             membershipStatus={m.status}
           />
-          <FederatedToggle membershipId={m.id} isFederated={m.isFederated} />
+          <FederationCell membership={m} />
         </div>
       </div>
       <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">

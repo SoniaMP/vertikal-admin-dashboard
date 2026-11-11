@@ -4,7 +4,7 @@ import { formatPrice } from "@/helpers/price-calculator";
 import { cn } from "@/lib/utils";
 import { MEMBERSHIP_STATUS } from "@/types";
 import { MembershipActions } from "./membership-actions";
-import { FederatedToggle } from "./federated-toggle";
+import { FederationCell } from "./membership-federation-cell";
 import { StatusBadges } from "./membership-status-badges";
 import type { MembershipRow } from "./memberships-table";
 import { formatDate, licenseLabel } from "./membership-helpers";
@@ -34,7 +34,7 @@ export function DesktopRow({ membership: m }: Props) {
         />
       </TableCell>
       <TableCell>
-        <FederatedToggle membershipId={m.id} isFederated={m.isFederated} />
+        <FederationCell membership={m} />
       </TableCell>
       <TableCell className="text-muted-foreground">
         {formatDate(m.createdAt)}

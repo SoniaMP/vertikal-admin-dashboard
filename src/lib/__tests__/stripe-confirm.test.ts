@@ -122,7 +122,9 @@ describe("confirmMembershipCheckout", () => {
 
     mockMembershipUpdate.mockResolvedValue({
       member: mockMember,
+      hasClubLicense: true,
       licenseLabelSnapshot: "Competición - Nacional - Senior",
+      externalLicenseLabel: null,
       totalAmount: 15000,
       supplements: [
         { supplement: { name: "Seguro extra" } },
@@ -134,6 +136,7 @@ describe("confirmMembershipCheckout", () => {
     expect(result).toEqual({
       member: mockMember,
       licenseLabel: "Competición - Nacional - Senior",
+      externalLicenseLabel: null,
       totalAmount: 15000,
       supplements: [{ name: "Seguro extra" }],
     });
@@ -151,4 +154,29 @@ describe("confirmMembershipCheckout", () => {
       },
     });
   });
+  // The success page prints `licenseLabel` as the license it sold. A member who
+  // federates elsewhere bought no license, so the snapshot must not leak there.
+  it("reports no club license when the member federates elsewhere", async () => {
+    mockSessionRetrieve.mockResolvedValue({
+      payment_status: "paid",
+      metadata: { membershipId: "ms-2" },
+      payment_intent: "pi_abc",
+    });
+
+    mockMembershipUpdate.mockResolvedValue({
+      member: {},
+      hasClubLicense: false,
+      licenseLabelSnapshot: "",
+      externalLicenseLabel: "FERM PLUS A",
+      totalAmount: 2000,
+      supplements: [],
+    });
+
+    const result = await confirmMembershipCheckout("cs_789");
+
+    expect(result?.licenseLabel).toBeNull();
+    expect(result?.externalLicenseLabel).toBe("FERM PLUS A");
+    expect(result?.totalAmount).toBe(2000);
+  });
+
 });

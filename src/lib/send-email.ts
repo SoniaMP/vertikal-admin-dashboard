@@ -30,7 +30,10 @@ export async function sendMembershipConfirmationEmail(
       firstName: membership.member.firstName,
       lastName: membership.member.lastName,
       email: membership.member.email,
-      licenseLabel: membership.licenseLabelSnapshot,
+      licenseLabel: membership.hasClubLicense
+        ? membership.licenseLabelSnapshot
+        : null,
+      externalLicenseLabel: membership.externalLicenseLabel,
       totalAmountCents: membership.totalAmount,
       supplements: membership.supplements.map((s) => s.supplement.name),
       seasonName: membership.season.name,

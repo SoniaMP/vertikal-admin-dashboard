@@ -6,7 +6,8 @@ const defaultProps = {
   firstName: "María",
   lastName: "García",
   email: "maria@example.com",
-  licenseLabel: "Federativa — Adulto — Estándar",
+  licenseLabel: "Federativa — Adulto — Estándar" as string | null,
+  externalLicenseLabel: null as string | null,
   totalAmountCents: 8500,
   supplements: ["Seguro RC extra", "Alquiler taquilla"],
   seasonName: "2025-2026",
@@ -46,5 +47,41 @@ describe("MembershipConfirmation", () => {
       MembershipConfirmation({ ...defaultProps, supplements: [] }),
     );
     expect(html).not.toContain("Suplementos");
+  });
+});
+
+const memberOnlyProps = {
+  ...defaultProps,
+  licenseLabel: null,
+  externalLicenseLabel: "FERM PLUS A",
+  supplements: [],
+  totalAmountCents: 2000,
+};
+
+describe("MembershipConfirmation — license obtained elsewhere", () => {
+  it("drops the license row", async () => {
+    const html = await render(MembershipConfirmation(memberOnlyProps));
+    expect(html).not.toContain("Licencia</");
+  });
+
+  it("names the federation the member declared", async () => {
+    const html = await render(MembershipConfirmation(memberOnlyProps));
+    expect(html).toContain("FERM PLUS A");
+  });
+
+  it("says only the membership fee was charged", async () => {
+    const html = await render(MembershipConfirmation(memberOnlyProps));
+    expect(html).toContain("solo te hemos cobrado la cuota de socio");
+    expect(html).toContain("20,00");
+  });
+
+  it("still reads correctly when no federation was given", async () => {
+    const html = await render(
+      MembershipConfirmation({
+        ...memberOnlyProps,
+        externalLicenseLabel: null,
+      }),
+    );
+    expect(html).toContain("Tramitas tu licencia federativa por tu cuenta");
   });
 });

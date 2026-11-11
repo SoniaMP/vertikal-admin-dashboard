@@ -7,7 +7,9 @@ export type MembershipConfirmationProps = {
   firstName: string;
   lastName: string;
   email: string;
-  licenseLabel: string;
+  /** Null when the member federates outside the club: there is nothing to bill. */
+  licenseLabel: string | null;
+  externalLicenseLabel: string | null;
   totalAmountCents: number;
   supplements: string[];
   seasonName: string;
@@ -23,6 +25,12 @@ export type CourseConfirmationProps = {
   amountCents: number;
 };
 
+/** What the admin needs to check a license the member obtained elsewhere. */
+export type ExternalLicenseNotice = {
+  label: string;
+  membershipUrl: string;
+};
+
 export type MembershipNotificationProps = {
   branding?: EmailBrandingSettings;
   fullName: string;
@@ -33,7 +41,9 @@ export type MembershipNotificationProps = {
   city: string;
   postalCode: string;
   province: string;
-  licenseLabel: string;
+  /** Null when the member federates outside the club. */
+  licenseLabel: string | null;
+  externalLicense: ExternalLicenseNotice | null;
   supplements: string[];
   totalAmountCents: number;
   seasonName: string;

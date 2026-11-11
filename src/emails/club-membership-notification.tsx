@@ -1,6 +1,9 @@
 import { Text, Section, Row, Column } from "@react-email/components";
 import { EmailLayout } from "./_components/email-layout";
-import type { MembershipNotificationProps } from "./types";
+import type {
+  ExternalLicenseNotice,
+  MembershipNotificationProps,
+} from "./types";
 import { formatPrice } from "./types";
 
 export default function ClubMembershipNotification({
@@ -13,6 +16,7 @@ export default function ClubMembershipNotification({
   postalCode,
   province,
   licenseLabel,
+  externalLicense,
   supplements,
   totalAmountCents,
   seasonName,
@@ -30,6 +34,10 @@ export default function ClubMembershipNotification({
         Se ha registrado una nueva inscripcion para la temporada{" "}
         <strong>{seasonName}</strong>.
       </Text>
+
+      {externalLicense && (
+        <ExternalLicenseWarning notice={externalLicense} />
+      )}
 
       <Section className="bg-gray-50 rounded-lg p-4 my-4">
         <Text className="text-gray-600 text-xs uppercase tracking-wide mt-0 mb-2">
@@ -49,7 +57,7 @@ export default function ClubMembershipNotification({
         <Text className="text-gray-600 text-xs uppercase tracking-wide mt-0 mb-2">
           Detalles de la inscripcion
         </Text>
-        <DetailRow label="Licencia" value={licenseLabel} />
+        {licenseLabel && <DetailRow label="Licencia" value={licenseLabel} />}
 
         {supplements.length > 0 && (
           <>
@@ -75,6 +83,26 @@ export default function ClubMembershipNotification({
   );
 }
 
+/**
+ * This member pays only the fee and federates elsewhere, so somebody has to
+ * open the PDF they uploaded and confirm the license is really in force.
+ */
+function ExternalLicenseWarning({ notice }: { notice: ExternalLicenseNotice }) {
+  return (
+    <Section className="bg-amber-50 border border-amber-200 rounded-lg p-4 my-4">
+      <Text className="text-amber-900 font-bold mt-0 mb-1">
+        Licencia externa — pendiente de verificar
+      </Text>
+      <Text className="text-amber-900 text-sm my-0">
+        Se ha dado de alta solo como socio y declara tener licencia en vigor:{" "}
+        <strong>{notice.label}</strong>. Revisa el PDF que ha subido y marcala
+        como verificada en{" "}
+        <a href={notice.membershipUrl}>el panel de administracion</a>.
+      </Text>
+    </Section>
+  );
+}
+
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <Row className="mt-1">
@@ -94,6 +122,7 @@ ClubMembershipNotification.PreviewProps = {
   postalCode: "28001",
   province: "Madrid",
   licenseLabel: "Federativa — Adulto — Estandar",
+  externalLicense: null,
   supplements: ["Seguro RC extra", "Alquiler taquilla"],
   totalAmountCents: 8500,
   seasonName: "2025-2026",

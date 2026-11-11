@@ -16,6 +16,10 @@ export type MembershipRow = {
   status: string;
   paymentStatus: string;
   isFederated: boolean;
+  hasClubLicense: boolean;
+  externalLicenseLabel: string | null;
+  externalLicenseFileUrl: string | null;
+  externalLicenseVerifiedAt: Date | null;
   totalAmount: number;
   createdAt: Date;
   member: {

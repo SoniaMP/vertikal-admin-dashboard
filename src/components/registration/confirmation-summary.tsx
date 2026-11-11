@@ -34,7 +34,14 @@ export function ConfirmationSummary({ data }: ConfirmationSummaryProps) {
       <Separator />
 
       <ConfirmationSection title="Licencia">
-        <ConfirmationRow label="Tipo" value={data.licenseLabel} />
+        {data.licenseLabel ? (
+          <ConfirmationRow label="Tipo" value={data.licenseLabel} />
+        ) : (
+          <ConfirmationRow
+            label="La tramitas por tu cuenta"
+            value={data.externalLicenseLabel?.trim() || "Licencia externa"}
+          />
+        )}
         {data.supplements.length > 0 && (
           <ConfirmationRow
             label="Suplementos"

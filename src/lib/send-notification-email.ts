@@ -4,12 +4,35 @@ import { renderBrandedEmail } from "@/lib/email-renderer";
 import { prisma } from "@/lib/prisma";
 import { getNotificationEmails } from "@/lib/settings";
 import ClubMembershipNotification from "@/emails/club-membership-notification";
+import type { ExternalLicenseNotice } from "@/emails/types";
 import ClubCourseNotification from "@/emails/club-course-notification";
 
 function getEmailFrom(): string {
   const from = process.env.EMAIL_FROM;
   if (!from) throw new Error("Missing EMAIL_FROM env var");
   return from;
+}
+
+type ExternalLicenseSource = {
+  id: string;
+  hasClubLicense: boolean;
+  externalLicenseLabel: string | null;
+};
+
+/**
+ * Payment activates the membership straight away, so the only guard against a
+ * lapsed license is an admin opening the PDF. The notification has to say so.
+ */
+function buildExternalLicenseNotice(
+  membership: ExternalLicenseSource,
+): ExternalLicenseNotice | null {
+  if (membership.hasClubLicense) return null;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  return {
+    label: membership.externalLicenseLabel?.trim() || "sin indicar",
+    membershipUrl: `${appUrl}/admin/registros/${membership.id}`,
+  };
 }
 
 export async function sendClubMembershipNotification(
@@ -28,6 +51,7 @@ export async function sendClubMembershipNotification(
   });
 
   const { member } = membership;
+  const externalLicense = buildExternalLicenseNotice(membership);
 
   const html = await renderBrandedEmail(
     createElement(ClubMembershipNotification, {
@@ -39,7 +63,10 @@ export async function sendClubMembershipNotification(
       city: member.city,
       postalCode: member.postalCode,
       province: member.province,
-      licenseLabel: membership.licenseLabelSnapshot,
+      licenseLabel: membership.hasClubLicense
+        ? membership.licenseLabelSnapshot
+        : null,
+      externalLicense,
       supplements: membership.supplements.map((s) => s.supplement.name),
       totalAmountCents: membership.totalAmount,
       seasonName: membership.season.name,

@@ -64,7 +64,9 @@ export type MembershipConfirmation = {
     postalCode: string;
     province: string;
   };
-  licenseLabel: string;
+  /** Null when the member federates outside the club. */
+  licenseLabel: string | null;
+  externalLicenseLabel: string | null;
   totalAmount: number;
   supplements: { name: string }[];
 };
@@ -97,7 +99,10 @@ export async function confirmMembershipCheckout(
 
   return {
     member: membership.member,
-    licenseLabel: membership.licenseLabelSnapshot,
+    licenseLabel: membership.hasClubLicense
+      ? membership.licenseLabelSnapshot
+      : null,
+    externalLicenseLabel: membership.externalLicenseLabel,
     totalAmount: membership.totalAmount,
     supplements: membership.supplements.map((s) => ({
       name: s.supplement.name,
