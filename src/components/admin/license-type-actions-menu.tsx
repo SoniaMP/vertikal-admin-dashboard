@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { LicenseType } from "@prisma/client";
-import { Pencil, Power, Trash2 } from "lucide-react";
+import { Eye, Pencil, Power, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -20,15 +19,30 @@ import {
   deleteLicenseType,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { LicenseTypeFormDialog } from "./license-type-form-dialog";
+import { LicensePreviewDialog } from "./license-preview-dialog";
+import { resolveLicenseVisibility } from "@/helpers/license-visibility";
+import type {
+  LicenseTypeWithRelations,
+  CategoryWithCount,
+} from "./license-types-table";
 
 type Props = {
-  licenseType: LicenseType;
+  licenseType: LicenseTypeWithRelations;
   membershipCount: number;
+  categories: CategoryWithCount[];
+  seasonName: string;
 };
 
-export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
+export function LicenseTypeActions({
+  licenseType,
+  membershipCount,
+  categories,
+  seasonName,
+}: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const isDraft = resolveLicenseVisibility(licenseType) === "draft";
 
   function handleToggle() {
     startTransition(async () => {
@@ -48,6 +62,15 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
     <div className="flex items-center gap-1">
       <Button
         type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setIsPreviewOpen(true)}
+        aria-label={isDraft ? "Previsualizar y publicar" : "Previsualizar"}
+      >
+        <Eye className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
         variant="ghost-info"
         size="icon"
         onClick={() => setIsEditOpen(true)}
@@ -55,16 +78,20 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
       >
         <Pencil className="h-4 w-4" />
       </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={handleToggle}
-        disabled={isPending}
-        aria-label={licenseType.active ? "Desactivar" : "Activar"}
-      >
-        <Power className="h-4 w-4" />
-      </Button>
+      {/* Activating a draft changes nothing a member can see, so the toggle
+          only shows up once the type has been published. */}
+      {!isDraft && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={handleToggle}
+          disabled={isPending}
+          aria-label={licenseType.active ? "Desactivar" : "Activar"}
+        >
+          <Power className="h-4 w-4" />
+        </Button>
+      )}
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
@@ -104,6 +131,13 @@ export function LicenseTypeActions({ licenseType, membershipCount }: Props) {
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         licenseType={licenseType}
+      />
+      <LicensePreviewDialog
+        open={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+        licenseType={licenseType}
+        categories={categories}
+        seasonName={seasonName}
       />
     </div>
   );

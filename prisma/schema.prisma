@@ -26,6 +26,10 @@ model LicenseType {
   name        String
   description String
   active      Boolean  @default(true)
+  /// Null while the type is a draft, so it stays out of the public wizard
+  /// until an admin publishes it. Set once and never cleared: retiring a
+  /// published type is `active = false`, which is a different thing.
+  publishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -39,6 +43,9 @@ model LicenseSubtype {
   name          String
   description   String
   active        Boolean  @default(true)
+  /// Same draft marker as on LicenseType: a new modality of an already
+  /// published federation stays hidden until it has prices.
+  publishedAt   DateTime?
   licenseTypeId String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

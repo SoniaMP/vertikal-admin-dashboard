@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { getActiveSeason } from "@/lib/settings";
 import { selectSellableSubtypes } from "@/helpers/sellable-subtypes";
+import { groupOfferingsByCategory } from "@/helpers/category-offerings";
 import type {
   LicenseCatalogType,
-  CategoryOffering,
   SupplementSummary,
   SupplementGroupSummary,
 } from "@/types";
@@ -13,10 +13,15 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
 
   const [types, offerings, supplements, supplementPrices, groupPrices] =
     await Promise.all([
+      // Drafts never reach the public wizard: `publishedAt` is the admin
+      // saying this federation is ready to be sold.
       prisma.licenseType.findMany({
-        where: { active: true },
+        where: { active: true, publishedAt: { not: null } },
         include: {
-          subtypes: { where: { active: true }, orderBy: { createdAt: "asc" } },
+          subtypes: {
+            where: { active: true, publishedAt: { not: null } },
+            orderBy: { createdAt: "asc" },
+          },
         },
         orderBy: { name: "asc" },
       }),
@@ -73,40 +78,20 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
 
   const catalog = types.map((type) => {
     const typeOfferings = offerings.filter((o) => o.typeId === type.id);
-    const categoryMap = new Map<string, CategoryOffering>();
-
-    for (const o of typeOfferings) {
-      if (!o.category) continue;
-      if (!categoryMap.has(o.categoryId)) {
-        categoryMap.set(o.categoryId, {
-          id: o.category.id,
-          name: o.category.name,
-          description: o.category.description,
-          active: o.category.active,
-          prices: [],
-        });
-      }
-      categoryMap.get(o.categoryId)!.prices.push({
-        subtypeId: o.subtypeId,
-        price: o.price,
-      });
-    }
 
     return {
       id: type.id,
       name: type.name,
       description: type.description,
       active: type.active,
-      subtypes: selectSellableSubtypes(type.subtypes, typeOfferings).map(
-        (st) => ({
-          id: st.id,
-          name: st.name,
-          description: st.description,
-          active: st.active,
-          licenseTypeId: st.licenseTypeId,
-        }),
-      ),
-      categories: [...categoryMap.values()],
+      subtypes: selectSellableSubtypes(type.subtypes, typeOfferings).map((st) => ({
+        id: st.id,
+        name: st.name,
+        description: st.description,
+        active: st.active,
+        licenseTypeId: st.licenseTypeId,
+      })),
+      categories: groupOfferingsByCategory(typeOfferings),
       supplements: supplementEntries,
       supplementGroups: [...uniqueGroups.values()],
     };

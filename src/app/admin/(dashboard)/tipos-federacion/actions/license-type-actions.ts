@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { licenseTypeSchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { getActiveSeason } from "@/lib/settings";
 
 export async function createLicenseType(
   _prevState: ActionResult,
@@ -46,6 +47,57 @@ export async function updateLicenseType(
   }
 
   await prisma.licenseType.update({ where: { id }, data: parsed.data });
+  revalidatePath("/admin/tipos-federacion");
+  return { success: true };
+}
+
+/**
+ * Modalities of this type that members could buy right now: they have a price
+ * in the active season for a category that is still on offer.
+ */
+async function findSellableSubtypeIds(typeId: string): Promise<string[]> {
+  const season = await getActiveSeason();
+  const offerings = await prisma.licenseOffering.findMany({
+    where: {
+      typeId,
+      seasonId: season.id,
+      subtype: { active: true },
+      category: { active: true },
+    },
+    select: { subtypeId: true },
+  });
+  return [...new Set(offerings.map((offering) => offering.subtypeId))];
+}
+
+/**
+ * Takes a draft federation live. Partial price coverage is fine — gaps are
+ * often deliberate — but a type with no price at all would reach the wizard
+ * and dead-end every member who picked it.
+ */
+export async function publishLicenseType(id: string): Promise<ActionResult> {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  const sellableSubtypeIds = await findSellableSubtypeIds(id);
+  if (sellableSubtypeIds.length === 0) {
+    return {
+      success: false,
+      error:
+        "No se puede publicar: todavía no tiene ningún precio en la temporada activa",
+    };
+  }
+
+  const publishedAt = new Date();
+  await prisma.$transaction(async (tx) => {
+    await tx.licenseType.update({ where: { id }, data: { publishedAt } });
+    // A modality left as a draft stays invisible even under a published type,
+    // which reads as if publishing did nothing.
+    await tx.licenseSubtype.updateMany({
+      where: { id: { in: sellableSubtypeIds }, publishedAt: null },
+      data: { publishedAt },
+    });
+  });
+
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }

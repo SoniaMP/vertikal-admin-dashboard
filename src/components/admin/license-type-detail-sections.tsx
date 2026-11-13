@@ -18,7 +18,11 @@ export function DetailSections({
 }: Props) {
   return (
     <>
-      <SubtypesSection licenseTypeId={lt.id} subtypes={lt.subtypes} />
+      <SubtypesSection
+        licenseTypeId={lt.id}
+        subtypes={lt.subtypes}
+        offerings={lt.offerings}
+      />
       <OfferingMatrixSection
         seasonId={seasonId}
         typeId={lt.id}

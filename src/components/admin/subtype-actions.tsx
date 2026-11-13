@@ -20,6 +20,7 @@ import {
   deleteSubtype,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { SubtypeFormDialog } from "./subtype-form-dialog";
+import { resolveLicenseVisibility } from "@/helpers/license-visibility";
 
 type Props = {
   subtype: LicenseSubtype;
@@ -43,6 +44,7 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
   }
 
   const hasMemberships = membershipCount > 0;
+  const isDraft = resolveLicenseVisibility(subtype) === "draft";
 
   return (
     <div className="flex items-center gap-1">
@@ -56,17 +58,21 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
       >
         <Pencil className="h-3 w-3" />
       </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={handleToggle}
-        disabled={isPending}
-        aria-label={subtype.active ? "Desactivar" : "Activar"}
-        className="h-7 w-7"
-      >
-        <Power className="h-3 w-3" />
-      </Button>
+      {/* A draft is already invisible to members, so there is nothing to
+          deactivate until it has been published. */}
+      {!isDraft && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={handleToggle}
+          disabled={isPending}
+          aria-label={subtype.active ? "Desactivar" : "Activar"}
+          className="h-7 w-7"
+        >
+          <Power className="h-3 w-3" />
+        </Button>
+      )}
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button

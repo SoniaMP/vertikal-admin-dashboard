@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { LicenseStateBadge } from "./license-state-badge";
 import {
   Collapsible,
   CollapsibleContent,
@@ -34,22 +34,28 @@ export type CategoryWithCount = Category & {
   _count: { memberships: number };
 };
 
+export type OfferingWithCategory = LicenseOffering & {
+  category: Category;
+};
+
 export type LicenseTypeWithRelations = LicenseType & {
   _count: { memberships: number };
   subtypes: SubtypeWithCount[];
-  offerings: LicenseOffering[];
+  offerings: OfferingWithCategory[];
 };
 
 type Props = {
   licenseTypes: LicenseTypeWithRelations[];
   categories: CategoryWithCount[];
   seasonId: string;
+  seasonName: string;
 };
 
 export function LicenseTypesTable({
   licenseTypes,
   categories,
   seasonId,
+  seasonName,
 }: Props) {
   if (licenseTypes.length === 0) {
     return (
@@ -68,6 +74,7 @@ export function LicenseTypesTable({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
+            seasonName={seasonName}
           />
         ))}
       </div>
@@ -78,6 +85,7 @@ export function LicenseTypesTable({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
+            seasonName={seasonName}
           />
         ))}
       </div>
@@ -89,9 +97,15 @@ type RowProps = {
   licenseType: LicenseTypeWithRelations;
   categories: CategoryWithCount[];
   seasonId: string;
+  seasonName: string;
 };
 
-function DesktopRow({ licenseType: lt, categories, seasonId }: RowProps) {
+function DesktopRow({
+  licenseType: lt,
+  categories,
+  seasonId,
+  seasonName,
+}: RowProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -138,9 +152,7 @@ function DesktopRow({ licenseType: lt, categories, seasonId }: RowProps) {
                 />
               </TableCell>
               <TableCell className="align-middle">
-                <Badge variant={lt.active ? "default" : "secondary"}>
-                  {lt.active ? "Activo" : "Inactivo"}
-                </Badge>
+                <LicenseStateBadge license={lt} />
               </TableCell>
               <TableCell className="align-middle">
                 {lt._count.memberships}
@@ -150,6 +162,8 @@ function DesktopRow({ licenseType: lt, categories, seasonId }: RowProps) {
                   <LicenseTypeActions
                     licenseType={lt}
                     membershipCount={lt._count.memberships}
+                    categories={categories}
+                    seasonName={seasonName}
                   />
                 </div>
               </TableCell>
@@ -168,7 +182,12 @@ function DesktopRow({ licenseType: lt, categories, seasonId }: RowProps) {
   );
 }
 
-function MobileCard({ licenseType: lt, categories, seasonId }: RowProps) {
+function MobileCard({
+  licenseType: lt,
+  categories,
+  seasonId,
+  seasonName,
+}: RowProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -192,9 +211,7 @@ function MobileCard({ licenseType: lt, categories, seasonId }: RowProps) {
               </div>
             </button>
           </CollapsibleTrigger>
-          <Badge variant={lt.active ? "default" : "secondary"}>
-            {lt.active ? "Activo" : "Inactivo"}
-          </Badge>
+          <LicenseStateBadge license={lt} />
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span>{lt._count.memberships} registros</span>
@@ -202,6 +219,8 @@ function MobileCard({ licenseType: lt, categories, seasonId }: RowProps) {
         <LicenseTypeActions
           licenseType={lt}
           membershipCount={lt._count.memberships}
+          categories={categories}
+          seasonName={seasonName}
         />
         <CollapsibleContent>
           <DetailSections

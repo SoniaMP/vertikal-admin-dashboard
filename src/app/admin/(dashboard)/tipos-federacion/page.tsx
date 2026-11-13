@@ -55,6 +55,7 @@ export default async function FederationTypesPage() {
         licenseTypes={licenseTypes}
         categories={categories}
         seasonId={season.id}
+        seasonName={season.name}
       />
       <StandaloneSections
         categories={categories}
