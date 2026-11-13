@@ -15,23 +15,61 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatPrice } from "@/helpers/price-calculator";
+import { buildCategoryOptions } from "@/helpers/category-options";
+import type { CategoryOption } from "@/helpers/category-options";
 import type { CategoryOffering } from "@/types";
 import type { RegistrationInput } from "@/validations/registration";
 
 type CategorySelectorProps = {
   categories: CategoryOffering[];
   selectedSubtypeId: string;
+  subtypeName: string;
 };
+
+/**
+ * A category only has a price when the catalog holds an offering for it in the
+ * chosen modality. Offering the others anyway would let the member fill in the
+ * whole wizard and only hit "no such offering" when the server builds the
+ * payment, with nothing telling them what to change.
+ */
+function CategoryItem({
+  option,
+  subtypeName,
+}: {
+  option: CategoryOption;
+  subtypeName: string;
+}) {
+  if (option.price !== null) {
+    return (
+      <SelectItem value={option.id}>
+        {option.name} — {formatPrice(option.price)}
+      </SelectItem>
+    );
+  }
+
+  return (
+    <SelectItem value={option.id} disabled>
+      <span className="flex flex-col items-start">
+        <span>{option.name}</span>
+        <span className="text-xs text-muted-foreground">
+          No disponible en {subtypeName}
+        </span>
+      </span>
+    </SelectItem>
+  );
+}
 
 export function CategorySelector({
   categories,
   selectedSubtypeId,
+  subtypeName,
 }: CategorySelectorProps) {
   const form = useFormContext<RegistrationInput>();
 
-  const activeCategories = categories.filter((c) => c.active);
+  const options = buildCategoryOptions(categories, selectedSubtypeId);
+  if (options.length === 0) return null;
 
-  if (activeCategories.length === 0) return null;
+  const hasAnyOffering = options.some((option) => option.price !== null);
 
   return (
     <FormField
@@ -40,29 +78,32 @@ export function CategorySelector({
       render={({ field }) => (
         <FormItem>
           <h3 className="text-lg font-semibold">Categoría</h3>
-          <FormControl>
-            <Select
-              value={field.value || undefined}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona una categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                {activeCategories.map((cat) => {
-                  const priceEntry = cat.prices.find(
-                    (p) => p.subtypeId === selectedSubtypeId,
-                  );
-                  return (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                      {priceEntry ? ` — ${formatPrice(priceEntry.price)}` : ""}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </FormControl>
+          {hasAnyOffering ? (
+            <FormControl>
+              <Select
+                value={field.value || undefined}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona una categoría" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options.map((option) => (
+                    <CategoryItem
+                      key={option.id}
+                      option={option}
+                      subtypeName={subtypeName}
+                    />
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Todavía no hay precios para {subtypeName} esta temporada. Elige
+              otra modalidad o escríbenos y lo resolvemos.
+            </p>
+          )}
           <FormMessage />
         </FormItem>
       )}

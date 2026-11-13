@@ -73,6 +73,7 @@ export function FederationStep({
         <CategorySelector
           categories={selectedType.categories}
           selectedSubtypeId={selectedSubtypeId}
+          subtypeName={selectedSubtype.name}
         />
       )}
 

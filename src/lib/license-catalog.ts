@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getActiveSeason } from "@/lib/settings";
+import { selectSellableSubtypes } from "@/helpers/sellable-subtypes";
 import type {
   LicenseCatalogType,
   CategoryOffering,
@@ -70,7 +71,7 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
     }
   }
 
-  return types.map((type) => {
+  const catalog = types.map((type) => {
     const typeOfferings = offerings.filter((o) => o.typeId === type.id);
     const categoryMap = new Map<string, CategoryOffering>();
 
@@ -96,16 +97,22 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
       name: type.name,
       description: type.description,
       active: type.active,
-      subtypes: type.subtypes.map((st) => ({
-        id: st.id,
-        name: st.name,
-        description: st.description,
-        active: st.active,
-        licenseTypeId: st.licenseTypeId,
-      })),
+      subtypes: selectSellableSubtypes(type.subtypes, typeOfferings).map(
+        (st) => ({
+          id: st.id,
+          name: st.name,
+          description: st.description,
+          active: st.active,
+          licenseTypeId: st.licenseTypeId,
+        }),
+      ),
       categories: [...categoryMap.values()],
       supplements: supplementEntries,
       supplementGroups: [...uniqueGroups.values()],
     };
   });
+
+  // A federation whose modalities are all unpriced would be a card the member
+  // can click that leads nowhere, so it stays out of the wizard too.
+  return catalog.filter((type) => type.subtypes.length > 0);
 }
