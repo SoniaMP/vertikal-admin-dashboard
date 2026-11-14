@@ -98,6 +98,63 @@ describe("fetchLicenseCatalog", () => {
     ]);
   });
 
+  it("drops a supplement with no price for the season", async () => {
+    const { fetchLicenseCatalog } = await import("../license-catalog");
+    mockTypeFindMany.mockResolvedValue([
+      {
+        id: "lt-1",
+        name: "FERM",
+        description: "",
+        active: true,
+        subtypes: [
+          {
+            id: "st-1",
+            name: "BÁSICA A",
+            description: "",
+            active: true,
+            licenseTypeId: "lt-1",
+          },
+        ],
+      },
+    ]);
+    mockOfferingFindMany.mockResolvedValue([
+      {
+        typeId: "lt-1",
+        subtypeId: "st-1",
+        categoryId: "cat-1",
+        price: 1500,
+        category: CATEGORY,
+      },
+    ]);
+    mockSupplementFindMany.mockResolvedValue([
+      {
+        id: "sup-priced",
+        name: "Seguro ampliado",
+        description: "",
+        active: true,
+        supplementGroupId: null,
+        supplementGroup: null,
+      },
+      {
+        id: "sup-unpriced",
+        name: "Tarjeta impresa",
+        description: "",
+        active: true,
+        supplementGroupId: null,
+        supplementGroup: null,
+      },
+    ]);
+    mockSupplementPriceFindMany.mockResolvedValue([
+      { supplementId: "sup-priced", price: 1200 },
+    ]);
+
+    const catalog = await fetchLicenseCatalog();
+
+    expect(catalog[0].supplements.map((s) => s.name)).toEqual([
+      "Seguro ampliado",
+    ]);
+  });
+
   it("drops a type left with no priced modality", async () => {
     const { fetchLicenseCatalog } = await import("../license-catalog");
     mockTypeFindMany.mockResolvedValue([

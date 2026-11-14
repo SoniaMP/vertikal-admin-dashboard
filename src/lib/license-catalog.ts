@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getActiveSeason } from "@/lib/settings";
 import { selectSellableSubtypes } from "@/helpers/sellable-subtypes";
 import { groupOfferingsByCategory } from "@/helpers/category-offerings";
+import { selectSellableSupplements } from "@/helpers/sellable-supplements";
 import type {
   LicenseCatalogType,
   SupplementSummary,
@@ -49,24 +50,35 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
     groupPrices.map((gp) => [gp.groupId, gp.price]),
   );
 
-  const supplementEntries: SupplementSummary[] = supplements.map((s) => ({
-    id: s.id,
-    name: s.name,
-    description: s.description,
-    price: priceBySupplementId.get(s.id) ?? null,
-    active: s.active,
-    supplementGroupId: s.supplementGroupId,
-    supplementGroup: s.supplementGroup
-      ? {
-          id: s.supplementGroup.id,
-          name: s.supplementGroup.name,
-          price: priceByGroupId.get(s.supplementGroup.id) ?? 0,
-        }
-      : null,
-  }));
+  // Nothing the club sells is free, so a supplement with no price this season
+  // is setup left unfinished, not a gift. Offering it would show the member an
+  // extra that looks included and then bounce them at checkout.
+  const sellableSupplements = selectSellableSupplements(
+    supplements,
+    priceBySupplementId,
+    priceByGroupId,
+  );
+
+  const supplementEntries: SupplementSummary[] = sellableSupplements.map(
+    (s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      price: priceBySupplementId.get(s.id) ?? null,
+      active: s.active,
+      supplementGroupId: s.supplementGroupId,
+      supplementGroup: s.supplementGroup
+        ? {
+            id: s.supplementGroup.id,
+            name: s.supplementGroup.name,
+            price: priceByGroupId.get(s.supplementGroup.id) ?? 0,
+          }
+        : null,
+    }),
+  );
 
   const uniqueGroups = new Map<string, SupplementGroupSummary>();
-  for (const s of supplements) {
+  for (const s of sellableSupplements) {
     if (s.supplementGroup && !uniqueGroups.has(s.supplementGroup.id)) {
       uniqueGroups.set(s.supplementGroup.id, {
         id: s.supplementGroup.id,
