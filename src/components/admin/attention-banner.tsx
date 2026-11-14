@@ -7,6 +7,11 @@ import type { AttentionNotice } from "@/helpers/attention-notices";
  * Sits above every admin screen so a misconfiguration cannot hide on a page
  * nobody opens. It renders nothing when there is nothing to fix: a strip that
  * is always occupied is one the eye learns to skip.
+ *
+ * Deliberately server-only. Hiding the action link on the screen it points to
+ * would need `usePathname`, and a client component in a layout hydrates
+ * without the route the server rendered with, which breaks hydration. A link
+ * back to the page you are on is the cheaper flaw.
  */
 export async function AttentionBanner() {
   const notices = await fetchAttentionNotices();
