@@ -126,6 +126,34 @@ describe("personalDataSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  // The browser date picker never sends these; the API has no picker and is
+  // what writes to the database.
+  it("rejects a date of birth that is not a date", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dateOfBirth: "no soy una fecha",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a date of birth in the future", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      dateOfBirth: "2099-01-15",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts an email pasted with surrounding spaces", () => {
+    const result = personalDataSchema.safeParse({
+      ...validPersonalData,
+      email: "  juan@example.com  ",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.email).toBe("juan@example.com");
+  });
+
   it("accepts F as sex", () => {
     const result = personalDataSchema.safeParse({
       ...validPersonalData,

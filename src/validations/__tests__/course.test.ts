@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   courseCatalogSchema,
   courseRegistrationCheckoutSchema,
+  manualEnrolleeSchema,
 } from "@/validations/course";
 
 describe("courseCatalogSchema", () => {
@@ -107,5 +108,41 @@ describe("courseRegistrationCheckoutSchema", () => {
     if (result.success) {
       expect("sex" in result.data).toBe(false);
     }
+  });
+});
+
+describe("manualEnrolleeSchema", () => {
+  const validEnrollee = {
+    firstName: "Ana",
+    lastName: "García",
+    email: "ana@example.com",
+    coursePriceId: "price-1",
+  };
+
+  // The admin enrolls people who are not members, so most fields stay blank.
+  it("accepts an enrollee with no date of birth", () => {
+    const result = manualEnrolleeSchema.safeParse(validEnrollee);
+
+    expect(result.success).toBe(true);
+    expect(result.data?.dateOfBirth).toBe("");
+  });
+
+  it("rejects a date of birth that is filled in but not a date", () => {
+    const result = manualEnrolleeSchema.safeParse({
+      ...validEnrollee,
+      dateOfBirth: "no soy una fecha",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts an email pasted with surrounding spaces", () => {
+    const result = manualEnrolleeSchema.safeParse({
+      ...validEnrollee,
+      email: "  ana@example.com  ",
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.email).toBe("ana@example.com");
   });
 });

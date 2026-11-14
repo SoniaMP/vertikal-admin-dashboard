@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { personalDataSchema, dniSchema } from "./registration";
+import { birthDateSchema } from "./birth-date";
 import { startOfLocalDay } from "@/helpers/registration-deadline";
 
 export const courseTypeSchema = z.object({
@@ -89,13 +90,16 @@ export const manualEnrolleeSchema = z.object({
   lastName: z
     .string()
     .min(2, { message: "Los apellidos deben tener al menos 2 caracteres" }),
-  email: z.string().email({ message: "Introduce un email válido" }),
+  email: z.string().trim().email({ message: "Introduce un email válido" }),
   coursePriceId: z
     .string()
     .min(1, { message: "El precio es obligatorio" }),
   phone: z.string().optional().default(""),
   dni: dniSchema.optional().or(z.literal("")),
-  dateOfBirth: z.string().optional().default(""),
+  // Optional here: the admin enrolls people who are not members and may not
+  // have asked for a birth date. Blank stays blank, but a date that is filled
+  // in has to be a real one.
+  dateOfBirth: z.literal("").or(birthDateSchema).optional().default(""),
   address: z.string().optional().default(""),
   city: z.string().optional().default(""),
   postalCode: z.string().optional().default(""),

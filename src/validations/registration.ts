@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { normalizeDni } from "@/helpers/dni";
+import { birthDateSchema } from "./birth-date";
 
 const DNI_PATTERN = /^[A-Z0-9]{5,20}$/;
 const DNI_MESSAGE = "Documento no válido (5-20 caracteres alfanuméricos)";
@@ -24,16 +25,17 @@ export const personalDataSchema = z.object({
   lastName: z
     .string()
     .min(2, { message: "Los apellidos deben tener al menos 2 caracteres" }),
-  email: z.string().email({ message: "Introduce un email válido" }),
+  // Trimmed before validating: a pasted address drags a trailing space in,
+  // and rejecting it shows an error pointing at something the member cannot
+  // see. The trimmed value is the one that gets stored.
+  email: z.string().trim().email({ message: "Introduce un email válido" }),
   phone: z
     .string()
     .regex(SPANISH_PHONE_REGEX, {
       message: "Introduce un teléfono válido (ej: 612345678)",
     }),
   dni: dniSchema,
-  dateOfBirth: z
-    .string()
-    .min(1, { message: "La fecha de nacimiento es obligatoria" }),
+  dateOfBirth: birthDateSchema,
   sex: z
     .string()
     .refine((v) => ["M", "F"].includes(v), { message: "Selecciona el sexo" }),
