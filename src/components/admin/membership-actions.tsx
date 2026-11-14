@@ -16,7 +16,7 @@ import {
   updateMembershipStatus,
   deleteMembership,
 } from "@/app/admin/(dashboard)/registros/membership-actions";
-import { MEMBERSHIP_STATUS } from "@/types";
+import { MEMBERSHIP_STATUS, PAYMENT_STATUS } from "@/types";
 import {
   MemberFormDialog,
   type MemberFormData,
@@ -33,6 +33,8 @@ export function MembershipActions({ membership }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const isCancelled = membership.status === MEMBERSHIP_STATUS.CANCELLED;
+  const hasPaymentInFlight =
+    membership.paymentStatus === PAYMENT_STATUS.PENDING;
 
   function handleToggleStatus() {
     const nextStatus = isCancelled ? "ACTIVE" : "CANCELLED";
@@ -96,6 +98,15 @@ export function MembershipActions({ membership }: Props) {
               datos asociados.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {/* Deleting does not stop the checkout the member may still have
+              open, and Stripe will confirm it against a record that is gone. */}
+          {hasPaymentInFlight && (
+            <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              Este registro tiene un pago pendiente. Si el socio lo completa
+              después de borrarlo, el cobro llegará sin alta a la que imputarlo
+              y habrá que devolverlo desde Stripe.
+            </p>
+          )}
           {deleteError && (
             <p className="text-sm text-destructive">{deleteError}</p>
           )}
