@@ -60,6 +60,22 @@ export type CourseNotificationProps = {
   amountCents: number;
 };
 
+/**
+ * A payment Stripe confirmed for a record that is no longer in the database.
+ * The club has the money and nothing to attach it to, so the alert carries
+ * what is needed to find the payer in Stripe and refund them.
+ */
+export type OrphanPaymentProps = {
+  branding?: EmailBrandingSettings;
+  /** "membresía" or "inscripción a curso": what the payment was meant to be. */
+  recordKind: string;
+  /** The id that no longer resolves, kept for the server logs. */
+  missingId: string;
+  sessionId: string;
+  payerEmail: string | null;
+  amountCents: number | null;
+};
+
 /** Format cents as EUR price (e.g. 1500 -> "15,00 €"). */
 export function formatPrice(cents: number): string {
   return new Intl.NumberFormat("es-ES", {

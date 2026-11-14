@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
-import { prisma } from "@/lib/prisma";
-import {
-  sendMembershipConfirmationEmail,
-  sendCourseConfirmationEmail,
-} from "@/lib/send-email";
-import {
-  sendClubMembershipNotification,
-  sendClubCourseNotification,
-} from "@/lib/send-notification-email";
+import { completeCheckout } from "@/lib/checkout-completion";
 import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
@@ -42,60 +34,35 @@ export async function POST(request: NextRequest) {
   }
 
   if (event.type === "checkout.session.completed") {
-    await handleCheckoutCompleted(event.data.object);
+    return respondToCheckout(event.data.object);
   }
 
   return NextResponse.json({ received: true });
 }
 
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const { courseRegistrationId, membershipId } = session.metadata ?? {};
-
-  if (courseRegistrationId) {
-    await prisma.courseRegistration.update({
-      where: { id: courseRegistrationId },
-      data: {
-        paymentStatus: "COMPLETED",
-        stripePaymentIntentId:
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : null,
-      },
-    });
-    await trySendEmail(() =>
-      sendCourseConfirmationEmail(courseRegistrationId),
-    );
-    await trySendEmail(() =>
-      sendClubCourseNotification(courseRegistrationId),
-    );
-  }
-
-  if (membershipId) {
-    await prisma.membership.update({
-      where: { id: membershipId },
-      data: {
-        paymentStatus: "COMPLETED",
-        status: "ACTIVE",
-        stripePaymentId:
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : null,
-      },
-    });
-    await trySendEmail(() =>
-      sendMembershipConfirmationEmail(membershipId),
-    );
-    await trySendEmail(() =>
-      sendClubMembershipNotification(membershipId),
-    );
-  }
-}
-
-/** Send email without blocking the webhook response on failure. */
-async function trySendEmail(fn: () => Promise<void>): Promise<void> {
+/**
+ * Stripe reads the status code as an instruction: a 2xx retires the event and
+ * anything else asks for another delivery. So the question is never whether
+ * something went wrong, but whether delivering it again could do better.
+ *
+ * A record that does not exist will not exist on the next attempt either, so
+ * that alone is settled with a 2xx. An alert that could not be sent, on the
+ * other hand, can still go out later, which is why only that case asks Stripe
+ * to come back: the retries become the delivery guarantee for the one message
+ * saying the club has money it cannot account for.
+ */
+async function respondToCheckout(session: Stripe.Checkout.Session) {
   try {
-    await fn();
+    const settled = await completeCheckout(session);
+    if (!settled) {
+      return NextResponse.json(
+        { error: "Orphan payment could not be reported" },
+        { status: 500 },
+      );
+    }
+    return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Failed to send confirmation email:", error);
+    console.error("Stripe webhook processing failed:", error);
+    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
   }
 }
