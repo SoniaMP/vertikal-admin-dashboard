@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
-  fetchCourseConfirmation,
+  confirmCourseCheckout,
   type CourseConfirmation,
 } from "@/lib/stripe-confirm";
 import { formatPrice } from "@/helpers/price-calculator";
@@ -24,7 +24,7 @@ export default async function CursoExitoPage({
   const { session_id: sessionId } = await searchParams;
 
   const confirmation = sessionId
-    ? await fetchCourseConfirmation(sessionId).catch(() => null)
+    ? await confirmCourseCheckout(sessionId).catch(() => null)
     : null;
 
   if (!confirmation) {
