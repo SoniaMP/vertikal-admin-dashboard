@@ -2,6 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { autofillHints } from "@/helpers/autofill-hints";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -118,6 +119,7 @@ function TextField({
           <FormControl>
             <Input
               type={type}
+              {...autofillHints(name)}
               placeholder={placeholder}
               {...field}
               value={typeof field.value === "string" ? field.value : ""}

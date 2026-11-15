@@ -2,6 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { autofillHints } from "@/helpers/autofill-hints";
 import {
   FormField,
   FormItem,
@@ -68,6 +69,7 @@ function TextField({ name, label, type = "text" }: TextFieldProps) {
           <FormControl>
             <Input
               type={type}
+              {...autofillHints(name)}
               {...field}
               value={typeof field.value === "string" ? field.value : ""}
             />
