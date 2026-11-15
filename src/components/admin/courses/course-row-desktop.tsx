@@ -7,6 +7,7 @@ import { DraftCourseIcon } from "./draft-course-icon";
 import { isRegistrationClosed } from "@/helpers/registration-deadline";
 import { formatCourseDate } from "./helpers";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 type Props = {
   course: CourseRow;
@@ -32,7 +33,7 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
       }
       aria-label={isPast ? "Curso pasado" : undefined}
     >
-      <TableCell className="font-medium">
+      <TableCell className="max-w-[260px] font-medium">
         <div className="flex items-center gap-2">
           {showDraftWarning && <DraftCourseIcon />}
           {showClosedWarning && <RegistrationClosedIcon />}
@@ -40,7 +41,7 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
             href={`/admin/cursos/${course.id}`}
             className="hover:underline"
           >
-            {course.title}
+            <TruncatedText text={course.title} />
           </Link>
         </div>
       </TableCell>

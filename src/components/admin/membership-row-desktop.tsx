@@ -8,6 +8,7 @@ import { FederationCell } from "./membership-federation-cell";
 import { StatusBadges } from "./membership-status-badges";
 import type { MembershipRow } from "./memberships-table";
 import { formatDate, licenseLabel } from "./membership-helpers";
+import { TruncatedText } from "@/components/ui/truncated-text";
 
 type Props = { membership: MembershipRow };
 
@@ -15,15 +16,19 @@ export function DesktopRow({ membership: m }: Props) {
   const isCancelled = m.status === MEMBERSHIP_STATUS.CANCELLED;
   return (
     <TableRow className={cn(isCancelled && "opacity-50")}>
-      <TableCell>
+      <TableCell className="max-w-[220px]">
         <Link
           href={`/admin/registros/${m.id}`}
           className="font-medium hover:underline"
         >
-          {m.member.firstName} {m.member.lastName}
+          <TruncatedText
+            text={`${m.member.firstName} ${m.member.lastName}`}
+          />
         </Link>
       </TableCell>
-      <TableCell className="text-muted-foreground">{m.member.email}</TableCell>
+      <TableCell className="max-w-[240px] text-muted-foreground">
+        {m.member.email}
+      </TableCell>
       <TableCell>{m.member.sex}</TableCell>
       <TableCell>{licenseLabel(m)}</TableCell>
       <TableCell>{formatPrice(m.totalAmount)}</TableCell>

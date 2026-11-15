@@ -19,9 +19,13 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
 
   return (
     <TableRow>
-      <TableCell className="font-medium">{p.firstName}</TableCell>
-      <TableCell>{p.lastName}</TableCell>
-      <TableCell className="text-muted-foreground">{p.email}</TableCell>
+      <TableCell className="max-w-[180px] font-medium">
+        {p.firstName}
+      </TableCell>
+      <TableCell className="max-w-[200px]">{p.lastName}</TableCell>
+      <TableCell className="max-w-[240px] text-muted-foreground">
+        {p.email}
+      </TableCell>
       <TableCell className="text-muted-foreground">{p.phone ?? "—"}</TableCell>
       <TableCell className="text-muted-foreground">{p.dni ?? "—"}</TableCell>
       <TableCell className="text-muted-foreground">{p.dateOfBirth ?? "—"}</TableCell>

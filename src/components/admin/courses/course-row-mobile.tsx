@@ -36,7 +36,7 @@ export function CourseRowMobile({ course, courseTypes, instructors, isInstructor
           {showClosedWarning && <RegistrationClosedIcon />}
           <Link
             href={`/admin/cursos/${course.id}`}
-            className="font-medium truncate hover:underline"
+            className="font-medium break-words hover:underline"
           >
             {course.title}
           </Link>

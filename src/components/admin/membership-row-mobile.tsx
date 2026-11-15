@@ -24,7 +24,7 @@ export function MobileCard({ membership: m }: Props) {
           href={`/admin/registros/${m.id}`}
           className="min-w-0 hover:underline"
         >
-          <p className="font-medium truncate">
+          <p className="font-medium break-words">
             {m.member.firstName} {m.member.lastName}
           </p>
           <p className="text-sm text-muted-foreground truncate">

@@ -51,11 +51,11 @@ export function NotRenewedTable({ members, previousSeasonName }: Props) {
           <TableBody>
             {members.map((m) => (
               <TableRow key={m.id}>
-                <TableCell className="font-medium">
+                <TableCell className="max-w-[220px] font-medium">
                   {m.firstName} {m.lastName}
                 </TableCell>
                 <TableCell>{m.dni}</TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="max-w-[240px] text-muted-foreground">
                   {m.email}
                 </TableCell>
                 <TableCell className="text-muted-foreground">

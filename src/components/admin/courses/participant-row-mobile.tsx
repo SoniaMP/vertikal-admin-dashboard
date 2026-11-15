@@ -20,7 +20,7 @@ export function ParticipantRowMobile({ participant: p, courseId }: Props) {
     <div className="rounded-lg border p-4 transition-colors">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="font-medium truncate">
+          <p className="font-medium break-words">
             {p.firstName} {p.lastName}
           </p>
           <p className="text-sm text-muted-foreground truncate">{p.email}</p>

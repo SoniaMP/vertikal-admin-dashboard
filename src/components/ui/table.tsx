@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { TruncatedText } from "@/components/ui/truncated-text"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -78,7 +79,32 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   )
 }
 
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
+/**
+ * The readable text of a cell, or null when it holds anything else.
+ *
+ * `<TableCell>{first} {last}</TableCell>` arrives as a list of pieces rather
+ * than one string, and that is exactly the long-name case worth a tooltip, so
+ * an all-text list is joined instead of skipped.
+ */
+function plainText(children: React.ReactNode): string | null {
+  const parts = React.Children.toArray(children)
+  if (parts.length === 0) return null
+
+  const isText = parts.every(
+    (part) => typeof part === "string" || typeof part === "number"
+  )
+  return isText ? parts.join("") : null
+}
+
+/**
+ * Cells clip to a fixed width so the columns stay aligned. Plain text goes
+ * through `TruncatedText`, which hands back whatever the clipping hides. Cells
+ * holding elements -- badges, buttons, menus -- are left alone: they are not
+ * text to read, and wrapping them would put a tooltip on every action.
+ */
+function TableCell({ className, children, ...props }: React.ComponentProps<"td">) {
+  const text = plainText(children)
+
   return (
     <td
       data-slot="table-cell"
@@ -87,7 +113,9 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
         className
       )}
       {...props}
-    />
+    >
+      {text === null ? children : <TruncatedText text={text} />}
+    </td>
   )
 }
 

@@ -55,8 +55,10 @@ export function UsersTable({ users, currentUserId }: Props) {
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell className="font-medium">{user.name}</TableCell>
-            <TableCell className="text-muted-foreground">
+            <TableCell className="max-w-[220px] font-medium">
+              {user.name}
+            </TableCell>
+            <TableCell className="max-w-[240px] text-muted-foreground">
               {user.email}
             </TableCell>
             <TableCell>
