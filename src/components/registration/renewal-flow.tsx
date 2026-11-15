@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RenewalLookup } from "./renewal-lookup";
 import { RegistrationWizard } from "./registration-wizard";
@@ -28,21 +30,29 @@ export function RenewalFlow({
     );
   }
 
-  // No "Volver atrás" link above the wizard any more. It used to throw away
-  // every field the member had typed, and now it would also throw away a
-  // verified session: getting back in costs another code, and only three are
-  // sent per hour. "Anterior" inside the wizard is the way back.
+  // The way out sits below the form and says what it does. The old link said
+  // "Volver atrás" at the top of every step while actually restarting the
+  // whole thing, which is the opposite of what "back" means next to the
+  // wizard's own "Anterior" button.
   return (
-    <Card>
-      <CardContent>
-        <RegistrationWizard
-          licenseTypes={licenseTypes}
-          membershipFee={membershipFee}
-          mode="renewal"
-          defaultValues={prefill?.member}
-          previousLicense={prefill?.previousLicense ?? null}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <Card>
+        <CardContent>
+          <RegistrationWizard
+            licenseTypes={licenseTypes}
+            membershipFee={membershipFee}
+            mode="renewal"
+            defaultValues={prefill?.member}
+            previousLicense={prefill?.previousLicense ?? null}
+          />
+        </CardContent>
+      </Card>
+
+      <div className="mt-4 text-center">
+        <Button variant="link" asChild className="text-muted-foreground">
+          <Link href="/registro">Empezar de nuevo</Link>
+        </Button>
+      </div>
+    </>
   );
 }
