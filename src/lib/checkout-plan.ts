@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { MEMBERSHIP_FEE_ITEM } from "@/helpers/checkout-labels";
 import { CheckoutError } from "@/lib/checkout-error";
 import {
   resolveSupplements,
@@ -22,8 +23,6 @@ export type CheckoutPlan = {
     externalLicenseFileUrl: string | null;
   };
 };
-
-const MEMBERSHIP_FEE_ITEM = "Cuota de socio";
 
 type PlanInput = {
   data: RegistrationInput;
