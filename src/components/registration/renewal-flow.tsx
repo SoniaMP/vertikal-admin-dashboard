@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RenewalLookup } from "./renewal-lookup";
 import { RegistrationWizard } from "./registration-wizard";
-import type { RenewalSearchResult } from "@/app/registro/actions";
+import type { RenewalPrefill } from "@/lib/renewal-prefill";
 import type { LicenseCatalogType } from "@/types";
-import { RegistrationInput } from "@/validations/registration";
 
 type RenewalFlowProps = {
   licenseTypes: LicenseCatalogType[];
@@ -20,34 +16,33 @@ export function RenewalFlow({
   licenseTypes,
   membershipFee,
 }: RenewalFlowProps) {
-  const [renewalData, setRenewalData] = useState<RenewalSearchResult | null>(
-    null,
-  );
+  const [prefill, setPrefill] = useState<RenewalPrefill | null>(null);
+  const [isFillingByHand, setIsFillingByHand] = useState(false);
 
-  if (!renewalData) {
-    return <RenewalLookup onFound={setRenewalData} />;
+  if (!prefill && !isFillingByHand) {
+    return (
+      <RenewalLookup
+        onVerified={setPrefill}
+        onSkip={() => setIsFillingByHand(true)}
+      />
+    );
   }
 
-  const defaultValues: Partial<RegistrationInput> = renewalData;
-
+  // No "Volver atrás" link above the wizard any more. It used to throw away
+  // every field the member had typed, and now it would also throw away a
+  // verified session: getting back in costs another code, and only three are
+  // sent per hour. "Anterior" inside the wizard is the way back.
   return (
-    <>
-      <Button variant="ghost" asChild className="mb-4">
-        <Link href="/registro">
-          <ArrowLeft className="mr-2 size-4" />
-          Volver atrás
-        </Link>
-      </Button>
-      <Card>
-        <CardContent>
-          <RegistrationWizard
-            licenseTypes={licenseTypes}
-            membershipFee={membershipFee}
-            mode="renewal"
-            defaultValues={defaultValues}
-          />
-        </CardContent>
-      </Card>
-    </>
+    <Card>
+      <CardContent>
+        <RegistrationWizard
+          licenseTypes={licenseTypes}
+          membershipFee={membershipFee}
+          mode="renewal"
+          defaultValues={prefill?.member}
+          previousLicense={prefill?.previousLicense ?? null}
+        />
+      </CardContent>
+    </Card>
   );
 }

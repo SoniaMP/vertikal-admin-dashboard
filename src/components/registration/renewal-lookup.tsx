@@ -2,95 +2,52 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { dniSchema } from "@/validations/registration";
-import {
-  findMemberByDni,
-  type RenewalSearchResult,
-} from "@/app/registro/actions";
+import { Separator } from "@/components/ui/separator";
+import { RenewalDniForm } from "./renewal-dni-form";
+import { RenewalCodeForm } from "./renewal-code-form";
+import type { RenewalPrefill } from "@/lib/renewal-prefill";
 
 type RenewalLookupProps = {
-  onFound: (data: RenewalSearchResult) => void;
+  onVerified: (prefill: RenewalPrefill) => void;
+  onSkip: () => void;
 };
 
-type LookupState = "idle" | "loading" | "not-found" | "error";
-
-export function RenewalLookup({ onFound }: RenewalLookupProps) {
-  const [dni, setDni] = useState("");
-  const [state, setState] = useState<LookupState>("idle");
-
-  const isDniValid = dniSchema.safeParse(dni).success;
-
-  async function handleSearch() {
-    if (!isDniValid) return;
-
-    setState("loading");
-    try {
-      const result = await findMemberByDni(dni);
-      if (result) {
-        onFound(result);
-      } else {
-        setState("not-found");
-      }
-    } catch {
-      setState("error");
-    }
-  }
+export function RenewalLookup({ onVerified, onSkip }: RenewalLookupProps) {
+  const [dniAwaitingCode, setDniAwaitingCode] = useState<string | null>(null);
 
   return (
     <Card>
       <CardContent className="space-y-6 pt-6">
-        <div className="space-y-2">
-          <Label htmlFor="renewal-dni">DNI del socio</Label>
-          <Input
-            id="renewal-dni"
-            value={dni}
-            onChange={(e) => {
-              setDni(e.target.value.trim());
-              if (state !== "idle" && state !== "loading") setState("idle");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && isDniValid) handleSearch();
-            }}
+        {dniAwaitingCode === null ? (
+          <RenewalDniForm onCodeSent={setDniAwaitingCode} />
+        ) : (
+          <RenewalCodeForm
+            dni={dniAwaitingCode}
+            onVerified={onVerified}
+            onRestart={() => setDniAwaitingCode(null)}
           />
-        </div>
-
-        {state === "not-found" && (
-          <div className="space-y-3">
-            <p className="text-sm text-destructive">
-              No se ha encontrado ningún registro con este DNI
-            </p>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/registro/alta">Hacer alta nueva</Link>
-            </Button>
-          </div>
         )}
 
-        {state === "error" && (
-          <p className="text-sm text-destructive">
-            Error al buscar el registro. Inténtalo de nuevo.
-          </p>
-        )}
+        <Separator />
 
-        <div className="flex items-center justify-between">
+        {/* Nobody is ever stuck behind the code: recovering the stored data is
+            a convenience, so losing the mail cannot cost a renewal. */}
+        <Button variant="outline" onClick={onSkip} className="w-full">
+          Continuar sin recuperar mis datos
+        </Button>
+
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Button variant="ghost" asChild>
             <Link href="/registro">
               <ArrowLeft className="mr-2 size-4" />
               Volver atrás
             </Link>
           </Button>
-          <Button
-            onClick={handleSearch}
-            disabled={!isDniValid || state === "loading"}
-          >
-            {state === "loading" && (
-              <Loader2 className="mr-2 size-4 animate-spin" />
-            )}
-            Siguiente
+          <Button variant="link" asChild>
+            <Link href="/registro/alta">¿Aún no eres socio? Hacer alta</Link>
           </Button>
         </div>
       </CardContent>

@@ -10,6 +10,7 @@ import { FederationStep } from "./federation-step";
 import { ExternalLicenseStep } from "./external-license-step";
 import { RegistrationSummary } from "./registration-summary";
 import { RenewalBanner } from "./renewal-banner";
+import { PreviousLicenseNote } from "./previous-license-note";
 import { useRegistrationSteps } from "@/hooks/use-registration-steps";
 import { useRegistrationSubmit } from "@/hooks/use-registration-submit";
 import {
@@ -17,12 +18,15 @@ import {
   type RegistrationInput,
 } from "@/validations/registration";
 import type { LicenseCatalogType } from "@/types";
+import type { PreviousLicense } from "@/lib/renewal-prefill";
 
 type RegistrationWizardProps = {
   licenseTypes: LicenseCatalogType[];
   membershipFee: number;
   mode?: "new" | "renewal";
   defaultValues?: Partial<RegistrationInput>;
+  /** Shown on step 3 when a renewing member had a license last season. */
+  previousLicense?: PreviousLicense | null;
 };
 
 // `hasClubLicense` is deliberately absent: step 2 must start with neither card
@@ -61,6 +65,7 @@ export function RegistrationWizard({
   membershipFee,
   mode = "new",
   defaultValues,
+  previousLicense = null,
 }: RegistrationWizardProps) {
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
@@ -87,10 +92,15 @@ export function RegistrationWizard({
     name: "hasClubLicense",
   });
 
+  // The banner asks the member to check their data, which only means something
+  // when there is data to check. Someone who chose to continue without
+  // recovering theirs is looking at an empty form.
+  const hasRecoveredData = mode === "renewal" && defaultValues !== undefined;
+
   return (
     <Form {...form}>
       <form onSubmit={(e) => e.preventDefault()}>
-        {mode === "renewal" && <RenewalBanner />}
+        {hasRecoveredData && <RenewalBanner />}
         <StepIndicator
           currentStep={currentStep}
           steps={buildSteps(hasClubLicense)}
@@ -99,6 +109,12 @@ export function RegistrationWizard({
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
             {error}
+          </div>
+        )}
+
+        {currentStep === 3 && previousLicense && (
+          <div className="mb-6">
+            <PreviousLicenseNote previousLicense={previousLicense} />
           </div>
         )}
 

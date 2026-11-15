@@ -83,3 +83,10 @@ export function formatPrice(cents: number): string {
     currency: "EUR",
   }).format(cents / 100);
 }
+
+export type RenewalCodeProps = {
+  branding?: EmailBrandingSettings;
+  firstName: string;
+  code: string;
+  expiresInMinutes: number;
+};

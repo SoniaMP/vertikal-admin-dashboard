@@ -331,3 +331,17 @@ model CourseRegistration {
   @@index([stripeSessionId])
   @@map("courses")
 }
+
+/// Short-lived code that lets a returning member recover their own stored data
+/// on the public renewal screen. Keyed by DNI rather than by member so the
+/// lookup never has to reveal whether that member exists.
+model RenewalCode {
+  id        String   @id @default(cuid())
+  dni       String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([dni])
+}
