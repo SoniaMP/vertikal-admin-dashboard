@@ -1,4 +1,5 @@
 import { Separator } from "@/components/ui/separator";
+import { formatBirthDate } from "@/helpers/birth-date-display";
 import { formatPrice } from "@/helpers/price-calculator";
 import type { MembershipConfirmation } from "@/lib/stripe-confirm";
 
@@ -22,7 +23,7 @@ export function ConfirmationSummary({ data }: ConfirmationSummaryProps) {
         <ConfirmationRow label="DNI" value={member.dni} />
         <ConfirmationRow
           label="Fecha de nacimiento"
-          value={member.dateOfBirth}
+          value={formatBirthDate(member.dateOfBirth)}
         />
         <ConfirmationRow
           label="Sexo"

@@ -23,7 +23,7 @@ export async function GET() {
     h1 { font-size: 1.25rem; margin-bottom: 1.5rem; }
     ul { list-style: none; padding: 0; }
     li { margin-bottom: 0.75rem; }
-    a { color: #1d4ed8; text-decoration: none; }
+    a { color: #004522; text-decoration: none; }
     a:hover { text-decoration: underline; }
   </style>
 </head>

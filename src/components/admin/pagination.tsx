@@ -10,8 +10,13 @@ type Props = {
   total: number;
   pageSize: number;
   basePath?: string;
-  itemLabel?: string;
+  itemLabel?: ItemLabel;
 };
+
+/** Singular and plural, because "de 1 miembros" is what you get otherwise. */
+type ItemLabel = { one: string; many: string };
+
+const MEMBER_LABEL: ItemLabel = { one: "miembro", many: "miembros" };
 
 export function Pagination({
   currentPage,
@@ -19,7 +24,7 @@ export function Pagination({
   total,
   pageSize,
   basePath = "/admin",
-  itemLabel = "miembros",
+  itemLabel = MEMBER_LABEL,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,7 +47,8 @@ export function Pagination({
   return (
     <nav aria-label="Paginación" className="flex items-center justify-between mt-4">
       <span className="text-sm text-muted-foreground">
-        Mostrando {from}-{to} de {total} {itemLabel}
+        Mostrando {from}-{to} de {total}{" "}
+        {total === 1 ? itemLabel.one : itemLabel.many}
       </span>
       {totalPages > 1 && (
         <div className="flex items-center gap-2">

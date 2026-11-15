@@ -54,6 +54,7 @@ export default async function CoursesPage({
         totalPages={totalPages}
         total={total}
         pageSize={pageSize}
+        itemLabel={{ one: "curso", many: "cursos" }}
       />
     </div>
   );

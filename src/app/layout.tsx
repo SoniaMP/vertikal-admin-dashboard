@@ -12,10 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Every route inherits this unless it sets its own, so it has to be the club,
+// not the admin panel: the public pages are the ones people actually land on.
 export const metadata: Metadata = {
-  title: "Club Vertikal - Panel de administración",
+  title: "Club Vertikal",
   description:
-    "Panel de administración para gestionar miembros, federativas deportivas y ajustes del club.",
+    "Club de escalada y espeleología: altas de socio, renovaciones y cursos.",
 };
 
 export default function RootLayout({

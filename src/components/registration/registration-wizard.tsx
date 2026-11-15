@@ -4,6 +4,7 @@ import { useForm, useWatch, type DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { StepIndicator } from "./step-indicator";
+import { buildRegistrationSteps } from "@/helpers/registration-steps";
 import { PersonalDataForm } from "./personal-data-form";
 import { MembershipModeStep } from "./membership-mode-step";
 import { FederationStep } from "./federation-step";
@@ -51,15 +52,6 @@ const EMPTY_DEFAULTS: DefaultValues<RegistrationInput> = {
   externalLicenseFileUrl: "",
 };
 
-function buildSteps(hasClubLicense: boolean | undefined) {
-  return [
-    { number: 1, label: "Datos personales" },
-    { number: 2, label: "Licencia" },
-    { number: 3, label: hasClubLicense === false ? "Tu licencia" : "Federativa" },
-    { number: 4, label: "Resumen" },
-  ];
-}
-
 export function RegistrationWizard({
   licenseTypes,
   membershipFee,
@@ -103,7 +95,7 @@ export function RegistrationWizard({
         {hasRecoveredData && <RenewalBanner />}
         <StepIndicator
           currentStep={currentStep}
-          steps={buildSteps(hasClubLicense)}
+          steps={buildRegistrationSteps(hasClubLicense)}
         />
 
         {error && (

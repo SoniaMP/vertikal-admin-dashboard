@@ -1,5 +1,10 @@
 import Image from "next/image";
 
+export const metadata = {
+  title: "Cursos - Club Vertikal",
+  description: "Cursos y actividades del Club Vertikal: fechas, plazas y precios.",
+};
+
 export default function CursosLayout({
   children,
 }: {

@@ -4,6 +4,12 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { MobileSidebar } from "@/components/admin/mobile-sidebar";
 import { AttentionBanner } from "@/components/admin/attention-banner";
 
+export const metadata = {
+  title: "Panel de administración - Club Vertikal",
+  description:
+    "Gestión de socios, cursos, licencias federativas y ajustes del club.",
+};
+
 export default async function AdminDashboardLayout({
   children,
 }: {

@@ -1,25 +1,14 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-
-type Step = { number: number; label: string };
-
-const DEFAULT_STEPS: Step[] = [
-  { number: 1, label: "Datos personales" },
-  { number: 2, label: "Licencia" },
-  { number: 3, label: "Federativa" },
-  { number: 4, label: "Resumen" },
-];
+import type { RegistrationStep } from "@/helpers/registration-steps";
 
 type StepIndicatorProps = {
   currentStep: number;
-  steps?: Step[];
+  steps: RegistrationStep[];
 };
 
-export function StepIndicator({
-  currentStep,
-  steps = DEFAULT_STEPS,
-}: StepIndicatorProps) {
+export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
   return (
     <nav aria-label="Progreso del registro" className="-mx-6 px-6 pb-6">
       <ol className="flex items-center justify-between">

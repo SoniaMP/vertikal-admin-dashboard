@@ -106,7 +106,7 @@ export function ParticipantsSection({
         total={total}
         pageSize={pageSize}
         basePath={basePath}
-        itemLabel="participantes"
+        itemLabel={{ one: "participante", many: "participantes" }}
       />
 
       <AddEnrolleeDialog

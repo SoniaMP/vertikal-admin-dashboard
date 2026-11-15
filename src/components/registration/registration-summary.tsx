@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { formatBirthDate } from "@/helpers/birth-date-display";
 import { PriceSummary } from "./price-summary";
 import { SummarySection } from "./summary-section";
 import { SummaryRow } from "./summary-row";
@@ -81,7 +82,10 @@ export function RegistrationSummary({
         <SummaryRow label="Email" value={data.email} />
         <SummaryRow label="Teléfono" value={data.phone} />
         <SummaryRow label="DNI" value={data.dni} />
-        <SummaryRow label="Fecha de nacimiento" value={data.dateOfBirth} />
+        <SummaryRow
+          label="Fecha de nacimiento"
+          value={formatBirthDate(data.dateOfBirth)}
+        />
         <SummaryRow
           label="Sexo"
           value={data.sex === "M" ? "Hombre" : data.sex === "F" ? "Mujer" : ""}

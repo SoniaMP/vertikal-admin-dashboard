@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { subtypeOptionLabel } from "@/helpers/subtype-option-label";
 import type { LicenseSubtypeSummary } from "@/types";
 import type { RegistrationInput } from "@/validations/registration";
 
@@ -48,9 +49,7 @@ export function SubtypeSelector({ subtypes }: SubtypeSelectorProps) {
               <SelectContent>
                 {subtypes.map((st) => (
                   <SelectItem key={st.id} value={st.id}>
-                    {st.description
-                      ? `${st.name} - ${st.description}`
-                      : st.name}
+                    {subtypeOptionLabel(st)}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -7,10 +7,14 @@ export type EmailBrandingSettings = {
   backgroundColor: string;
 };
 
+/**
+ * Sampled from `public/logo-horizontal-color.png`. The lime (#81b826) stays out
+ * of here: it only reaches 2.3:1 on this background, so it cannot carry text.
+ */
 export const DEFAULT_BRANDING: EmailBrandingSettings = {
   logoUrl: null,
-  primaryColor: "#1d4ed8",
-  secondaryColor: "#374151",
+  primaryColor: "#004522",
+  secondaryColor: "#3d5a47",
   backgroundColor: "#f9fafb",
 };
 
