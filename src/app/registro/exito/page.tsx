@@ -3,7 +3,7 @@ import { AlertTriangle, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { confirmMembershipCheckout } from "@/lib/stripe-confirm";
+import { fetchMembershipConfirmation } from "@/lib/stripe-confirm";
 import { ConfirmationSummary } from "@/components/registration/confirmation-summary";
 
 export const metadata = {
@@ -19,7 +19,7 @@ export default async function ExitoPage({ searchParams }: ExitoPageProps) {
   const { session_id: sessionId } = await searchParams;
 
   const confirmation = sessionId
-    ? await confirmMembershipCheckout(sessionId).catch(() => null)
+    ? await fetchMembershipConfirmation(sessionId).catch(() => null)
     : null;
 
   if (!confirmation) {
