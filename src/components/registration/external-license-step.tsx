@@ -64,17 +64,7 @@ export function ExternalLicenseStep({
           <FormItem>
             <FormLabel>FEDERACIÓN + Tipo de federativa</FormLabel>
             <FormControl>
-              {/* Revalidates as the member types so the error clears once the
-                  field is filled, instead of lingering until the next step. */}
-              <Input
-                placeholder="Ej: FERM PLUS A"
-                {...field}
-                onChange={(event) =>
-                  form.setValue("externalLicenseLabel", event.target.value, {
-                    shouldValidate: true,
-                  })
-                }
-              />
+              <Input placeholder="Ej: FERM PLUS A" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

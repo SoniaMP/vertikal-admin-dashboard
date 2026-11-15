@@ -64,6 +64,13 @@ export function RegistrationWizard({
 }: RegistrationWizardProps) {
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
+    // Steps advance through `trigger`, not `handleSubmit`, so `isSubmitted`
+    // never flips and the default `reValidateMode` never applies: an error
+    // painted by "Siguiente" would sit there untouched while the member fixes
+    // the field. `onTouched` revalidates once a field has been left, which
+    // clears each message as the member moves on without flashing errors at
+    // every keystroke across the eleven fields of step one.
+    mode: "onTouched",
     defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
   });
 
