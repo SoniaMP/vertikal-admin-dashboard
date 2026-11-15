@@ -148,9 +148,9 @@ describe("POST /api/checkout", () => {
 
     expect(response.status).toBe(400);
     const data = await response.json();
-    expect(data.error).toBe(
-      "No hay oferta para esta combinación de licencia y categoría",
-    );
+    // The member reads this verbatim in the wizard, so it has to name the step
+    // they can fix it from instead of describing a missing database row.
+    expect(data.error).toContain("Vuelve al paso de licencia");
   });
 
   it("returns 400 for invalid supplements", async () => {

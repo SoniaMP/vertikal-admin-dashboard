@@ -11,6 +11,7 @@ import { FederationStep } from "./federation-step";
 import { ExternalLicenseStep } from "./external-license-step";
 import { RegistrationSummary } from "./registration-summary";
 import { RenewalBanner } from "./renewal-banner";
+import { WizardErrorBanner } from "./wizard-error-banner";
 import { PreviousLicenseNote } from "./previous-license-note";
 import { useRegistrationSteps } from "@/hooks/use-registration-steps";
 import { useRegistrationSubmit } from "@/hooks/use-registration-submit";
@@ -98,11 +99,7 @@ export function RegistrationWizard({
           steps={buildRegistrationSteps(hasClubLicense)}
         />
 
-        {error && (
-          <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error}
-          </div>
-        )}
+        {error && <WizardErrorBanner>{error}</WizardErrorBanner>}
 
         {currentStep === 3 && previousLicense && (
           <div className="mb-6">

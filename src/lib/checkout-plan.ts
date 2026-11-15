@@ -71,7 +71,7 @@ async function buildClubLicensePlan({
 
   if (!offering) {
     throw new CheckoutError(
-      "No hay oferta para esta combinación de licencia y categoría",
+      "La modalidad y la categoría que elegiste ya no tienen precio esta temporada. Vuelve al paso de licencia y elige otra combinación.",
     );
   }
 

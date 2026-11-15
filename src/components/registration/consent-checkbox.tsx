@@ -7,11 +7,14 @@ import { DataProtectionDialog } from "./data-protection-dialog";
 type ConsentCheckboxProps = {
   isChecked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  /** Lets the pay action send focus here when this is what is missing. */
+  focusRef?: React.Ref<HTMLButtonElement>;
 };
 
 export function ConsentCheckbox({
   isChecked,
   onCheckedChange,
+  focusRef,
 }: ConsentCheckboxProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -19,6 +22,7 @@ export function ConsentCheckbox({
     <>
       <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4">
         <Checkbox
+          ref={focusRef}
           checked={isChecked}
           onCheckedChange={(v) => onCheckedChange(v === true)}
           className="mt-0.5"

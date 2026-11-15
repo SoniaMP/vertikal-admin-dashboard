@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatBirthDate } from "@/helpers/birth-date-display";
 import { PriceSummary } from "./price-summary";
@@ -10,6 +9,9 @@ import { SummarySection } from "./summary-section";
 import { SummaryRow } from "./summary-row";
 import { SummaryLicenseSection } from "./summary-license-section";
 import { ConsentCheckbox } from "./consent-checkbox";
+import { SummaryPayAction } from "./summary-pay-action";
+import { payBlockReason } from "@/helpers/pay-block-reason";
+import type { PayBlocker } from "@/helpers/pay-block-reason";
 import {
   calculateTotal,
   calculateMemberOnlyTotal,
@@ -65,9 +67,29 @@ export function RegistrationSummary({
   isSubmitting,
 }: RegistrationSummaryProps) {
   const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(false);
+  const [blocker, setBlocker] = useState<PayBlocker | null>(null);
+  const consentRef = useRef<HTMLButtonElement>(null);
   const form = useFormContext<RegistrationInput>();
   const data = form.getValues();
   const breakdown = buildBreakdown(data, licenseTypes, membershipFee);
+
+  function handlePay() {
+    const reason = payBlockReason({
+      hasTotal: breakdown !== null,
+      hasAcceptedPrivacy,
+    });
+    setBlocker(reason);
+    if (!reason) {
+      onSubmit();
+      return;
+    }
+    if (reason.target === "consent") consentRef.current?.focus();
+  }
+
+  function acceptPrivacy(isChecked: boolean) {
+    setHasAcceptedPrivacy(isChecked);
+    if (isChecked) setBlocker(null);
+  }
 
   return (
     <div className="space-y-6">
@@ -113,25 +135,16 @@ export function RegistrationSummary({
 
       <ConsentCheckbox
         isChecked={hasAcceptedPrivacy}
-        onCheckedChange={setHasAcceptedPrivacy}
+        onCheckedChange={acceptPrivacy}
+        focusRef={consentRef}
       />
 
-      <div className="flex justify-between pt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => onEdit(LICENSE_STEP)}
-        >
-          Anterior
-        </Button>
-        <Button
-          type="button"
-          onClick={onSubmit}
-          disabled={!hasAcceptedPrivacy || isSubmitting}
-        >
-          {isSubmitting ? "Procesando..." : "Proceder al pago"}
-        </Button>
-      </div>
+      <SummaryPayAction
+        blocker={blocker}
+        isSubmitting={isSubmitting}
+        onBack={() => onEdit(LICENSE_STEP)}
+        onPay={handlePay}
+      />
     </div>
   );
 }
