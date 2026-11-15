@@ -112,7 +112,7 @@ describe("useRegistrationSteps", () => {
     // Reading touchedFields is what subscribes RHF's formState proxy to it;
     // without this read the assertion below sees an empty object either way.
     expect(result.current.form.formState.touchedFields).toEqual({});
-    act(() => result.current.steps.setCurrentStep(3));
+    act(() => result.current.steps.goToStep(3));
 
     await act(async () => {
       await result.current.steps.goNext();
@@ -162,7 +162,7 @@ describe("useRegistrationSteps", () => {
 
   it("validates the club license fields on step 3 when buying through the club", async () => {
     const { result } = setup({ hasClubLicense: true });
-    act(() => result.current.steps.setCurrentStep(3));
+    act(() => result.current.steps.goToStep(3));
     const trigger = vi.spyOn(result.current.form, "trigger");
 
     await act(async () => {
@@ -177,7 +177,7 @@ describe("useRegistrationSteps", () => {
 
   it("validates the external license fields on step 3 when federating elsewhere", async () => {
     const { result } = setup({ hasClubLicense: false });
-    act(() => result.current.steps.setCurrentStep(3));
+    act(() => result.current.steps.goToStep(3));
     const trigger = vi.spyOn(result.current.form, "trigger");
 
     await act(async () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useStepHistory } from "./use-step-history";
 import Link from "next/link";
 import type { FieldPath, UseFormReturn } from "react-hook-form";
 import {
@@ -46,7 +47,7 @@ function dniErrorMessage(reason: string | undefined): ReactNode {
  * jump, pressing "Siguiente" looks like nothing happened at all.
  */
 export function useRegistrationSteps({ form, mode }: UseRegistrationStepsArgs) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const { step: currentStep, goTo, goBack: popHistory } = useStepHistory(1);
   const [error, setError] = useState<ReactNode>(null);
 
   function fieldsForStep(step: number): FieldPath<RegistrationInput>[] {
@@ -99,13 +100,23 @@ export function useRegistrationSteps({ form, mode }: UseRegistrationStepsArgs) {
   async function goNext() {
     setError(null);
     if (currentStep > 3) return;
-    if (await validateStep(currentStep)) setCurrentStep(currentStep + 1);
+    if (await validateStep(currentStep)) goTo(currentStep + 1);
   }
 
   function goBack() {
     setError(null);
-    setCurrentStep((step) => Math.max(1, step - 1));
+    popHistory();
   }
 
-  return { currentStep, setCurrentStep, error, setError, goNext, goBack };
+  /**
+   * Jumping back from the summary pushes an entry like any other move, so the
+   * back button returns the member to the summary they came from instead of
+   * making them walk the remaining steps again.
+   */
+  function goToStep(step: number) {
+    setError(null);
+    goTo(step);
+  }
+
+  return { currentStep, goToStep, error, setError, goNext, goBack };
 }

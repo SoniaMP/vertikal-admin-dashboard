@@ -79,7 +79,7 @@ export function RegistrationWizard({
     defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
   });
 
-  const { currentStep, setCurrentStep, error, setError, goNext, goBack } =
+  const { currentStep, goToStep, error, setError, goNext, goBack } =
     useRegistrationSteps({ form, mode });
 
   const { isSubmitting, submit } = useRegistrationSubmit({
@@ -141,7 +141,7 @@ export function RegistrationWizard({
           <RegistrationSummary
             licenseTypes={licenseTypes}
             membershipFee={membershipFee}
-            onEdit={setCurrentStep}
+            onEdit={goToStep}
             onSubmit={submit}
             isSubmitting={isSubmitting}
           />
