@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getAuthSession, type ActionResult } from "@/lib/actions";
-import { hashPassword } from "@/lib/hash-password";
+import { hashPassword, verifyPassword } from "@/lib/password";
 import { z } from "zod";
 
 const changePasswordSchema = z
@@ -44,8 +44,11 @@ export async function changePassword(
 
   if (!user) return { success: false, error: "Usuario no encontrado" };
 
-  const currentHash = await hashPassword(parsed.data.currentPassword);
-  if (currentHash !== user.passwordHash) {
+  const { isValid } = await verifyPassword(
+    parsed.data.currentPassword,
+    user.passwordHash,
+  );
+  if (!isValid) {
     return { success: false, error: "La contraseña actual no es correcta" };
   }
 

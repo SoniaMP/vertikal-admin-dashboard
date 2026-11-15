@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, type ActionResult } from "@/lib/actions";
-import { hashPassword } from "@/lib/hash-password";
+import { hashPassword } from "@/lib/password";
 import { createUserSchema, updateUserSchema } from "@/validations/user";
 import { auth } from "@/lib/auth";
 

@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { hash } from "node:crypto";
+import { hashPassword } from "../src/lib/password";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
@@ -32,7 +32,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       email,
-      passwordHash: hash("sha256", password),
+      passwordHash: await hashPassword(password),
       name,
       roles: { create: { roleId: adminRole.id } },
     },

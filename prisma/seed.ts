@@ -1,16 +1,12 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { hash } from "node:crypto";
+import { hashPassword } from "../src/lib/password";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
 });
 const prisma = new PrismaClient({ adapter });
-
-function hashPassword(password: string): string {
-  return hash("sha256", password);
-}
 
 async function main() {
   // Ensure ADMIN role exists
@@ -36,7 +32,7 @@ async function main() {
     await prisma.user.create({
       data: {
         email: "admin@vertikal.club",
-        passwordHash: hashPassword("admin123"),
+        passwordHash: await hashPassword("admin123"),
         name: "Admin",
         roles: { create: { roleId: adminRole.id } },
       },
