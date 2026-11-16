@@ -170,6 +170,14 @@
   --pill-neutral-bg: #eceee8;   --pill-neutral-ink: #35383a;
 }
 
+/* A surface is separated by its edge or by a step in tone, never by both an
+   edge and a shadow. Shadows are left for what actually floats: a menu, a
+   dialog, a popover. */
+.admin-shell [data-slot="card"] {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
 /* ---------------------------------------------------------------------
    The public flow
    Its visitors are mostly on a phone and many are over sixty, so running
