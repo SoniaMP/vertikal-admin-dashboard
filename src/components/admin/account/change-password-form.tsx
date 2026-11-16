@@ -21,7 +21,6 @@ export function ChangePasswordForm() {
 
   return (
     <form ref={formRef} action={formAction} className="max-w-md space-y-4">
-      <h2 className="text-lg font-semibold">Cambiar contraseña</h2>
       <div className="space-y-2">
         <Label htmlFor="currentPassword">Contraseña actual</Label>
         <Input
