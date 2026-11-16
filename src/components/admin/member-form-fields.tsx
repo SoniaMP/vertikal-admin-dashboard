@@ -21,12 +21,12 @@ const FIELDS: {
   { name: "firstName", label: "Nombre" },
   { name: "lastName", label: "Apellidos" },
   { name: "email", label: "Email", type: "email" },
-  { name: "phone", label: "Telefono", type: "tel" },
+  { name: "phone", label: "Teléfono", type: "tel" },
   { name: "dni", label: "DNI" },
   { name: "dateOfBirth", label: "Fecha de nacimiento", type: "date" },
-  { name: "address", label: "Direccion" },
+  { name: "address", label: "Dirección" },
   { name: "city", label: "Ciudad" },
-  { name: "postalCode", label: "Codigo postal" },
+  { name: "postalCode", label: "Código postal" },
   { name: "province", label: "Provincia" },
 ];
 

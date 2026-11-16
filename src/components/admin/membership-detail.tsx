@@ -15,22 +15,22 @@ function PersonalDataCard({ membership: m }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Datos personales</CardTitle>
+        <CardTitle className="text-base">Datos personales</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-4">
         <DetailField label="Nombre" value={m.member.firstName} />
         <DetailField label="Apellidos" value={m.member.lastName} />
         <DetailField label="Email" value={m.member.email} />
-        <DetailField label="Telefono" value={m.member.phone} />
+        <DetailField label="Teléfono" value={m.member.phone} />
         <DetailField label="DNI" value={m.member.dni} />
         <DetailField
           label="Fecha de nacimiento"
           value={m.member.dateOfBirth}
         />
         <DetailField label="Sexo" value={formatSex(m.member.sex)} />
-        <DetailField label="Direccion" value={m.member.address} />
+        <DetailField label="Dirección" value={m.member.address} />
         <DetailField label="Ciudad" value={m.member.city} />
-        <DetailField label="Codigo postal" value={m.member.postalCode} />
+        <DetailField label="Código postal" value={m.member.postalCode} />
         <DetailField label="Provincia" value={m.member.province} />
       </CardContent>
     </Card>

@@ -3,22 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/helpers/price-calculator";
 import { DetailField } from "./detail-field";
 import { ExternalLicenseBadge } from "./external-license-badge";
-import {
-  PAYMENT_LABELS,
-  PAYMENT_TONES,
-  STATUS_TONES,
-} from "./membership-status-badges";
-import { StatusPill } from "./status-pill";
 import type { MembershipDetailData } from "./membership-detail-types";
 
 type Props = { membership: MembershipDetailData };
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING_PAYMENT: "Pendiente de pago",
-  ACTIVE: "Activo",
-  EXPIRED: "Expirado",
-  CANCELLED: "Cancelado",
-};
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("es-ES", {
@@ -58,22 +45,9 @@ export function MembershipPaymentCard({ membership: m }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Pago y licencia</CardTitle>
+        <CardTitle className="text-base">Pago y licencia</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Estado de la membresia</span>
-          <StatusPill tone={STATUS_TONES[m.status] ?? "neutral"}>
-            {STATUS_LABELS[m.status] ?? m.status}
-          </StatusPill>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Estado del pago</span>
-          <StatusPill tone={PAYMENT_TONES[m.paymentStatus] ?? "neutral"}>
-            {PAYMENT_LABELS[m.paymentStatus] ?? m.paymentStatus}
-          </StatusPill>
-        </div>
-        <Separator />
         {m.hasClubLicense ? (
           <DetailField
             label="Licencia"
@@ -92,7 +66,7 @@ export function MembershipPaymentCard({ membership: m }: Props) {
                   className="text-sm flex justify-between"
                 >
                   <span>{s.supplement.name}</span>
-                  <span className="text-muted-foreground">
+                  <span className="tabular-nums text-muted-foreground">
                     {formatPrice(s.priceAtTime)}
                   </span>
                 </li>
@@ -103,11 +77,11 @@ export function MembershipPaymentCard({ membership: m }: Props) {
         <Separator />
         <div className="flex justify-between font-semibold">
           <span>Total</span>
-          <span>{formatPrice(m.totalAmount)}</span>
+          <span className="tabular-nums">{formatPrice(m.totalAmount)}</span>
         </div>
         <Separator />
         <DetailField
-          label="Email de confirmacion enviado"
+          label="Email de confirmación enviado"
           value={m.confirmationSent ? "Si" : "No"}
         />
         {m.stripePaymentId && (
