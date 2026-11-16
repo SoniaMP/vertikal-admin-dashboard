@@ -19,7 +19,7 @@ export function LoginForm() {
   });
 
   return (
-    <form action={formAction} className="mt-9 space-y-5">
+    <form action={formAction} className="mt-2 space-y-5">
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}

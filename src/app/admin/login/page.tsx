@@ -19,9 +19,6 @@ export default async function AdminLoginPage() {
           <h1 className="text-[30px] font-semibold leading-tight tracking-[-0.02em] text-foreground">
             Acceso al panel
           </h1>
-          <p className="mt-2.5 text-[17px] text-muted-foreground">
-            Gestión de socios, licencias y cursos.
-          </p>
 
           <LoginForm />
 
