@@ -68,6 +68,12 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.358 0.099 152.535);
   --lime: oklch(0.779 0.171 121.698);
+
+  /* Two of the public flow's three tones, raised to the root because the
+     admin login borrows them: a filled field and the colour field behind it.
+     The third, --sheet, stays with the flow that owns the idea. */
+  --field: #f1f3ee;
+  --ground: #dde3d7;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -239,8 +245,6 @@
    fields stop reading as controls, which is the whole trap of this idea. */
 .public-flow {
   --sheet: #ffffff;
-  --field: #f1f3ee;
-  --ground: #dde3d7;
   background: var(--ground);
 
   /* One step darker than the tone it answers, for the hover of a whole

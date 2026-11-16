@@ -6,16 +6,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "@/app/admin/login/actions";
 
+/**
+ * The login's own field and button sizes. The admin panel keeps its denser
+ * scale everywhere else, so these stay here instead of in a shared rule.
+ */
+const FIELD_STYLES =
+  "h-13 rounded-none border-0 bg-[var(--field)] px-3.5 text-[17px] shadow-none focus-visible:border-0 focus-visible:ring-0 focus-visible:outline-3 focus-visible:outline-offset-0 focus-visible:outline-primary";
+
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, {
     error: "",
   });
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="mt-9 space-y-5">
       {state.error && (
-        <p className="text-sm text-destructive text-center">{state.error}</p>
+        <p role="alert" className="text-sm text-destructive">
+          {state.error}
+        </p>
       )}
+
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -24,8 +34,10 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="email"
+          className={FIELD_STYLES}
         />
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="password">Contraseña</Label>
         <Input
@@ -34,9 +46,15 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
+          className={FIELD_STYLES}
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isPending}>
+
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="h-13 w-full rounded-none text-[17px]"
+      >
         {isPending ? "Iniciando sesión..." : "Iniciar sesión"}
       </Button>
     </form>
