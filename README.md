@@ -110,26 +110,27 @@ Copy the webhook signing secret it prints and set it as `STRIPE_WEBHOOK_SECRET` 
 ## Uploaded Files
 
 Members attach their federation license as a PDF during registration. Those
-files carry personal data (name, document number, license number), so they do
-not live in the repository.
+files carry personal data (name, document number, license number).
 
 `UPLOADS_DIR` decides where they are written. Left unset it falls back to
-`data/uploads`, which `.gitignore` excludes — fine for local development.
+`<project>/data/uploads`.
 
-**In production, point it outside the checkout**, or a redeploy will take the
-files with it:
+**Under the Docker Compose deployment, leave it unset.** The `sqlite-data`
+volume is mounted at `/app/data`, so the default already resolves to
+`/app/data/uploads`, inside that volume, and survives a rebuild. Pointing
+`UPLOADS_DIR` at a path outside `/app/data` would move the PDFs into the
+container's writable layer, where the next `docker compose up --build`
+destroys them.
+
+Set it only when running outside Docker, or when you add a volume of its own:
 
 ```bash
-UPLOADS_DIR=/var/lib/vertikal/uploads
-```
-
-Create it once, owned by the user the app runs as, and readable by nobody else:
-
-```bash
+UPLOADS_DIR=/var/lib/vertikal/uploads   # bare-metal, or a mounted volume
 sudo mkdir -p /var/lib/vertikal/uploads
 sudo chown -R vertikal:vertikal /var/lib/vertikal/uploads
 sudo chmod 700 /var/lib/vertikal/uploads
 ```
 
-Include this directory in your backups: it is not covered by
-`scripts/backup-db.sh`, which only dumps the database.
+**These files are not backed up.** The `backup` service only copies
+`/app/data/vertikal.db`; `scripts/backup-db.sh` dumps the database and nothing
+else. Add `/app/data/uploads` to your backups separately.
