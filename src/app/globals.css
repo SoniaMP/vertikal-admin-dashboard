@@ -242,6 +242,18 @@
   --field: #f1f3ee;
   --ground: #dde3d7;
   background: var(--ground);
+
+  /* One step darker than the tone it answers, for the hover of a whole
+     block. A block that only lightens its text on hover does not read as
+     clickable at arm's length. */
+  --primary-hover: oklch(0.3 0.09 152.535);
+  --ground-hover: #d2dbca;
+
+  /* Secondary text that sits on a filled block. The shared
+     --muted-foreground is a grey tuned for white and turns to mud on both
+     of these, so each filled tone carries its own. */
+  --on-primary-muted: #dfe9e2;
+  --on-ground-muted: #3f5244;
 }
 
 /* The sheet grows in steps instead of sitting at one width. At 920px it reads
