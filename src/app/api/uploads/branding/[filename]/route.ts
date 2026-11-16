@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
-import { join } from "path";
 import { existsSync } from "fs";
-
-const UPLOAD_DIR = join(process.cwd(), "data/uploads/branding");
+import { uploadsPath } from "@/lib/uploads-dir";
 
 const CONTENT_TYPES: Record<string, string> = {
   png: "image/png",
@@ -22,7 +20,7 @@ export async function GET(
     return NextResponse.json({ error: "Archivo no válido" }, { status: 400 });
   }
 
-  const filePath = join(UPLOAD_DIR, filename);
+  const filePath = uploadsPath("branding", filename);
 
   if (!existsSync(filePath)) {
     return NextResponse.json(

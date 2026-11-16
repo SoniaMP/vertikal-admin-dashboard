@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 import { randomUUID } from "crypto";
+import { uploadsPath } from "@/lib/uploads-dir";
+import { auth } from "@/lib/auth";
 
-const UPLOAD_DIR = join(process.cwd(), "data/uploads/branding");
 const MAX_SIZE = 1 * 1024 * 1024; // 1 MB
 
 const ALLOWED_TYPES: Record<string, string> = {
@@ -12,7 +12,24 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/svg+xml": ".svg",
 };
 
+/**
+ * The email logo is an administration setting, configured in /admin/ajustes.
+ * The middleware only guards pages, so without this check the endpoint was a
+ * public write to the club's disk, and an instructor could reach a setting
+ * their role is kept out of everywhere else.
+ */
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json(
+      { error: "Se requiere rol de administrador" },
+      { status: 403 },
+    );
+  }
+
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -41,8 +58,8 @@ export async function POST(request: NextRequest) {
   const filename = `${randomUUID()}${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  await writeFile(join(UPLOAD_DIR, filename), buffer);
+  await mkdir(uploadsPath("branding"), { recursive: true });
+  await writeFile(uploadsPath("branding", filename), buffer);
 
   return NextResponse.json({
     url: `/api/uploads/branding/${filename}`,

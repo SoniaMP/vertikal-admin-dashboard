@@ -106,3 +106,30 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
 Copy the webhook signing secret it prints and set it as `STRIPE_WEBHOOK_SECRET` in your `.env`.
+
+## Uploaded Files
+
+Members attach their federation license as a PDF during registration. Those
+files carry personal data (name, document number, license number), so they do
+not live in the repository.
+
+`UPLOADS_DIR` decides where they are written. Left unset it falls back to
+`data/uploads`, which `.gitignore` excludes — fine for local development.
+
+**In production, point it outside the checkout**, or a redeploy will take the
+files with it:
+
+```bash
+UPLOADS_DIR=/var/lib/vertikal/uploads
+```
+
+Create it once, owned by the user the app runs as, and readable by nobody else:
+
+```bash
+sudo mkdir -p /var/lib/vertikal/uploads
+sudo chown -R vertikal:vertikal /var/lib/vertikal/uploads
+sudo chmod 700 /var/lib/vertikal/uploads
+```
+
+Include this directory in your backups: it is not covered by
+`scripts/backup-db.sh`, which only dumps the database.

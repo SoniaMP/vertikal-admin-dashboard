@@ -5,10 +5,15 @@ vi.mock("fs/promises", () => ({
   mkdir: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(async () => ({ user: { role: "ADMIN" } })),
+}));
+
 vi.mock("crypto", () => ({
   randomUUID: () => "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
 }));
 
+import { auth } from "@/lib/auth";
 import { POST } from "../route";
 import { NextRequest } from "next/server";
 
@@ -81,5 +86,23 @@ describe("POST /api/upload/branding", () => {
     const res = await POST(req);
 
     expect(res.status).toBe(400);
+  });
+});
+
+describe("POST /api/upload/branding, who may call it", () => {
+  it("refuses a caller with no session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const file = new File(["PNG data"], "logo.png", { type: "image/png" });
+
+    expect((await POST(createRequest(file))).status).toBe(401);
+  });
+
+  it("refuses an instructor, who cannot reach this setting anywhere else", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({
+      user: { role: "INSTRUCTOR" },
+    } as never);
+    const file = new File(["PNG data"], "logo.png", { type: "image/png" });
+
+    expect((await POST(createRequest(file))).status).toBe(403);
   });
 });

@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
-import { join } from "path";
 import { existsSync } from "fs";
+import { uploadsPath } from "@/lib/uploads-dir";
 import { auth } from "@/lib/auth";
-
-const UPLOAD_DIR = join(process.cwd(), "data/uploads/licenses");
 
 export async function GET(
   _request: NextRequest,
@@ -24,7 +22,7 @@ export async function GET(
     return NextResponse.json({ error: "Archivo no válido" }, { status: 400 });
   }
 
-  const filePath = join(UPLOAD_DIR, filename);
+  const filePath = uploadsPath("licenses", filename);
 
   if (!existsSync(filePath)) {
     return NextResponse.json(
