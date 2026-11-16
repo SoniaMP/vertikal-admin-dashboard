@@ -57,9 +57,7 @@ export function MembershipModeStep({
         render={({ field }) => (
           <FormItem>
             <h3 className="text-lg font-semibold">Licencia federativa</h3>
-            <p className="text-sm text-muted-foreground">
-              Elige cómo quieres tramitarla.
-            </p>
+
             <FormControl>
               <RadioGroup
                 value={toRadioValue(field.value)}
