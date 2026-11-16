@@ -233,25 +233,50 @@
   }
 }
 
-/* The shell grows in steps instead of sitting at one width. At 920px it reads
+/* Paper on a table. Three tones, each a clear step down as you move outward
+   from the content: the sheet is white, a field one step, the ground two.
+   Put the field and the ground within a few points of each other and the
+   fields stop reading as controls, which is the whole trap of this idea. */
+.public-flow {
+  --sheet: #ffffff;
+  --field: #f1f3ee;
+  --ground: #dde3d7;
+  background: var(--ground);
+}
+
+@media (min-width: 768px) {
+  .public-flow {
+    padding-block: 2.5rem;
+  }
+}
+
+/* The sheet grows in steps instead of sitting at one width. At 920px it reads
    as an island on a 27" monitor; at 1240 it spreads a laptop's form too thin.
    The growth is shared with the index column, because handing it all to the
-   fields would leave a 900px-wide "Dirección" box. */
-.public-shell {
+   fields would leave a 900px-wide "Dirección" box.
+
+   On a phone it runs edge to edge: there is no room to spend on margins at
+   390px, so the ground simply does not show there. */
+.public-sheet {
   width: 100%;
   max-width: 920px;
   margin-inline: auto;
-  padding-inline: 1.25rem;
+  background: var(--sheet);
 }
 @media (min-width: 1440px) {
-  .public-shell {
+  .public-sheet {
     max-width: 1100px;
   }
 }
 @media (min-width: 1800px) {
-  .public-shell {
+  .public-sheet {
     max-width: 1240px;
   }
+}
+
+.public-shell {
+  width: 100%;
+  padding-inline: 1.25rem;
 }
 
 /* The index stands beside the form on a desktop and lies above it on a
@@ -302,7 +327,7 @@
 .public-flow [data-slot="select-trigger"] {
   height: 3.25rem;
   border: 0;
-  background: var(--muted);
+  background: var(--field);
   box-shadow: none;
   padding-inline: 0.875rem;
   font-size: var(--step-body);
