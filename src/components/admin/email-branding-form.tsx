@@ -25,8 +25,6 @@ export function EmailBrandingForm({ branding }: EmailBrandingFormProps) {
 
   return (
     <form ref={formRef} action={formAction} className="max-w-sm space-y-4">
-      <h2 className="text-lg font-semibold">Configuración email</h2>
-
       <input type="hidden" name="logoUrl" value={logoUrl} />
       <LogoUploader
         currentLogoUrl={branding.logoUrl}
