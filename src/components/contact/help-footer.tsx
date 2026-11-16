@@ -16,7 +16,7 @@ type HelpFooterProps = {
 export function HelpFooter({ subject }: HelpFooterProps) {
   return (
     <footer className="mt-20 border-t border-primary/10">
-      <div className="mx-auto w-full max-w-[920px] px-5 p-8 text-center">
+      <div className="public-shell py-8 text-center">
         <p className="mx-auto text-base text-muted-foreground">
           ¿Tienes dudas o algo no te funciona? Escríbenos a{" "}
           <ClubContactLink subject={subject} /> y te ayudamos.

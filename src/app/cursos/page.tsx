@@ -21,7 +21,7 @@ export default async function CursosPage() {
           No hay cursos disponibles en este momento.
         </p>
       ) : (
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 min-[1440px]:grid-cols-3">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}

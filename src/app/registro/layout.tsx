@@ -8,7 +8,7 @@ export default function RegistroLayout({
 }) {
   return (
     <div className="public-flow flex min-h-svh flex-col">
-      <main className="mx-auto w-full max-w-[920px] flex-1 px-5 py-10">
+      <main className="public-shell flex-1 py-10">
         <Image
           src="/logo-horizontal-color.png"
           alt="Club Vertikal"

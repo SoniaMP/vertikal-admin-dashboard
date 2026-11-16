@@ -233,6 +233,27 @@
   }
 }
 
+/* The shell grows in steps instead of sitting at one width. At 920px it reads
+   as an island on a 27" monitor; at 1240 it spreads a laptop's form too thin.
+   The growth is shared with the index column, because handing it all to the
+   fields would leave a 900px-wide "Dirección" box. */
+.public-shell {
+  width: 100%;
+  max-width: 920px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 1440px) {
+  .public-shell {
+    max-width: 1100px;
+  }
+}
+@media (min-width: 1800px) {
+  .public-shell {
+    max-width: 1240px;
+  }
+}
+
 /* The index stands beside the form on a desktop and lies above it on a
    phone. One DOM order for both, so nothing is rendered twice. */
 .wizard-cols {
@@ -242,9 +263,14 @@
 }
 @media (min-width: 768px) {
   .wizard-cols {
-    grid-template-columns: clamp(200px, 27%, 250px) 1fr;
+    grid-template-columns: clamp(200px, 26%, 290px) 1fr;
     gap: 3.5rem;
     align-items: start;
+  }
+}
+@media (min-width: 1440px) {
+  .wizard-cols {
+    gap: 4.5rem;
   }
 }
 
