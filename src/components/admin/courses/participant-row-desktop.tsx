@@ -1,24 +1,27 @@
 import { Download } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill, type PillTone } from "../status-pill";
 import { DeleteEnrolleeButton } from "./delete-enrollee-button";
 import type { ParticipantRow } from "./participants-table";
 
 type Props = { participant: ParticipantRow; courseId: string };
 
-const PAYMENT_STYLES: Record<string, { className: string; label: string }> = {
-  COMPLETED: { className: "bg-green-100 text-green-800", label: "Completado" },
-  PENDING: { className: "bg-yellow-100 text-yellow-800", label: "Pendiente" },
-  FAILED: { className: "bg-red-100 text-red-800", label: "Fallido" },
-  REFUNDED: { className: "bg-gray-100 text-gray-800", label: "Reembolsado" },
-  MANUAL: { className: "bg-blue-100 text-blue-800", label: "Manual" },
+/* The same five states as a membership, in the same five tones. "Manual"
+   was blue here and "Pagado a mano" grey in the members table: one fact, two
+   languages. */
+const PAYMENT_STYLES: Record<string, { tone: PillTone; label: string }> = {
+  COMPLETED: { tone: "positive", label: "Completado" },
+  PENDING: { tone: "warning", label: "Pendiente" },
+  FAILED: { tone: "negative", label: "Fallido" },
+  REFUNDED: { tone: "neutral", label: "Reembolsado" },
+  MANUAL: { tone: "neutral", label: "Pagado a mano" },
 };
 
 export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
   const payment = PAYMENT_STYLES[p.paymentStatus];
 
   return (
-    <TableRow>
+    <TableRow className="h-12">
       <TableCell className="max-w-[180px] font-medium">
         {p.firstName}
       </TableCell>
@@ -31,11 +34,9 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
       <TableCell className="text-muted-foreground">{p.dateOfBirth ?? "—"}</TableCell>
       <TableCell>{p.coursePrice.name}</TableCell>
       <TableCell>
-        {payment ? (
-          <Badge className={payment.className}>{payment.label}</Badge>
-        ) : (
-          <Badge variant="secondary">{p.paymentStatus}</Badge>
-        )}
+        <StatusPill tone={payment?.tone ?? "neutral"}>
+          {payment?.label ?? p.paymentStatus}
+        </StatusPill>
       </TableCell>
       <TableCell className="text-muted-foreground">
         {p.licenseType ?? "—"}

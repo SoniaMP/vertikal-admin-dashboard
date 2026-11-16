@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { formatCourseDate } from "./helpers";
 import { CoursePublishToggle } from "./course-publish-toggle";
+import { StatusPill } from "../status-pill";
 
 type CourseDetail = {
   id: string;
@@ -24,17 +24,11 @@ export function CourseDetailHeader({ course, isAdmin }: Props) {
         initialPublished={isPublished}
         isAdmin={isAdmin}
       />
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* The places live in the strip below, once. Here the header says only
+          what the strip does not: the day it happens, and whether it is full. */}
+      <div className="flex flex-wrap items-center gap-2">
         <span>{formatCourseDate(course.courseDate)}</span>
-        <span aria-label="separator">·</span>
-        <span className="tabular-nums">
-          {enrolled} / {course.maxCapacity} plazas
-        </span>
-        {isFull && (
-          <Badge variant="destructive" className="ml-1">
-            Lleno
-          </Badge>
-        )}
+        {isFull && <StatusPill tone="warning">Lleno</StatusPill>}
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ import {
   parseParticipantParams,
 } from "@/lib/course-participant-queries";
 import { CourseDetailHeader } from "@/components/admin/courses/course-detail-header";
+import { CourseMetricsStrip } from "@/components/admin/courses/course-metrics";
+import { fetchCourseMetrics } from "@/lib/course-metrics";
 import { ParticipantsSection } from "@/components/admin/courses/participants-section";
 
 type Props = {
@@ -36,8 +38,10 @@ export default async function CourseDetailPage({
   }
 
   const filters = parseParticipantParams(rawParams, id);
-  const { participants, total, pageSize } =
-    await fetchCourseParticipants(filters);
+  const [{ participants, total, pageSize }, metrics] = await Promise.all([
+    fetchCourseParticipants(filters),
+    fetchCourseMetrics(id, course.maxCapacity),
+  ]);
   const totalPages = Math.ceil(total / pageSize);
 
   return (
@@ -54,6 +58,8 @@ export default async function CourseDetailPage({
         </div>
         <CourseDetailHeader course={course} isAdmin={isAdmin} />
       </div>
+
+      <CourseMetricsStrip metrics={metrics} />
 
       <ParticipantsSection
         courseId={id}

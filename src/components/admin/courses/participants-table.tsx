@@ -8,6 +8,10 @@ import {
 } from "@/components/ui/table";
 import { TableHead } from "@/components/ui/table";
 import { SortableHeader } from "@/components/admin/sortable-header";
+
+/* 12px grey, no fill band, like every other table in the panel. */
+const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
+const HEAD_NUM = `${HEAD} text-right`;
 import { ParticipantRowDesktop } from "./participant-row-desktop";
 import { ParticipantRowMobile } from "./participant-row-mobile";
 
@@ -66,6 +70,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="lastName"
@@ -73,6 +78,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="email"
@@ -80,6 +86,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="phone"
@@ -87,6 +94,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="dni"
@@ -94,6 +102,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="dateOfBirth"
@@ -101,6 +110,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="priceName"
@@ -108,6 +118,7 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
               <SortableHeader
                 field="paymentStatus"
@@ -115,17 +126,21 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD}
               />
-              <TableHead>Tipo licencia</TableHead>
-              <TableHead>PDF</TableHead>
+              <TableHead className={HEAD}>Tipo licencia</TableHead>
+              <TableHead className={HEAD}>PDF</TableHead>
               <SortableHeader
                 field="createdAt"
-                label="Fecha inscripcion"
+                label="Fecha inscripción"
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
+                className={HEAD_NUM}
               />
-              <TableHead className="w-12" />
+              <TableHead className={`${HEAD} w-12`}>
+                <span className="sr-only">Acciones</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
