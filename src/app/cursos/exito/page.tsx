@@ -41,7 +41,7 @@ export default async function CursoExitoPage({
   return (
     <Card className="mx-auto max-w-lg">
       <CardContent className="flex flex-col items-center text-center">
-        <h2 className="text-2xl font-bold">¡Inscripción completada!</h2>
+        <h1 className="text-[length:var(--step-head)] font-semibold leading-none tracking-[-0.035em]">¡Inscripción completada!</h1>
         <p className="mt-4 max-w-lg">
           Gracias por inscribirte, {confirmation.firstName}.
         </p>

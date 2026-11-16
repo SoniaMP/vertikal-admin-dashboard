@@ -12,19 +12,18 @@ export default function CursosLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
-      <div className="mb-8 text-center">
+    <div className="public-flow flex min-h-svh flex-col">
+      <main className="mx-auto w-full max-w-[920px] flex-1 px-5 py-10">
         <Image
           src="/logo-horizontal-color.png"
           alt="Club Vertikal"
-          width={200}
-          height={40}
-          className="mx-auto mb-4"
+          width={190}
+          height={38}
+          className="mb-11"
           priority
         />
-        <h1 className="text-2xl font-bold sm:text-3xl">Cursos</h1>
-      </div>
-      {children}
+        {children}
+      </main>
       <HelpFooter subject="Duda sobre un curso" />
     </div>
   );

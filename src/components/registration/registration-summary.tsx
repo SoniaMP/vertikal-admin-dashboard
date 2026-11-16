@@ -11,12 +11,9 @@ import { SummaryLicenseSection } from "./summary-license-section";
 import { ConsentCheckbox } from "./consent-checkbox";
 import { SummaryPayAction } from "./summary-pay-action";
 import { payBlockReason } from "@/helpers/pay-block-reason";
+import { buildPriceBreakdown } from "@/helpers/price-breakdown";
 import type { PayBlocker } from "@/helpers/pay-block-reason";
-import {
-  calculateTotal,
-  calculateMemberOnlyTotal,
-} from "@/helpers/price-calculator";
-import type { LicenseCatalogType, PriceBreakdown } from "@/types";
+import type { LicenseCatalogType } from "@/types";
 import type { RegistrationInput } from "@/validations/registration";
 
 const PERSONAL_DATA_STEP = 1;
@@ -26,43 +23,18 @@ type RegistrationSummaryProps = {
   licenseTypes: LicenseCatalogType[];
   membershipFee: number;
   onEdit: (step: number) => void;
+  /** One step back, which pops history. `onEdit` pushes, so it must not be
+      used for a button labelled "Anterior": the two together loop. */
+  onBack: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
 };
-
-function buildBreakdown(
-  data: RegistrationInput,
-  licenseTypes: LicenseCatalogType[],
-  membershipFee: number,
-): PriceBreakdown | null {
-  if (!data.hasClubLicense) return calculateMemberOnlyTotal(membershipFee);
-
-  const licenseType = licenseTypes.find((lt) => lt.id === data.typeId);
-  const category = licenseType?.categories.find(
-    (c) => c.id === data.categoryId,
-  );
-  const categoryPrice = category?.prices.find(
-    (p) => p.subtypeId === data.subtypeId,
-  );
-  if (!category || !categoryPrice) return null;
-
-  const supplements =
-    licenseType?.supplements.filter((s) =>
-      data.supplementIds?.includes(s.id),
-    ) ?? [];
-
-  return calculateTotal(
-    category.name,
-    categoryPrice.price,
-    supplements,
-    membershipFee,
-  );
-}
 
 export function RegistrationSummary({
   licenseTypes,
   membershipFee,
   onEdit,
+  onBack,
   onSubmit,
   isSubmitting,
 }: RegistrationSummaryProps) {
@@ -71,7 +43,7 @@ export function RegistrationSummary({
   const consentRef = useRef<HTMLButtonElement>(null);
   const form = useFormContext<RegistrationInput>();
   const data = form.getValues();
-  const breakdown = buildBreakdown(data, licenseTypes, membershipFee);
+  const breakdown = buildPriceBreakdown(data, licenseTypes, membershipFee);
 
   function handlePay() {
     const reason = payBlockReason({
@@ -142,7 +114,7 @@ export function RegistrationSummary({
       <SummaryPayAction
         blocker={blocker}
         isSubmitting={isSubmitting}
-        onBack={() => onEdit(LICENSE_STEP)}
+        onBack={onBack}
         onPay={handlePay}
       />
     </div>

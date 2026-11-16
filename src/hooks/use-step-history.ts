@@ -19,6 +19,11 @@ function stepFromState(state: unknown, fallback: number): number {
  * memory — that is what makes this free. A reload therefore starts at step
  * one, which is honest: there is nothing to resume.
  *
+ * Every move pushes, forwards or backwards. Mixing a push with a
+ * `history.back()` is what made the wizard loop: the summary's "Anterior"
+ * pushed while the next screen's popped, so the two bounced off each other.
+ * With one rule, the browser's back button always undoes the last move.
+ *
  * Next keeps its own router state on the same history entries, so every write
  * preserves what is already there.
  */
@@ -49,13 +54,5 @@ export function useStepHistory(firstStep: number) {
     setStep(next);
   }, []);
 
-  /**
-   * Handed to the browser rather than changing the step here: consuming the
-   * entry we pushed is what keeps the two in step. Setting state directly
-   * would leave a stale forward entry, and the back button would then need
-   * two presses to do anything.
-   */
-  const goBack = useCallback(() => window.history.back(), []);
-
-  return { step, goTo, goBack };
+  return { step, goTo };
 }

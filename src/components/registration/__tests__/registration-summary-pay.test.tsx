@@ -14,9 +14,13 @@ const EMPTY_CATALOG: LicenseCatalogType[] = [];
 function Harness({
   values,
   onSubmit,
+  onEdit = () => {},
+  onBack = () => {},
 }: {
   values: Partial<RegistrationInput>;
   onSubmit: () => void;
+  onEdit?: (step: number) => void;
+  onBack?: () => void;
 }) {
   const form = useForm<RegistrationInput>({ defaultValues: values });
   return (
@@ -24,7 +28,8 @@ function Harness({
       <RegistrationSummary
         licenseTypes={EMPTY_CATALOG}
         membershipFee={MEMBERSHIP_FEE}
-        onEdit={() => {}}
+        onEdit={onEdit}
+        onBack={onBack}
         onSubmit={onSubmit}
         isSubmitting={false}
       />
@@ -102,5 +107,30 @@ describe("RegistrationSummary paying", () => {
   it("shows no total at all when it cannot price the license", () => {
     render(<Harness values={UNPRICEABLE} onSubmit={() => {}} />);
     expect(screen.queryByText("Resumen de precio")).toBeNull();
+  });
+});
+
+describe('the summary\'s "Anterior"', () => {
+  /**
+   * It used to call `onEdit`, which pushes a history entry, while every other
+   * step's "Anterior" pops one. Pressing both in turn bounced the member
+   * between the summary and step three forever.
+   */
+  it("steps back instead of jumping, so the back button cannot loop", () => {
+    const onBack = vi.fn();
+    const onEdit = vi.fn();
+    render(
+      <Harness
+        values={MEMBER_ONLY}
+        onSubmit={() => {}}
+        onBack={onBack}
+        onEdit={onEdit}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Anterior" }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(onEdit).not.toHaveBeenCalled();
   });
 });

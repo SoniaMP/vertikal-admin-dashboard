@@ -5,6 +5,10 @@ type ClubContactLinkProps = {
   subject?: string;
 };
 
+/**
+ * Takes its colour from the text around it, so the same link works on the
+ * white of a form and inside a muted footer line.
+ */
 export function ClubContactLink({ subject }: ClubContactLinkProps) {
   const href = subject
     ? `mailto:${CLUB_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`
@@ -13,7 +17,7 @@ export function ClubContactLink({ subject }: ClubContactLinkProps) {
   return (
     <a
       href={href}
-      className="font-medium text-primary underline underline-offset-2"
+      className="font-semibold text-primary underline underline-offset-4"
     >
       {CLUB_CONTACT_EMAIL}
     </a>

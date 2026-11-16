@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { StepIndicator } from "../step-indicator";
 import { buildRegistrationSteps } from "@/helpers/registration-steps";
 
@@ -36,10 +36,18 @@ describe("StepIndicator", () => {
     ]);
   });
 
-  it("hides the decorative number from assistive tech", () => {
-    render(<StepIndicator currentStep={1} steps={STEPS} />);
-    const circle = screen.getByText("1");
-    expect(circle.getAttribute("aria-hidden")).toBe("true");
+  it("keeps the decorative marks out of assistive tech", () => {
+    // The numbered circles are gone: the axis marks carry the progress
+    // visually and the sr-only line above carries it in words.
+    const { container } = render(
+      <StepIndicator currentStep={1} steps={STEPS} />,
+    );
+
+    const marks = container.querySelectorAll(".step-mark");
+    expect(marks).toHaveLength(STEPS.length);
+    marks.forEach((mark) =>
+      expect(mark.getAttribute("aria-hidden")).toBe("true"),
+    );
   });
 
   it("says the position and the name where a phone can read it", () => {
@@ -59,5 +67,46 @@ describe("StepIndicator", () => {
       />,
     );
     expect(screen.getByText("Paso 1 de 2")).toBeDefined();
+  });
+});
+
+describe("StepIndicator, navigable", () => {
+  it("offers a way back to each step already completed", () => {
+    const onStepSelect = vi.fn();
+    render(
+      <StepIndicator
+        currentStep={3}
+        steps={STEPS}
+        onStepSelect={onStepSelect}
+      />,
+    );
+
+    const backToFirst = screen.getByRole("button", {
+      name: "Paso 1 de 4: Datos personales, completado",
+    });
+    fireEvent.click(backToFirst);
+
+    expect(onStepSelect).toHaveBeenCalledWith(1);
+  });
+
+  it("offers no way to skip ahead, which would walk past the validation", () => {
+    render(
+      <StepIndicator currentStep={3} steps={STEPS} onStepSelect={() => {}} />,
+    );
+
+    // Only steps 1 and 2 are done at step 3.
+    expect(screen.getAllByRole("button")).toHaveLength(2);
+    expect(
+      screen.queryByRole("button", { name: /Paso 4 de 4/ }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /paso actual/ }),
+    ).toBeNull();
+  });
+
+  it("stays plain text when no handler is given", () => {
+    render(<StepIndicator currentStep={3} steps={STEPS} />);
+
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
   });
 });

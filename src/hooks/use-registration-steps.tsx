@@ -47,7 +47,7 @@ function dniErrorMessage(reason: string | undefined): ReactNode {
  * jump, pressing "Siguiente" looks like nothing happened at all.
  */
 export function useRegistrationSteps({ form, mode }: UseRegistrationStepsArgs) {
-  const { step: currentStep, goTo, goBack: popHistory } = useStepHistory(1);
+  const { step: currentStep, goTo } = useStepHistory(1);
   const [error, setError] = useState<ReactNode>(null);
 
   function fieldsForStep(step: number): FieldPath<RegistrationInput>[] {
@@ -105,12 +105,12 @@ export function useRegistrationSteps({ form, mode }: UseRegistrationStepsArgs) {
 
   function goBack() {
     setError(null);
-    popHistory();
+    if (currentStep > 1) goTo(currentStep - 1);
   }
 
   /**
-   * Jumping back from the summary pushes an entry like any other move, so the
-   * back button returns the member to the summary they came from instead of
+   * Jumping back pushes an entry like any other move, so the browser's back
+   * button returns the member to the screen they jumped from instead of
    * making them walk the remaining steps again.
    */
   function goToStep(step: number) {

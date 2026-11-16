@@ -7,83 +7,91 @@ import type { RegistrationStep } from "@/helpers/registration-steps";
 type StepIndicatorProps = {
   currentStep: number;
   steps: RegistrationStep[];
+  /**
+   * Makes the steps already completed clickable. Only backwards: jumping
+   * forward would walk past the validation of everything in between.
+   */
+  onStepSelect?: (step: number) => void;
 };
 
-export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
-  const currentLabel = steps.find((s) => s.number === currentStep)?.label;
+type StepState = "done" | "current" | "upcoming";
+
+function stepState(step: RegistrationStep, currentStep: number): StepState {
+  if (currentStep > step.number) return "done";
+  if (currentStep === step.number) return "current";
+  return "upcoming";
+}
+
+/**
+ * The steps hang from the axis: a column beside the form on a desktop, a rail
+ * above it on a phone, where height is the scarce dimension. The marks are
+ * filled blocks rather than numbered circles, so the one shape of the page
+ * carries the progress too.
+ */
+export function StepIndicator({
+  currentStep,
+  steps,
+  onStepSelect,
+}: StepIndicatorProps) {
+  const current = steps.find((step) => step.number === currentStep);
 
   return (
-    <nav aria-label="Progreso del registro" className="-mx-6 px-6 pb-6">
-      {/* A phone has no room for four labels under four circles, so the step
-          the member is on says its name and its place, once, above them. The
-          same words reach a screen reader through each item below. */}
-      <p aria-hidden="true" className="mb-3 text-sm sm:hidden">
-        <span className="text-muted-foreground">
-          Paso {currentStep} de {steps.length}
-        </span>
-        {currentLabel && (
-          <span className="font-medium text-primary"> · {currentLabel}</span>
-        )}
-      </p>
-
-      <ol className="flex items-center justify-between">
-        {steps.map((step, index) => {
-          const isCompleted = currentStep > step.number;
-          const isCurrent = currentStep === step.number;
+    <nav aria-label="Progreso del registro">
+      <ol className="step-axis">
+        {steps.map((step) => {
+          const state = stepState(step, currentStep);
+          const label = stepStatusLabel({
+            step,
+            totalSteps: steps.length,
+            currentStep,
+          });
+          const canGoBack = state === "done" && onStepSelect !== undefined;
 
           return (
             <li
               key={step.number}
-              aria-current={isCurrent ? "step" : undefined}
-              className="flex flex-1 items-center"
+              className="step-item"
+              data-state={state}
+              aria-current={state === "current" ? "step" : undefined}
             >
-              <span className="sr-only">
-                {stepStatusLabel({
-                  step,
-                  totalSteps: steps.length,
-                  currentStep,
-                })}
-              </span>
-              <div className="flex flex-col items-center gap-2">
-                <div
-                  aria-hidden="true"
-                  className={cn(
-                    "flex size-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
-                    isCompleted &&
-                      "border-primary bg-primary text-primary-foreground",
-                    isCurrent && "border-primary text-primary",
-                    !isCompleted &&
-                      !isCurrent &&
-                      "border-muted-foreground/30 text-muted-foreground",
-                  )}
+              {canGoBack ? (
+                // Covers the whole item, so the target is the row and not the
+                // four-pixel label, and the mark keeps its own place.
+                <button
+                  type="button"
+                  className="step-link"
+                  onClick={() => onStepSelect(step.number)}
                 >
-                  {isCompleted ? "✓" : step.number}
-                </div>
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "hidden text-xs font-medium sm:block",
-                    isCurrent ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {step.label}
-                </span>
-              </div>
-              {index < steps.length - 1 && (
-                <div
-                  aria-hidden="true"
-                  className={cn(
-                    // No label under the circles on a phone, so no room to
-                    // leave for one: the line centers on the circles instead.
-                    "mx-2 mb-0 h-0.5 flex-1 sm:mb-6",
-                    isCompleted ? "bg-primary" : "bg-muted-foreground/30",
-                  )}
-                />
+                  <span className="sr-only">{label}</span>
+                </button>
+              ) : (
+                <span className="sr-only">{label}</span>
               )}
+              <span aria-hidden="true" className="step-mark" />
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "step-label block leading-tight",
+                  state === "current"
+                    ? "font-semibold text-primary"
+                    : "font-medium text-muted-foreground",
+                )}
+              >
+                {step.label}
+              </span>
             </li>
           );
         })}
       </ol>
+
+      <p aria-hidden="true" className="step-now text-sm">
+        <span className="text-muted-foreground">
+          Paso {currentStep} de {steps.length}
+        </span>
+        {current && (
+          <span className="font-semibold text-primary"> · {current.label}</span>
+        )}
+      </p>
     </nav>
   );
 }

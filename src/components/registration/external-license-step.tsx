@@ -62,7 +62,7 @@ export function ExternalLicenseStep({
         name="externalLicenseLabel"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>FEDERACIÓN + Tipo de federativa</FormLabel>
+            <FormLabel>Federación y tipo de licencia</FormLabel>
             <FormControl>
               <Input placeholder="Ej: FERM PLUS A" {...field} />
             </FormControl>

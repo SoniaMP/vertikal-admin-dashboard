@@ -123,27 +123,35 @@ export function CourseRegistrationWizard({
 
   return (
     <FormProvider {...form}>
-      <StepIndicator currentStep={step} steps={COURSE_STEPS} />
-
-      {error && (
-        <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
-      {step === 1 && (
-        <CourseRegistrationStep prices={prices} onNext={handleNext} />
-      )}
-
-      {step === 2 && (
-        <CourseRegistrationSummary
-          courseTitle={courseTitle}
-          prices={prices}
-          onBack={() => setStep(1)}
-          onSubmit={handleCheckout}
-          isSubmitting={isSubmitting}
+      <div className="wizard-cols">
+        <StepIndicator
+          currentStep={step}
+          steps={COURSE_STEPS}
+          onStepSelect={setStep}
         />
-      )}
+
+        <div>
+          {error && (
+            <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
+          {step === 1 && (
+            <CourseRegistrationStep prices={prices} onNext={handleNext} />
+          )}
+
+          {step === 2 && (
+            <CourseRegistrationSummary
+              courseTitle={courseTitle}
+              prices={prices}
+              onBack={() => setStep(1)}
+              onSubmit={handleCheckout}
+              isSubmitting={isSubmitting}
+            />
+          )}
+        </div>
+      </div>
     </FormProvider>
   );
 }

@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-albert-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -67,6 +67,7 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.358 0.099 152.535);
+  --lime: oklch(0.779 0.171 121.698);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -114,6 +115,219 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.779 0.171 121.698);
+}
+
+/* ---------------------------------------------------------------------
+   The public flow
+   Its visitors are mostly on a phone and many are over sixty, so running
+   text is 17-19px in the full ink. The admin panel keeps the denser
+   default: it is a working surface, used on a desktop.
+   --------------------------------------------------------------------- */
+.public-flow {
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 3.5rem);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--foreground);
+}
+
+/* The motif: the club is called Vertikal, and this is the line its two
+   disciplines travel. Escalada climbs it, espeleologia descends it. It is a
+   filled block and never a border, so it reads as a shape of the page
+   rather than as a divider. On a phone it lies on its side, because there
+   the scarce dimension is height. */
+.step-axis {
+  position: relative;
+  list-style: none;
+}
+.step-axis::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 11px;
+  bottom: 11px;
+  width: 4px;
+  background: var(--primary);
+  opacity: 0.16;
+}
+.step-item {
+  position: relative;
+  padding-left: 44px;
+  padding-bottom: 1.625rem;
+}
+.step-item:last-child {
+  padding-bottom: 0;
+}
+.step-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: var(--primary);
+  opacity: 0.28;
+}
+.step-item[data-state="done"] .step-mark {
+  opacity: 1;
+}
+.step-item[data-state="current"] .step-mark {
+  opacity: 1;
+  height: 34px;
+  background: var(--lime);
+}
+.step-now {
+  display: none;
+}
+
+/* The way back to a step already done. It covers its whole row, so the
+   target is the row rather than the label, and it reaches past the rail on a
+   phone, where the visible mark is only eight pixels tall. */
+.step-link {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+.step-link:hover ~ .step-label {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.step-link:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .step-axis {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  .step-axis::before {
+    display: none;
+  }
+  .step-item {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+  }
+  .step-mark {
+    position: static;
+    width: 100%;
+    height: 8px;
+  }
+  .step-item[data-state="current"] .step-mark {
+    height: 8px;
+  }
+  .step-label {
+    display: none;
+  }
+  .step-now {
+    display: block;
+    margin-top: 0.875rem;
+  }
+  .step-link {
+    inset: -0.875rem 0;
+  }
+}
+
+/* The index stands beside the form on a desktop and lies above it on a
+   phone. One DOM order for both, so nothing is rendered twice. */
+.wizard-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+@media (min-width: 768px) {
+  .wizard-cols {
+    grid-template-columns: clamp(200px, 27%, 250px) 1fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+}
+
+/* The controls of the public flow. The shared primitives are left alone so
+   the admin keeps its density: these overrides only reach inside
+   .public-flow. Fields become filled blocks rather than outlined boxes,
+   square like the rest of the page, and tall enough to be an easy target
+   for an older thumb on a phone.
+
+   The radius tokens are each restated because `--radius-md` and friends are
+   computed on :root from `--radius`; redefining `--radius` alone here would
+   not reach them. */
+.public-flow {
+  --radius: 0rem;
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
+  --radius-2xl: 0rem;
+}
+
+/* `FormControl` wraps each field in a Radix Slot, which replaces the
+   primitive's own `data-slot="input"` with `data-slot="form-control"`.
+   Matching on the element as well keeps checkboxes and radio groups,
+   which share that slot name, out of it. */
+.public-flow input[data-slot="input"],
+.public-flow input[data-slot="form-control"]:not([type="checkbox"]):not([type="radio"]),
+.public-flow textarea[data-slot="form-control"],
+.public-flow [data-slot="select-trigger"] {
+  height: 3.25rem;
+  border: 0;
+  background: var(--muted);
+  box-shadow: none;
+  padding-inline: 0.875rem;
+  font-size: var(--step-body);
+}
+
+.public-flow input[data-slot="form-control"]:focus-visible,
+.public-flow input[data-slot="input"]:focus-visible,
+.public-flow textarea[data-slot="form-control"]:focus-visible,
+.public-flow [data-slot="select-trigger"]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 0;
+  box-shadow: none;
+}
+
+/* A field whose error runs to a second line used to push its neighbour's
+   box down: `FormItem` is a grid, a grid item stretches to its row, and a
+   stretched grid container with auto rows grows the rows themselves.
+   Starting the rows keeps the boxes on one line whatever the message says. */
+[data-slot="form-item"] {
+  align-content: start;
+}
+
+/* The choices take the page's one shape, and a size a thumb can hit: the
+   primitives are 16px, which is small for the members this form is for. */
+.public-flow [data-slot="radio-group-item"],
+.public-flow [data-slot="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0;
+  border-width: 3px;
+  border-color: var(--primary);
+  box-shadow: none;
+}
+.public-flow [data-slot="radio-group-item"][data-state="checked"] {
+  background: var(--primary);
+}
+.public-flow [data-slot="radio-group-indicator"] svg {
+  display: none;
+}
+
+/* Labels read at the same size as the text they introduce: eleven of them
+   at 14px was what made the whole form measure small. */
+.public-flow [data-slot="form-label"] {
+  font-size: var(--step-body);
+}
+
+/* The one primary action per screen, at a size a thumb can find. */
+.public-flow [data-slot="button"]:not([data-variant="link"]) {
+  min-height: 3.25rem;
+  padding-inline: 1.75rem;
+  font-size: var(--step-body);
 }
 
 /* Hide number input spinners */

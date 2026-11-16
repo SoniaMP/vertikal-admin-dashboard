@@ -7,18 +7,18 @@ export default function RegistroLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <div className="mb-8 text-center">
+    <div className="public-flow flex min-h-svh flex-col">
+      <main className="mx-auto w-full max-w-[920px] flex-1 px-5 py-10">
         <Image
           src="/logo-horizontal-color.png"
           alt="Club Vertikal"
-          width={200}
-          height={40}
-          className="mx-auto mb-4"
+          width={190}
+          height={38}
+          className="mb-11"
           priority
         />
-      </div>
-      {children}
+        {children}
+      </main>
       <HelpFooter subject="Duda sobre el registro de socio" />
     </div>
   );

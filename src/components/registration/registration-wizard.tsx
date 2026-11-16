@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, useWatch, type DefaultValues } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { StepIndicator } from "./step-indicator";
@@ -21,6 +21,8 @@ import {
 } from "@/validations/registration";
 import type { LicenseCatalogType } from "@/types";
 import type { PreviousLicense } from "@/lib/renewal-prefill";
+import { EMPTY_REGISTRATION_VALUES } from "@/helpers/empty-registration-values";
+import type { ReactNode } from "react";
 
 type RegistrationWizardProps = {
   licenseTypes: LicenseCatalogType[];
@@ -29,28 +31,8 @@ type RegistrationWizardProps = {
   defaultValues?: Partial<RegistrationInput>;
   /** Shown on step 3 when a renewing member had a license last season. */
   previousLicense?: PreviousLicense | null;
-};
-
-// `hasClubLicense` is deliberately absent: step 2 must start with neither card
-// selected so the member makes an explicit choice.
-const EMPTY_DEFAULTS: DefaultValues<RegistrationInput> = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  dni: "",
-  dateOfBirth: "",
-  sex: "",
-  address: "",
-  city: "",
-  postalCode: "",
-  province: "",
-  typeId: "",
-  subtypeId: "",
-  categoryId: "",
-  supplementIds: [],
-  externalLicenseLabel: "",
-  externalLicenseFileUrl: "",
+  /** The page's title, which belongs in the content column beside the index. */
+  header?: ReactNode;
 };
 
 export function RegistrationWizard({
@@ -59,6 +41,7 @@ export function RegistrationWizard({
   mode = "new",
   defaultValues,
   previousLicense = null,
+  header,
 }: RegistrationWizardProps) {
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
@@ -69,7 +52,7 @@ export function RegistrationWizard({
     // clears each message as the member moves on without flashing errors at
     // every keystroke across the eleven fields of step one.
     mode: "onTouched",
-    defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
+    defaultValues: { ...EMPTY_REGISTRATION_VALUES, ...defaultValues },
   });
 
   const { currentStep, goToStep, error, setError, goNext, goBack } =
@@ -94,47 +77,56 @@ export function RegistrationWizard({
     <Form {...form}>
       <form onSubmit={(e) => e.preventDefault()}>
         {hasRecoveredData && <RenewalBanner />}
-        <StepIndicator
-          currentStep={currentStep}
-          steps={buildRegistrationSteps(hasClubLicense)}
-        />
 
-        {error && <WizardErrorBanner>{error}</WizardErrorBanner>}
+        <div className="wizard-cols">
+          <StepIndicator
+            currentStep={currentStep}
+            steps={buildRegistrationSteps(hasClubLicense)}
+            onStepSelect={goToStep}
+          />
 
-        {currentStep === 3 && previousLicense && (
-          <div className="mb-6">
-            <PreviousLicenseNote previousLicense={previousLicense} />
+          <div>
+            {header && <div className="mb-10">{header}</div>}
+
+            {error && <WizardErrorBanner>{error}</WizardErrorBanner>}
+
+            {currentStep === 3 && previousLicense && (
+              <div className="mb-6">
+                <PreviousLicenseNote previousLicense={previousLicense} />
+              </div>
+            )}
+
+            {currentStep === 1 && <PersonalDataForm onNext={goNext} />}
+
+            {currentStep === 2 && (
+              <MembershipModeStep onNext={goNext} onBack={goBack} />
+            )}
+
+            {currentStep === 3 && hasClubLicense && (
+              <FederationStep
+                licenseTypes={licenseTypes}
+                membershipFee={membershipFee}
+                onNext={goNext}
+                onBack={goBack}
+              />
+            )}
+
+            {currentStep === 3 && !hasClubLicense && (
+              <ExternalLicenseStep onNext={goNext} onBack={goBack} />
+            )}
+
+            {currentStep === 4 && (
+              <RegistrationSummary
+                licenseTypes={licenseTypes}
+                membershipFee={membershipFee}
+                onEdit={goToStep}
+                onBack={goBack}
+                onSubmit={submit}
+                isSubmitting={isSubmitting}
+              />
+            )}
           </div>
-        )}
-
-        {currentStep === 1 && <PersonalDataForm onNext={goNext} />}
-
-        {currentStep === 2 && (
-          <MembershipModeStep onNext={goNext} onBack={goBack} />
-        )}
-
-        {currentStep === 3 && hasClubLicense && (
-          <FederationStep
-            licenseTypes={licenseTypes}
-            membershipFee={membershipFee}
-            onNext={goNext}
-            onBack={goBack}
-          />
-        )}
-
-        {currentStep === 3 && !hasClubLicense && (
-          <ExternalLicenseStep onNext={goNext} onBack={goBack} />
-        )}
-
-        {currentStep === 4 && (
-          <RegistrationSummary
-            licenseTypes={licenseTypes}
-            membershipFee={membershipFee}
-            onEdit={goToStep}
-            onSubmit={submit}
-            isSubmitting={isSubmitting}
-          />
-        )}
+        </div>
       </form>
     </Form>
   );

@@ -28,8 +28,9 @@ export function SummaryPayAction({
         </p>
       )}
       <div className="flex justify-between gap-3">
-        {/* Both labels lead to the license step; the wording only changes when
-            that step is the thing the member has to go and fix. */}
+        {/* Both labels step back to the license step, which is the one before
+            this; the wording only changes when that step is the thing the
+            member has to go and fix. */}
         <Button type="button" variant="outline" onClick={onBack}>
           {isLicenseBlocked ? "Cambiar la licencia" : "Anterior"}
         </Button>

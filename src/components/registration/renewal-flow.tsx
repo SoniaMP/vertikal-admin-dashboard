@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { RenewalLookup } from "./renewal-lookup";
 import { RegistrationWizard } from "./registration-wizard";
+import { RegistrationHeader } from "./registration-header";
 import type { RenewalPrefill } from "@/lib/renewal-prefill";
 import type { LicenseCatalogType } from "@/types";
 
@@ -36,17 +36,14 @@ export function RenewalFlow({
   // wizard's own "Anterior" button.
   return (
     <>
-      <Card>
-        <CardContent>
-          <RegistrationWizard
-            licenseTypes={licenseTypes}
-            membershipFee={membershipFee}
-            mode="renewal"
-            defaultValues={prefill?.member}
-            previousLicense={prefill?.previousLicense ?? null}
-          />
-        </CardContent>
-      </Card>
+      <RegistrationWizard
+        licenseTypes={licenseTypes}
+        membershipFee={membershipFee}
+        mode="renewal"
+        defaultValues={prefill?.member}
+        previousLicense={prefill?.previousLicense ?? null}
+        header={<RegistrationHeader />}
+      />
 
       <div className="mt-4 text-center">
         <Button variant="link" asChild className="text-muted-foreground">

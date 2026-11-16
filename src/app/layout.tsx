@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Albert_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// A geometric grotesque: round bowls, even colour, nothing decorative. One
+// family carries the whole product; weight and size do the hierarchy.
+// Albert Sans is a variable font, so `next/font/google` takes no weight
+// list: asking for one makes the import fail to compile.
+const albertSans = Albert_Sans({
+  variable: "--font-albert-sans",
   subsets: ["latin"],
 });
 
@@ -26,12 +30,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    // The font variables go on <html>, not <body>: `--font-sans` is declared
+    // at :root, so a reference to a variable defined further down the tree
+    // never resolves and the page silently falls back to the system face.
+    <html
+      lang="es"
+      className={`${albertSans.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

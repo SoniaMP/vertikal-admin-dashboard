@@ -1,3 +1,8 @@
+// The course list is read from the database on every request, so it cannot
+// be prerendered: the build worker has no database to open, which is what
+// made `npm run build` fail here.
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, Users } from "lucide-react";
 import { fetchCourseBySlug } from "@/lib/course-queries";
@@ -32,9 +37,9 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const showWizard = !isPast && !isClosed;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="space-y-8">
       <section className="space-y-4">
-        <h2 className="text-xl font-bold sm:text-2xl">{course.title}</h2>
+        <h1 className="text-[length:var(--step-head)] font-semibold leading-none tracking-[-0.035em]">{course.title}</h1>
 
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -74,17 +79,15 @@ export default async function CoursePage({ params }: CoursePageProps) {
         </Card>
       ) : (
         <section>
-          <h3 className="mb-4 text-lg font-semibold">Inscripción</h3>
-          <Card>
-            <CardContent>
-              <CourseRegistrationWizard
-                courseCatalogId={course.id}
-                courseTitle={course.title}
-                prices={course.prices}
-                isFull={isFull}
-              />
-            </CardContent>
-          </Card>
+          <h2 className="mb-8 text-[1.375rem] font-semibold leading-tight tracking-[-0.02em] text-primary">
+            Inscripción
+          </h2>
+          <CourseRegistrationWizard
+            courseCatalogId={course.id}
+            courseTitle={course.title}
+            prices={course.prices}
+            isFull={isFull}
+          />
         </section>
       )}
     </div>

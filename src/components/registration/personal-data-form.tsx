@@ -21,8 +21,8 @@ type PersonalDataFormProps = {
 export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
   return (
     <div className="space-y-6">
-      <fieldset className="space-y-4 rounded-lg border p-4">
-        <legend className="px-2 text-sm font-semibold">Datos personales</legend>
+      <fieldset className="space-y-5">
+        <legend className="sr-only">Datos personales</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField name="firstName" label="Nombre" />
           <TextField name="lastName" label="Apellidos" />
@@ -34,16 +34,16 @@ export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
         <SexField />
       </fieldset>
 
-      <fieldset className="space-y-4 rounded-lg border p-4">
-        <legend className="px-2 text-sm font-semibold">Contacto</legend>
+      <fieldset className="space-y-5">
+        <legend className="mb-4 text-[1.375rem] font-semibold leading-tight tracking-[-0.02em] text-primary">Contacto</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField name="email" label="Email" type="email" />
           <TextField name="phone" label="Teléfono" type="tel" />
         </div>
       </fieldset>
 
-      <fieldset className="space-y-4 rounded-lg border p-4">
-        <legend className="px-2 text-sm font-semibold">Dirección</legend>
+      <fieldset className="space-y-5">
+        <legend className="mb-4 text-[1.375rem] font-semibold leading-tight tracking-[-0.02em] text-primary">Dirección</legend>
         <TextField name="address" label="Dirección" />
         <div className="grid gap-4 sm:grid-cols-3">
           <TextField name="city" label="Ciudad" />
@@ -77,11 +77,11 @@ function SexField() {
               onValueChange={field.onChange}
               className="flex gap-6"
             >
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2">
                 <RadioGroupItem value="M" />
                 Hombre
               </label>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2">
                 <RadioGroupItem value="F" />
                 Mujer
               </label>
