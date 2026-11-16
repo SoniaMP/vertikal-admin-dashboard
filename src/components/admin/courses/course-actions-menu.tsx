@@ -39,11 +39,11 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
   const canEdit = !isInstructor || isActive;
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5 text-muted-foreground">
       {isActive && (
         <Button
           type="button"
-          variant="ghost-info"
+          variant="ghost"
           size="icon"
           asChild
           aria-label="Ver página pública"
@@ -56,7 +56,7 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
       {canEdit && (
         <Button
           type="button"
-          variant="ghost-info"
+          variant="ghost"
           size="icon"
           onClick={() => setIsEditOpen(true)}
           aria-label="Editar"
@@ -69,7 +69,7 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
           <AlertDialogTrigger asChild>
             <Button
               type="button"
-              variant="ghost-destructive"
+              variant="ghost"
               size="icon"
               disabled={isPending}
               aria-label="Eliminar"

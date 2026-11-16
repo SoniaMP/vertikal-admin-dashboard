@@ -10,6 +10,10 @@ import { CourseRowDesktop } from "./course-row-desktop";
 import { CourseRowMobile } from "./course-row-mobile";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
 
+/* The same header voice as the members table: 12px grey, no fill band. */
+const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
+const HEAD_NUM = `${HEAD} text-right`;
+
 type Props = {
   courses: CourseRow[];
   courseTypes: CourseTypeOption[];
@@ -44,14 +48,16 @@ export function CoursesTable({ courses, courseTypes, instructors, isInstructor }
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Título</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Plazo</TableHead>
-              <TableHead>Plazas</TableHead>
-              {!isInstructor && <TableHead>Director</TableHead>}
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className={HEAD}>Título</TableHead>
+              <TableHead className={HEAD}>Slug</TableHead>
+              <TableHead className={HEAD}>Tipo</TableHead>
+              <TableHead className={HEAD_NUM}>Fecha</TableHead>
+              <TableHead className={HEAD_NUM}>Plazo</TableHead>
+              <TableHead className={HEAD_NUM}>Plazas</TableHead>
+              {!isInstructor && <TableHead className={HEAD}>Director</TableHead>}
+              <TableHead className={HEAD_NUM}>
+                <span className="sr-only">Acciones</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

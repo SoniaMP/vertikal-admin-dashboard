@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -9,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StatusPill } from "../status-pill";
 import { UserActionsMenu } from "./user-actions-menu";
 import type { UserFormData } from "./user-form-dialog";
 
@@ -18,6 +18,9 @@ type Props = {
   users: UserRow[];
   currentUserId: string;
 };
+
+/* The same header voice as the other two tables: 12px grey, no fill band. */
+const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administrador",
@@ -45,16 +48,18 @@ export function UsersTable({ users, currentUserId }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nombre</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Rol</TableHead>
-          <TableHead>Creado</TableHead>
-          <TableHead className="w-12" />
+          <TableHead className={HEAD}>Nombre</TableHead>
+          <TableHead className={HEAD}>Email</TableHead>
+          <TableHead className={HEAD}>Rol</TableHead>
+          <TableHead className={`${HEAD} text-right`}>Creado</TableHead>
+          <TableHead className={`${HEAD} w-12`}>
+            <span className="sr-only">Acciones</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
-          <TableRow key={user.id}>
+          <TableRow key={user.id} className="h-12">
             <TableCell className="max-w-[220px] font-medium">
               {user.name}
             </TableCell>
@@ -64,7 +69,7 @@ export function UsersTable({ users, currentUserId }: Props) {
             <TableCell>
               <RoleBadge roleName={user.roleName} />
             </TableCell>
-            <TableCell className="text-muted-foreground">
+            <TableCell className="text-right tabular-nums text-muted-foreground">
               {formatDate(user.createdAt)}
             </TableCell>
             <TableCell>
@@ -80,19 +85,13 @@ export function UsersTable({ users, currentUserId }: Props) {
   );
 }
 
+/**
+ * A role is not a status: it says what someone may do, not whether anything
+ * is wrong. Both roles take the same neutral tint and the word tells them
+ * apart, instead of a blue and a purple that mean nothing to the reader.
+ */
 function RoleBadge({ roleName }: { roleName: string }) {
-  const label = ROLE_LABELS[roleName] ?? roleName;
-  const isAdmin = roleName === "ADMIN";
-
   return (
-    <Badge
-      className={
-        isAdmin
-          ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-          : "bg-purple-100 text-purple-800 hover:bg-purple-100"
-      }
-    >
-      {label}
-    </Badge>
+    <StatusPill tone="neutral">{ROLE_LABELS[roleName] ?? roleName}</StatusPill>
   );
 }

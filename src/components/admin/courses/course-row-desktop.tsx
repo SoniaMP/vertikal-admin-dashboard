@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "../status-pill";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { RegistrationClosedIcon } from "./registration-closed-icon";
 import { DraftCourseIcon } from "./draft-course-icon";
@@ -28,9 +29,7 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
 
   return (
     <TableRow
-      className={
-        isPast ? "bg-muted-foreground/10 text-muted-foreground" : undefined
-      }
+      className={cn("h-12", isPast && "text-muted-foreground")}
       aria-label={isPast ? "Curso pasado" : undefined}
     >
       <TableCell className="max-w-[260px] font-medium">
@@ -48,21 +47,25 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
       <TableCell className="text-muted-foreground text-xs font-mono">
         {course.slug}
       </TableCell>
-      <TableCell>
-        <Badge variant="outline">{course.courseType.name}</Badge>
-      </TableCell>
       <TableCell className="text-muted-foreground">
+        {course.courseType.name}
+      </TableCell>
+      <TableCell className="text-right tabular-nums text-muted-foreground">
         {formatCourseDate(course.courseDate)}
       </TableCell>
-      <TableCell className="text-muted-foreground">
+      <TableCell className="text-right tabular-nums text-muted-foreground">
         {formatCourseDate(course.registrationDeadline)}
       </TableCell>
-      <TableCell className="tabular-nums">
-        {course._count.registrations} / {course.maxCapacity}
+      {/* The count is the fact; "Lleno" is what it means, and only when it
+          is true. The slash and the capacity stay grey so the number read
+          down the column is the one that changes. */}
+      <TableCell className="text-right tabular-nums whitespace-nowrap">
+        {course._count.registrations}
+        <span className="text-muted-foreground"> / {course.maxCapacity}</span>
         {spots <= 0 && (
-          <Badge variant="destructive" className="ml-2">
-            Lleno
-          </Badge>
+          <span className="ml-2 align-middle">
+            <StatusPill tone="warning">Lleno</StatusPill>
+          </span>
         )}
       </TableCell>
       {!isInstructor && (

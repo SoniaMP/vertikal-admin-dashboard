@@ -33,10 +33,10 @@ export function UserActionsMenu({ user, isSelf }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5 text-muted-foreground">
       <Button
         type="button"
-        variant="ghost-info"
+        variant="ghost"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar"
@@ -47,7 +47,7 @@ export function UserActionsMenu({ user, isSelf }: Props) {
         <AlertDialogTrigger asChild>
           <Button
             type="button"
-            variant="ghost-destructive"
+            variant="ghost"
             size="icon"
             disabled={isSelf || isPending}
             aria-label="Eliminar"

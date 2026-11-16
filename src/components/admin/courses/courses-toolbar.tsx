@@ -26,7 +26,7 @@ export function CoursesToolbar({ courseTypes }: Props) {
   );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
       <Input
         placeholder="Buscar por título..."
         defaultValue={searchParams.get("search") ?? ""}
@@ -48,20 +48,6 @@ export function CoursesToolbar({ courseTypes }: Props) {
               {t.name}
             </SelectItem>
           ))}
-        </SelectContent>
-      </Select>
-
-      <Select
-        value={searchParams.get("status") ?? "all"}
-        onValueChange={(v) => updateParam("status", v)}
-      >
-        <SelectTrigger className="sm:w-36">
-          <SelectValue placeholder="Estado" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Estado: Todos</SelectItem>
-          <SelectItem value="DRAFT">Borrador</SelectItem>
-          <SelectItem value="ACTIVE">Publicado</SelectItem>
         </SelectContent>
       </Select>
 
