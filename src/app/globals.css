@@ -244,12 +244,6 @@
   background: var(--ground);
 }
 
-@media (min-width: 768px) {
-  .public-flow {
-    padding-block: 2.5rem;
-  }
-}
-
 /* The sheet grows in steps instead of sitting at one width. At 920px it reads
    as an island on a 27" monitor; at 1240 it spreads a laptop's form too thin.
    The growth is shared with the index column, because handing it all to the
