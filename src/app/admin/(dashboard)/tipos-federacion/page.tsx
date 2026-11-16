@@ -3,6 +3,7 @@ import { getActiveSeason } from "@/lib/settings";
 import { LicenseTypesTable } from "@/components/admin/license-types-table";
 import { CreateLicenseTypeButton } from "@/components/admin/create-license-type-button";
 import { StandaloneSections } from "@/components/admin/standalone-sections";
+import { formatLicenseCatalogFinding } from "@/helpers/license-catalog-finding";
 
 export default async function FederationTypesPage() {
   const season = await getActiveSeason();
@@ -45,10 +46,23 @@ export default async function FederationTypesPage() {
       }),
     ]);
 
+  const finding = formatLicenseCatalogFinding(
+    licenseTypes.map((type) => ({
+      name: type.name,
+      offeringCount: type.offerings.length,
+    })),
+    season.name,
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Gestión federativas deportivas</h1>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Federativas
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{finding}</p>
+        </div>
         <CreateLicenseTypeButton />
       </div>
       <LicenseTypesTable

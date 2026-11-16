@@ -71,7 +71,7 @@ export function LicenseTypeActions({
       </Button>
       <Button
         type="button"
-        variant="ghost-info"
+        variant="ghost"
         size="icon"
         onClick={() => setIsEditOpen(true)}
         aria-label="Editar"
@@ -96,7 +96,7 @@ export function LicenseTypeActions({
         <AlertDialogTrigger asChild>
           <Button
             type="button"
-            variant="ghost-destructive"
+            variant="ghost"
             size="icon"
             disabled={isPending || hasMemberships}
             aria-label="Eliminar"

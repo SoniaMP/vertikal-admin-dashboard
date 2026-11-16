@@ -26,6 +26,9 @@ import { LicenseTypeActions } from "./license-type-actions-menu";
 import { DetailSections } from "./license-type-detail-sections";
 import { TruncatedCell } from "./truncated-cell";
 
+/* 12px grey, no fill band, like every other table in the panel. */
+const HEAD = "h-9 px-2 align-middle text-xs font-normal text-muted-foreground";
+
 export type SubtypeWithCount = LicenseSubtype & {
   _count: { memberships: number };
 };
@@ -114,13 +117,13 @@ function DesktopRow({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-8 align-middle" />
-              <TableHead className="w-48 align-middle">Nombre</TableHead>
-              <TableHead className="w-64 align-middle">Descripción</TableHead>
-              <TableHead className="align-middle">Estado</TableHead>
-              <TableHead className="align-middle">Registros</TableHead>
-              <TableHead className="text-right align-middle">
-                Acciones
+              <TableHead className={`${HEAD} w-8`} />
+              <TableHead className={`${HEAD} w-48`}>Nombre</TableHead>
+              <TableHead className={`${HEAD} w-64`}>Descripción</TableHead>
+              <TableHead className={HEAD}>Estado</TableHead>
+              <TableHead className={`${HEAD} text-right`}>Registros</TableHead>
+              <TableHead className={`${HEAD} text-right`}>
+                <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -154,11 +157,11 @@ function DesktopRow({
               <TableCell className="align-middle">
                 <LicenseStateBadge license={lt} />
               </TableCell>
-              <TableCell className="align-middle">
+              <TableCell className="text-right align-middle tabular-nums">
                 {lt._count.memberships}
               </TableCell>
               <TableCell className="align-middle">
-                <div className="flex justify-end">
+                <div className="flex justify-end text-muted-foreground">
                   <LicenseTypeActions
                     licenseType={lt}
                     membershipCount={lt._count.memberships}

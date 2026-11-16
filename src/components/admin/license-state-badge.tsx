@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge";
 import { resolveLicenseVisibility } from "@/helpers/license-visibility";
+import { StatusPill, type PillTone } from "./status-pill";
 
-const BADGE_BY_VISIBILITY = {
-  draft: { label: "Borrador", variant: "outline" as const },
-  published: { label: "Activo", variant: "default" as const },
-  retired: { label: "Inactivo", variant: "secondary" as const },
+const PILL_BY_VISIBILITY: Record<string, { label: string; tone: PillTone }> = {
+  draft: { label: "Borrador", tone: "warning" },
+  published: { label: "Activo", tone: "positive" },
+  retired: { label: "Inactivo", tone: "neutral" },
 };
 
 type Props = {
@@ -12,9 +12,7 @@ type Props = {
 };
 
 export function LicenseStateBadge({ license }: Props) {
-  const { label, variant } = BADGE_BY_VISIBILITY[
-    resolveLicenseVisibility(license)
-  ];
+  const { label, tone } = PILL_BY_VISIBILITY[resolveLicenseVisibility(license)];
 
-  return <Badge variant={variant}>{label}</Badge>;
+  return <StatusPill tone={tone}>{label}</StatusPill>;
 }
