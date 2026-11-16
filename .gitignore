@@ -53,3 +53,7 @@ backups/
 
 # claude
 .claude/
+
+# design tooling output (reports, screenshots, mocks)
+.impeccable/
+.taste-skill/
