@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HelpFooter } from "@/components/contact/help-footer";
 
 export const metadata = {
   title: "Cursos - Club Vertikal",
@@ -24,6 +25,7 @@ export default function CursosLayout({
         <h1 className="text-2xl font-bold sm:text-3xl">Cursos</h1>
       </div>
       {children}
+      <HelpFooter subject="Duda sobre un curso" />
     </div>
   );
 }

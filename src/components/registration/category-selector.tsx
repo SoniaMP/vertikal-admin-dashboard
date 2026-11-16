@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { formatPrice } from "@/helpers/price-calculator";
 import { buildCategoryOptions } from "@/helpers/category-options";
+import { ClubContactLink } from "@/components/contact/club-contact-link";
 import type { CategoryOption } from "@/helpers/category-options";
 import type { CategoryOffering } from "@/types";
 import type { RegistrationInput } from "@/validations/registration";
@@ -101,7 +102,9 @@ export function CategorySelector({
           ) : (
             <p className="text-sm text-muted-foreground">
               Todavía no hay precios para {subtypeName} esta temporada. Elige
-              otra modalidad o escríbenos y lo resolvemos.
+              otra modalidad o escríbenos a{" "}
+              <ClubContactLink subject="No hay precios para mi modalidad" /> y lo
+              resolvemos.
             </p>
           )}
           <FormMessage />

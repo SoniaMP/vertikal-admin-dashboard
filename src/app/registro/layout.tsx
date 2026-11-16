@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HelpFooter } from "@/components/contact/help-footer";
 
 export default function RegistroLayout({
   children,
@@ -18,6 +19,7 @@ export default function RegistroLayout({
         />
       </div>
       {children}
+      <HelpFooter subject="Duda sobre el registro de socio" />
     </div>
   );
 }

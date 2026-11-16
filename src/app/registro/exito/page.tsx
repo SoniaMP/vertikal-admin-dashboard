@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { AlertTriangle, Mountain } from "lucide-react";
+import { Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { fetchMembershipConfirmation } from "@/lib/stripe-confirm";
 import { ConfirmationSummary } from "@/components/registration/confirmation-summary";
+import { UnconfirmedPaymentNotice } from "@/components/payment/unconfirmed-payment-notice";
 
 export const metadata = {
   title: "Registro completado - Club Vertikal",
@@ -24,18 +25,11 @@ export default async function ExitoPage({ searchParams }: ExitoPageProps) {
 
   if (!confirmation) {
     return (
-      <Card className="mx-auto max-w-2xl">
-        <CardContent className="flex flex-col items-center px-4 py-10">
-          <AlertTriangle className="mb-6 size-16 text-yellow-500" />
-          <h2 className="text-2xl font-bold">No se pudo confirmar el pago</h2>
-          <p className="mt-4 text-muted-foreground">
-            Si realizaste el pago, recibirás la confirmación en breve por email.
-          </p>
-          <Button asChild className="mt-8">
-            <Link href="/">Volver al inicio</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      <UnconfirmedPaymentNotice
+        backHref="/"
+        backLabel="Volver al inicio"
+        subject="No tengo la confirmación de mi alta de socio"
+      />
     );
   }
 
