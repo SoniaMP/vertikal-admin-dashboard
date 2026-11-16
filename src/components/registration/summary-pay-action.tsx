@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { WizardExitButton, type WizardExit } from "./wizard-exit-button";
 import type { PayBlocker } from "@/helpers/pay-block-reason";
 
 const BLOCKER_ID = "pay-blocker";
@@ -10,6 +12,8 @@ type SummaryPayActionProps = {
   isSubmitting: boolean;
   onBack: () => void;
   onPay: () => void;
+  /** Shown beside "Anterior" when the flow offers a way out of itself. */
+  exit?: WizardExit;
 };
 
 export function SummaryPayAction({
@@ -17,6 +21,7 @@ export function SummaryPayAction({
   isSubmitting,
   onBack,
   onPay,
+  exit,
 }: SummaryPayActionProps) {
   const isLicenseBlocked = blocker?.target === "license";
 
@@ -31,9 +36,13 @@ export function SummaryPayAction({
         {/* Both labels step back to the license step, which is the one before
             this; the wording only changes when that step is the thing the
             member has to go and fix. */}
-        <Button type="button" variant="outline" onClick={onBack}>
-          {isLicenseBlocked ? "Cambiar la licencia" : "Anterior"}
-        </Button>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onBack}>
+            <ArrowLeft aria-hidden="true" />
+            {isLicenseBlocked ? "Cambiar la licencia" : "Anterior"}
+          </Button>
+          {exit && <WizardExitButton exit={exit} />}
+        </div>
         <Button
           type="button"
           onClick={onPay}

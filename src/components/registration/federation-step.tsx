@@ -1,7 +1,9 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WizardExitButton, type WizardExit } from "./wizard-exit-button";
 import { FederationSelector } from "./federation-selector";
 import { SubtypeSelector } from "./subtype-selector";
 import { CategorySelector } from "./category-selector";
@@ -16,6 +18,8 @@ type FederationStepProps = {
   membershipFee: number;
   onNext: () => void;
   onBack: () => void;
+  /** Shown beside "Anterior" when the flow offers a way out of itself. */
+  exit?: WizardExit;
 };
 
 export function FederationStep({
@@ -23,6 +27,7 @@ export function FederationStep({
   membershipFee,
   onNext,
   onBack,
+  exit,
 }: FederationStepProps) {
   const form = useFormContext<RegistrationInput>();
   const selectedTypeId = form.watch("typeId");
@@ -87,12 +92,17 @@ export function FederationStep({
         </>
       )}
 
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Anterior
-        </Button>
+      <div className="flex justify-between gap-3">
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onBack}>
+            <ArrowLeft aria-hidden="true" />
+            Anterior
+          </Button>
+          {exit && <WizardExitButton exit={exit} />}
+        </div>
         <Button type="button" onClick={onNext}>
           Siguiente
+          <ArrowRight aria-hidden="true" />
         </Button>
       </div>
     </div>

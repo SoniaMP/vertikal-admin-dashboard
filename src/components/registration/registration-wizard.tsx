@@ -23,6 +23,18 @@ import type { LicenseCatalogType } from "@/types";
 import type { PreviousLicense } from "@/lib/renewal-prefill";
 import { EMPTY_REGISTRATION_VALUES } from "@/helpers/empty-registration-values";
 import type { ReactNode } from "react";
+import type { WizardExit } from "./wizard-exit-button";
+
+/**
+ * The alta is entered from the two cards, so step one steps back to them and
+ * the later steps reach it through "Anterior". A renewal may already carry
+ * data recovered from a code, so starting over is a real choice at any step,
+ * and it says so rather than pointing backwards.
+ */
+const WIZARD_EXITS: Record<"new" | "renewal", WizardExit> = {
+  new: { href: "/registro", label: "Volver", kind: "back" },
+  renewal: { href: "/registro", label: "Empezar de nuevo", kind: "restart" },
+};
 
 type RegistrationWizardProps = {
   licenseTypes: LicenseCatalogType[];
@@ -63,6 +75,9 @@ export function RegistrationWizard({
     onError: setError,
   });
 
+  const exit = WIZARD_EXITS[mode];
+  const laterStepsExit = mode === "renewal" ? exit : undefined;
+
   const hasClubLicense = useWatch({
     control: form.control,
     name: "hasClubLicense",
@@ -96,10 +111,16 @@ export function RegistrationWizard({
               </div>
             )}
 
-            {currentStep === 1 && <PersonalDataForm onNext={goNext} />}
+            {currentStep === 1 && (
+              <PersonalDataForm onNext={goNext} exit={exit} />
+            )}
 
             {currentStep === 2 && (
-              <MembershipModeStep onNext={goNext} onBack={goBack} />
+              <MembershipModeStep
+                onNext={goNext}
+                onBack={goBack}
+                exit={laterStepsExit}
+              />
             )}
 
             {currentStep === 3 && hasClubLicense && (
@@ -108,11 +129,16 @@ export function RegistrationWizard({
                 membershipFee={membershipFee}
                 onNext={goNext}
                 onBack={goBack}
+                exit={laterStepsExit}
               />
             )}
 
             {currentStep === 3 && !hasClubLicense && (
-              <ExternalLicenseStep onNext={goNext} onBack={goBack} />
+              <ExternalLicenseStep
+                onNext={goNext}
+                onBack={goBack}
+                exit={laterStepsExit}
+              />
             )}
 
             {currentStep === 4 && (
@@ -123,6 +149,7 @@ export function RegistrationWizard({
                 onBack={goBack}
                 onSubmit={submit}
                 isSubmitting={isSubmitting}
+                exit={laterStepsExit}
               />
             )}
           </div>

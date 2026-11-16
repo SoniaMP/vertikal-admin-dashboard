@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { autofillHints } from "@/helpers/autofill-hints";
@@ -12,13 +13,16 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { WizardExitButton, type WizardExit } from "./wizard-exit-button";
 import type { RegistrationInput } from "@/validations/registration";
 
 type PersonalDataFormProps = {
   onNext: () => void;
+  /** The way out of the flow, in the slot the later steps give "Anterior". */
+  exit?: WizardExit;
 };
 
-export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
+export function PersonalDataForm({ onNext, exit }: PersonalDataFormProps) {
   return (
     <div className="space-y-6">
       <fieldset className="space-y-5">
@@ -52,9 +56,11 @@ export function PersonalDataForm({ onNext }: PersonalDataFormProps) {
         </div>
       </fieldset>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-between pt-4">
+        {exit ? <WizardExitButton exit={exit} /> : <span />}
         <Button type="button" onClick={onNext}>
           Siguiente
+          <ArrowRight aria-hidden="true" />
         </Button>
       </div>
     </div>

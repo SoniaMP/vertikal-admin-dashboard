@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import { CoursePersonalFields } from "./course-personal-fields";
 import { CourseLicenseUpload } from "./course-license-upload";
 import { CoursePriceSelector } from "./course-price-selector";
@@ -26,6 +27,7 @@ export function CourseRegistrationStep({ prices, onNext }: Props) {
       <div className="flex justify-end pt-4">
         <Button type="button" onClick={onNext}>
           Siguiente
+          <ArrowRight aria-hidden="true" />
         </Button>
       </div>
     </div>

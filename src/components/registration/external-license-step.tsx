@@ -2,8 +2,9 @@
 
 import { useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { Upload, FileCheck, Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, FileCheck, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WizardExitButton, type WizardExit } from "./wizard-exit-button";
 import { Input } from "@/components/ui/input";
 import {
   FormField,
@@ -18,6 +19,8 @@ import type { RegistrationInput } from "@/validations/registration";
 type ExternalLicenseStepProps = {
   onNext: () => void;
   onBack: () => void;
+  /** Shown beside "Anterior" when the flow offers a way out of itself. */
+  exit?: WizardExit;
 };
 
 const UPLOAD_LABELS = {
@@ -39,6 +42,7 @@ function UploadIcon({ state }: { state: keyof typeof UPLOAD_LABELS }) {
 export function ExternalLicenseStep({
   onNext,
   onBack,
+  exit,
 }: ExternalLicenseStepProps) {
   const form = useFormContext<RegistrationInput>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -105,12 +109,17 @@ export function ExternalLicenseStep({
         )}
       />
 
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Anterior
-        </Button>
+      <div className="flex justify-between gap-3">
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onBack}>
+            <ArrowLeft aria-hidden="true" />
+            Anterior
+          </Button>
+          {exit && <WizardExitButton exit={exit} />}
+        </div>
         <Button type="button" onClick={onNext}>
           Siguiente
+          <ArrowRight aria-hidden="true" />
         </Button>
       </div>
     </div>

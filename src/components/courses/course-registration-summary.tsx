@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
@@ -54,6 +54,7 @@ export function CourseRegistrationSummary({
       />
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" onClick={onBack}>
+          <ArrowLeft aria-hidden="true" />
           Anterior
         </Button>
         <Button

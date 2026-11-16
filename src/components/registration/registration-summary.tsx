@@ -10,6 +10,7 @@ import { SummaryRow } from "./summary-row";
 import { SummaryLicenseSection } from "./summary-license-section";
 import { ConsentCheckbox } from "./consent-checkbox";
 import { SummaryPayAction } from "./summary-pay-action";
+import type { WizardExit } from "./wizard-exit-button";
 import { payBlockReason } from "@/helpers/pay-block-reason";
 import { buildPriceBreakdown } from "@/helpers/price-breakdown";
 import type { PayBlocker } from "@/helpers/pay-block-reason";
@@ -28,6 +29,8 @@ type RegistrationSummaryProps = {
   onBack: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  /** Shown beside "Anterior" when the flow offers a way out of itself. */
+  exit?: WizardExit;
 };
 
 export function RegistrationSummary({
@@ -37,6 +40,7 @@ export function RegistrationSummary({
   onBack,
   onSubmit,
   isSubmitting,
+  exit,
 }: RegistrationSummaryProps) {
   const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(false);
   const [blocker, setBlocker] = useState<PayBlocker | null>(null);
@@ -116,6 +120,7 @@ export function RegistrationSummary({
         isSubmitting={isSubmitting}
         onBack={onBack}
         onPay={handlePay}
+        exit={exit}
       />
     </div>
   );
