@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { toggleMembershipFederated } from "@/app/admin/(dashboard)/registros/membership-actions";
+import { StatusPill } from "./status-pill";
 
 type Props = {
   membershipId: string;
@@ -28,19 +28,20 @@ export function FederatedToggle({ membershipId, isFederated }: Props) {
 
   return (
     <Popover>
+      {/* Not federating is a choice, not a fault: it reads as quiet text, and
+          only the federated row carries a mark. A red block on every member
+          who pays the cuota alone turned the column into a warning. */}
       <PopoverTrigger asChild>
-        <button type="button" disabled={isPending} className="cursor-pointer">
-          <Badge
-            className={cn(
-              "text-white transition-opacity",
-              isFederated
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-red-600 hover:bg-red-700",
-              isPending && "opacity-50",
-            )}
-          >
-            {isFederated ? "Si" : "No"}
-          </Badge>
+        <button
+          type="button"
+          disabled={isPending}
+          className={cn("cursor-pointer", isPending && "opacity-50")}
+        >
+          {isFederated ? (
+            <StatusPill tone="positive">Federado</StatusPill>
+          ) : (
+            <span className="text-sm text-muted-foreground">No federado</span>
+          )}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-1" align="start">
@@ -51,7 +52,6 @@ export function FederatedToggle({ membershipId, isFederated }: Props) {
             className="justify-start text-xs"
             onClick={() => handleSelect(true)}
           >
-            <Badge className="bg-green-600 text-white mr-1.5">Si</Badge>
             Federado
           </Button>
           <Button
@@ -60,7 +60,6 @@ export function FederatedToggle({ membershipId, isFederated }: Props) {
             className="justify-start text-xs"
             onClick={() => handleSelect(false)}
           >
-            <Badge className="bg-red-600 text-white mr-1.5">No</Badge>
             No federado
           </Button>
         </div>

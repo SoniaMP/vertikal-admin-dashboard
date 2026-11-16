@@ -15,10 +15,10 @@ type Props = {
 };
 
 const BASE_CLASSES =
-  "flex items-center gap-2 rounded-md border-l-2 px-3 py-2 text-sm font-medium";
-const INACTIVE_CLASSES = "border-transparent hover:bg-secondary/20";
+  "flex h-8 items-center gap-2.5 rounded-md px-2 text-sm text-sidebar-foreground/80 [&_svg]:size-4 [&_svg]:shrink-0";
+const INACTIVE_CLASSES = "hover:bg-white/8 hover:text-sidebar-foreground";
 const ACTIVE_CLASSES =
-  "border-transparent bg-sidebar-accent text-sidebar-accent-foreground";
+  "bg-sidebar-accent font-medium text-sidebar-accent-foreground";
 
 export function NavLink({ href, label, icon, navHrefs, onClick }: Props) {
   const pathname = usePathname();

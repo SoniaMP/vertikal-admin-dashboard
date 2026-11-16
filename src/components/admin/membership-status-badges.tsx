@@ -1,20 +1,12 @@
-import { Badge } from "@/components/ui/badge";
 import { MEMBERSHIP_STATUS } from "@/types";
-
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-
-export const PAYMENT_VARIANTS: Record<string, BadgeVariant> = {
-  COMPLETED: "default",
-  PENDING: "secondary",
-  FAILED: "destructive",
-  REFUNDED: "outline",
-};
+import { StatusPill, type PillTone } from "./status-pill";
 
 export const PAYMENT_LABELS: Record<string, string> = {
   COMPLETED: "Completado",
   PENDING: "Pendiente",
   FAILED: "Fallido",
   REFUNDED: "Reembolsado",
+  MANUAL: "Pagado a mano",
 };
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -24,12 +16,32 @@ export const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Cancelado",
 };
 
-export const STATUS_VARIANTS: Record<string, BadgeVariant> = {
-  PENDING_PAYMENT: "secondary",
-  ACTIVE: "default",
-  EXPIRED: "outline",
-  CANCELLED: "destructive",
+export const PAYMENT_TONES: Record<string, PillTone> = {
+  COMPLETED: "positive",
+  MANUAL: "neutral",
+  PENDING: "warning",
+  FAILED: "negative",
+  REFUNDED: "neutral",
 };
+
+export const STATUS_TONES: Record<string, PillTone> = {
+  PENDING_PAYMENT: "warning",
+  ACTIVE: "positive",
+  EXPIRED: "neutral",
+  CANCELLED: "negative",
+};
+
+/** The membership state only speaks when it says something the payment does not. */
+function isRepeatedByPayment(
+  membershipStatus: string,
+  paymentStatus: string,
+): boolean {
+  if (membershipStatus === MEMBERSHIP_STATUS.ACTIVE) return true;
+  return (
+    membershipStatus === MEMBERSHIP_STATUS.PENDING_PAYMENT &&
+    paymentStatus === "PENDING"
+  );
+}
 
 type Props = {
   paymentStatus: string;
@@ -37,15 +49,17 @@ type Props = {
 };
 
 export function StatusBadges({ paymentStatus, membershipStatus }: Props) {
+  const showState = !isRepeatedByPayment(membershipStatus, paymentStatus);
+
   return (
     <div className="flex items-center gap-1.5">
-      <Badge variant={PAYMENT_VARIANTS[paymentStatus] ?? "outline"}>
+      <StatusPill tone={PAYMENT_TONES[paymentStatus] ?? "neutral"}>
         {PAYMENT_LABELS[paymentStatus] ?? paymentStatus}
-      </Badge>
-      {membershipStatus !== MEMBERSHIP_STATUS.ACTIVE && (
-        <Badge variant={STATUS_VARIANTS[membershipStatus] ?? "outline"}>
+      </StatusPill>
+      {showState && (
+        <StatusPill tone={STATUS_TONES[membershipStatus] ?? "neutral"}>
           {STATUS_LABELS[membershipStatus] ?? membershipStatus}
-        </Badge>
+        </StatusPill>
       )}
     </div>
   );

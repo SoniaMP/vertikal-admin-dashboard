@@ -25,12 +25,12 @@ export default async function AdminDashboardLayout({
   const userRole = session.user.role ?? "ADMIN";
 
   return (
-    <div className="flex h-screen flex-col md:flex-row">
+    <div className="admin-shell flex h-screen flex-col bg-background md:flex-row">
       <div className="hidden md:block">
         <AdminSidebar userName={userName} userRole={userRole} />
       </div>
       <MobileSidebar userName={userName} userRole={userRole} />
-      <main className="flex-1 overflow-y-auto p-4 md:p-6">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <AttentionBanner />
         {children}
       </main>

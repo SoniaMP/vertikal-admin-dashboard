@@ -1,7 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CircleUser } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "./logout-button";
 import { NavLink } from "./nav-link";
 import { getNavItemsForRole } from "./nav-items";
@@ -10,6 +8,8 @@ type Props = {
   userName: string;
   userRole: string;
 };
+
+const CLUB_HREFS = ["/admin/cuenta", "/admin/ajustes"];
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administrador",
@@ -20,42 +20,55 @@ export function AdminSidebar({ userName, userRole }: Props) {
   const navItems = getNavItemsForRole(userRole);
   const navHrefs = navItems.map((item) => item.href);
 
+  // Club comes last and apart: the four items above it are the work, these
+  // two are about who is using the panel.
+  const clubItems = navItems.filter((item) => CLUB_HREFS.includes(item.href));
+  const workItems = navItems.filter((item) => !CLUB_HREFS.includes(item.href));
+
   return (
-    <aside className="flex h-full w-56 flex-col border-r bg-sidebar text-sidebar-foreground">
-      <div className="p-4">
-        <Link href="/admin">
-          <Image
-            src="/logo-horizontal-light.png"
-            alt="Club Vertikal"
-            width={160}
-            height={40}
-            priority
-          />
-        </Link>
-        <div className="mt-3 flex items-center gap-2">
-          <CircleUser className="h-4 w-4 text-sidebar-foreground/70 shrink-0" />
-          <div className="min-w-0">
-            <p className="text-xs font-medium truncate">{userName}</p>
-            <p className="text-[10px] text-sidebar-foreground/50">
-              {ROLE_LABELS[userRole] ?? userRole}
-            </p>
-          </div>
+    <aside className="flex h-full w-60 flex-col gap-0.5 bg-sidebar px-3 py-4 text-sidebar-foreground">
+      <Link href="/admin" className="mb-6 block px-2">
+        <Image
+          src="/logo-horizontal-light.png"
+          alt="Club Vertikal"
+          width={160}
+          height={40}
+          priority
+        />
+      </Link>
+
+      {workItems.map((item) => (
+        <NavLink
+          key={item.href}
+          href={item.href}
+          label={item.label}
+          icon={<item.icon className="size-4" />}
+          navHrefs={navHrefs}
+        />
+      ))}
+
+      {clubItems.length > 0 && (
+        <p className="mt-6 mb-1.5 px-2 text-xs text-sidebar-foreground/60">
+          Club
+        </p>
+      )}
+      {clubItems.map((item) => (
+        <NavLink
+          key={item.href}
+          href={item.href}
+          label={item.label}
+          icon={<item.icon className="size-4" />}
+          navHrefs={navHrefs}
+        />
+      ))}
+
+      <div className="mt-auto">
+        <div className="px-2 py-2.5">
+          <p className="truncate text-sm font-medium">{userName}</p>
+          <p className="text-xs text-sidebar-foreground/60">
+            {ROLE_LABELS[userRole] ?? userRole}
+          </p>
         </div>
-      </div>
-      <Separator />
-      <nav className="flex-1 p-2 space-y-1">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={<item.icon className="h-4 w-4" />}
-            navHrefs={navHrefs}
-          />
-        ))}
-      </nav>
-      <Separator />
-      <div className="p-3">
         <LogoutButton />
       </div>
     </aside>

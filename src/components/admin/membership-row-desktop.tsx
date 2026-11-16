@@ -15,7 +15,7 @@ type Props = { membership: MembershipRow };
 export function DesktopRow({ membership: m }: Props) {
   const isCancelled = m.status === MEMBERSHIP_STATUS.CANCELLED;
   return (
-    <TableRow className={cn(isCancelled && "opacity-50")}>
+    <TableRow className={cn("h-12", isCancelled && "opacity-50")}>
       <TableCell className="max-w-[220px]">
         <Link
           href={`/admin/registros/${m.id}`}
@@ -25,13 +25,19 @@ export function DesktopRow({ membership: m }: Props) {
             text={`${m.member.firstName} ${m.member.lastName}`}
           />
         </Link>
+        {/* Where the two columns fold away, they come back under the name. */}
+        <span className="block truncate text-xs text-muted-foreground lg:hidden">
+          {m.member.email} · {m.member.sex}
+        </span>
       </TableCell>
-      <TableCell className="max-w-[240px] text-muted-foreground">
+      <TableCell className="hidden max-w-[240px] text-muted-foreground lg:table-cell">
         {m.member.email}
       </TableCell>
-      <TableCell>{m.member.sex}</TableCell>
+      <TableCell className="hidden lg:table-cell">{m.member.sex}</TableCell>
       <TableCell>{licenseLabel(m)}</TableCell>
-      <TableCell>{formatPrice(m.totalAmount)}</TableCell>
+      <TableCell className="text-right tabular-nums">
+        {formatPrice(m.totalAmount)}
+      </TableCell>
       <TableCell>
         <StatusBadges
           paymentStatus={m.paymentStatus}
@@ -41,7 +47,7 @@ export function DesktopRow({ membership: m }: Props) {
       <TableCell>
         <FederationCell membership={m} />
       </TableCell>
-      <TableCell className="text-muted-foreground">
+      <TableCell className="text-right tabular-nums text-muted-foreground">
         {formatDate(m.createdAt)}
       </TableCell>
       <TableCell className="text-right">

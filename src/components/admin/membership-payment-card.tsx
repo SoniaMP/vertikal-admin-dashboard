@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/helpers/price-calculator";
@@ -6,9 +5,10 @@ import { DetailField } from "./detail-field";
 import { ExternalLicenseBadge } from "./external-license-badge";
 import {
   PAYMENT_LABELS,
-  PAYMENT_VARIANTS,
-  STATUS_VARIANTS,
+  PAYMENT_TONES,
+  STATUS_TONES,
 } from "./membership-status-badges";
+import { StatusPill } from "./status-pill";
 import type { MembershipDetailData } from "./membership-detail-types";
 
 type Props = { membership: MembershipDetailData };
@@ -63,15 +63,15 @@ export function MembershipPaymentCard({ membership: m }: Props) {
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-sm">Estado de la membresia</span>
-          <Badge variant={STATUS_VARIANTS[m.status] ?? "outline"}>
+          <StatusPill tone={STATUS_TONES[m.status] ?? "neutral"}>
             {STATUS_LABELS[m.status] ?? m.status}
-          </Badge>
+          </StatusPill>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm">Estado del pago</span>
-          <Badge variant={PAYMENT_VARIANTS[m.paymentStatus] ?? "outline"}>
+          <StatusPill tone={PAYMENT_TONES[m.paymentStatus] ?? "neutral"}>
             {PAYMENT_LABELS[m.paymentStatus] ?? m.paymentStatus}
-          </Badge>
+          </StatusPill>
         </div>
         <Separator />
         {m.hasClubLicense ? (

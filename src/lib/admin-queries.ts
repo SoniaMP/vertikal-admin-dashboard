@@ -13,6 +13,8 @@ export type SeasonMetrics = {
   byPaymentStatus: Record<string, number>;
   totalRevenue: number;
   federatedCount: number;
+  /** The date of the oldest registration still waiting to be paid. */
+  oldestPendingAt: Date | null;
 };
 
 // ── Membership list with filters, pagination, sorting ──
@@ -47,7 +49,7 @@ export async function fetchSeasonMetrics(
 ): Promise<SeasonMetrics> {
   const base = { seasonId };
 
-  const [total, statusGroups, paymentGroups, revenue, federated] =
+  const [total, statusGroups, paymentGroups, revenue, federated, oldestPending] =
     await Promise.all([
       prisma.membership.count({ where: base }),
       prisma.membership.groupBy({
@@ -67,6 +69,11 @@ export async function fetchSeasonMetrics(
       prisma.membership.count({
         where: { ...base, isFederated: true },
       }),
+      prisma.membership.findFirst({
+        where: { ...base, status: "PENDING_PAYMENT" },
+        orderBy: { createdAt: "asc" },
+        select: { createdAt: true },
+      }),
     ]);
 
   const byStatus: Record<string, number> = {};
@@ -85,6 +92,7 @@ export async function fetchSeasonMetrics(
     byPaymentStatus,
     totalRevenue: (revenue._sum.totalAmount ?? 0) / 100,
     federatedCount: federated,
+    oldestPendingAt: oldestPending?.createdAt ?? null,
   };
 }
 

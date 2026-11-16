@@ -11,9 +11,12 @@ import { MembershipsToolbar } from "@/components/admin/memberships-toolbar";
 import { AdvancedFiltersPanel } from "@/components/admin/advanced-filters-panel";
 import { ActiveFilterChips } from "@/components/admin/active-filter-chips";
 import { MembershipsTable } from "@/components/admin/memberships-table";
+import { MembershipStatusTabs } from "@/components/admin/membership-status-tabs";
+import { ExportButton } from "@/components/admin/export-button";
+import { formatPendingFinding } from "@/helpers/pending-finding";
+import { MEMBERSHIP_STATUS } from "@/types";
 import { Pagination } from "@/components/admin/pagination";
 import { CreateMemberButton } from "@/components/admin/create-member-button";
-import { SeasonSelector } from "@/components/admin/season-selector";
 import { SeasonMetricsCards } from "@/components/admin/season-metrics";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -41,16 +44,20 @@ export default async function AdminRegistrationsPage({
     ]);
 
   const totalPages = Math.ceil(total / pageSize);
+  const finding = formatPendingFinding(
+    metrics.byStatus[MEMBERSHIP_STATUS.PENDING_PAYMENT] ?? 0,
+    metrics.oldestPendingAt,
+  );
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      <PageHeader finding={finding} catalog={catalog} />
+      <SeasonMetricsCards metrics={metrics} />
+      <MembershipStatusTabs />
+      <MembershipsToolbar
         allSeasons={allSeasons}
         currentSeasonId={filters.seasonId}
-        catalog={catalog}
       />
-      <SeasonMetricsCards metrics={metrics} />
-      <MembershipsToolbar />
       <AdvancedFiltersPanel filterOptions={filterOptions} />
       <ActiveFilterChips filterOptions={filterOptions} />
       <MembershipsTable
@@ -83,17 +90,22 @@ function applyViewOverrides(
 }
 
 type PageHeaderProps = {
-  allSeasons: { id: string; name: string; isActive: boolean }[];
-  currentSeasonId: string;
+  /** What in this season's data needs attention, read before the table. */
+  finding: string;
   catalog: Awaited<ReturnType<typeof fetchLicenseCatalog>>;
 };
 
-function PageHeader({ allSeasons, currentSeasonId, catalog }: PageHeaderProps) {
+function PageHeader({ finding, catalog }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between">
-      <h1 className="text-2xl font-bold">Miembros</h1>
-      <div className="flex items-center gap-3">
-        <SeasonSelector seasons={allSeasons} currentSeasonId={currentSeasonId} />
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Miembros
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">{finding}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <ExportButton />
         <CreateMemberButton licenseCatalog={catalog} />
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { TableHead } from "@/components/ui/table";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   field: string;
@@ -56,7 +57,10 @@ export function SortableHeader({
         type="button"
         onClick={handleClick}
         aria-label={`Ordenar por ${label}`}
-        className="flex items-center gap-1 hover:text-foreground transition-colors"
+        className={cn(
+          "flex items-center gap-1 transition-colors hover:text-foreground",
+          className?.includes("text-right") && "ml-auto",
+        )}
       >
         {label}
         <Icon className="h-3.5 w-3.5" />

@@ -124,6 +124,53 @@
 }
 
 /* ---------------------------------------------------------------------
+   The admin panel, as a ledger
+   The chrome holds no colour: the ground is a pale relative of the public
+   flow's, the surfaces are white, and the one filled action per screen is
+   near-black. The club's green stays on the band and on what the data says
+   (paid, federated), which is where it can still be read. Scoped to
+   .admin-shell so the public flow and the login keep their own scales.
+   --------------------------------------------------------------------- */
+.admin-shell {
+  --background: #f4f6f2;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #f7f8f5;
+  --muted-foreground: #5f6368;
+  --border: #e4e6e0;
+  --input: #cfd3ca;
+  --ring: #1d1f20;
+  --radius: 0.5rem;
+
+  /* One filled action per screen, and it is not the brand's green. */
+  --primary: #1d1f20;
+  --primary-foreground: #ffffff;
+  --secondary: #eceee8;
+  --secondary-foreground: #35383a;
+  --accent: #e7eae2;
+  --accent-foreground: #111111;
+
+  /* The band keeps the club's colour; its active row is lifted by light,
+     not by a second hue. */
+  --sidebar-accent: rgba(255, 255, 255, 0.14);
+  --sidebar-accent-foreground: #ffffff;
+
+  /* A row rule is lighter than a card edge; a control's border is darker. */
+  --rule: #eef0ea;
+
+  /* The club's own green, kept for the band and for the one proportion the
+     screen draws. It is not --primary here: nothing in the chrome is green. */
+  --club: oklch(0.358 0.099 152.535);
+
+  /* Status reads as a pale tint with the dark of its own hue, never as a
+     saturated block: a column of filled chips is louder than the data. */
+  --pill-positive-bg: #dcfae5;  --pill-positive-ink: #04250e;
+  --pill-negative-bg: #ffedea;  --pill-negative-ink: #831c1e;
+  --pill-warning-bg: #fffbeb;   --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #eceee8;   --pill-neutral-ink: #35383a;
+}
+
+/* ---------------------------------------------------------------------
    The public flow
    Its visitors are mostly on a phone and many are over sixty, so running
    text is 17-19px in the full ink. The admin panel keeps the denser

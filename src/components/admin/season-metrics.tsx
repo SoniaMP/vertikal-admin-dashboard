@@ -1,4 +1,8 @@
 import type { SeasonMetrics } from "@/lib/admin-queries";
+import { MEMBERSHIP_STATUS } from "@/types";
+import { MetricStrip } from "./metric-strip";
+import { Metric } from "./metric";
+import { ShareBar } from "./share-bar";
 
 type Props = {
   metrics: SeasonMetrics;
@@ -11,31 +15,35 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+/**
+ * The season in four figures. Only the federated share is drawn in colour:
+ * it is the one proportion here, and federating is the club's own choice.
+ */
 export function SeasonMetricsCards({ metrics }: Props) {
-  const activeCount = metrics.byStatus["ACTIVE"] ?? 0;
+  const activeCount = metrics.byStatus[MEMBERSHIP_STATUS.ACTIVE] ?? 0;
   const federatedPct =
     metrics.totalMembers > 0
       ? Math.round((metrics.federatedCount / metrics.totalMembers) * 100)
       : 0;
 
   return (
-    <div className="flex items-center divide-x text-sm">
-      <Stat label="Total" value={String(metrics.totalMembers)} />
-      <Stat label="Ingresos" value={formatCurrency(metrics.totalRevenue)} />
-      <Stat label="Activos" value={String(activeCount)} />
-      <Stat
-        label="Federados"
-        value={`${metrics.federatedCount} (${federatedPct}%)`}
+    <MetricStrip>
+      <Metric label="Socios" value={String(metrics.totalMembers)} />
+      <Metric
+        label="Ingresos cobrados"
+        value={formatCurrency(metrics.totalRevenue)}
       />
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-1.5 px-3 first:pl-0">
-      <span className="text-muted-foreground">{label}:</span>
-      <span className="font-semibold">{value}</span>
-    </div>
+      <Metric label="Activos" value={String(activeCount)} />
+      <Metric
+        label="Federados"
+        value={String(metrics.federatedCount)}
+        suffix={`de ${metrics.totalMembers}`}
+      >
+        <ShareBar percent={federatedPct} />
+        <p className="mt-1 text-xs text-muted-foreground">
+          {federatedPct}% federados
+        </p>
+      </Metric>
+    </MetricStrip>
   );
 }

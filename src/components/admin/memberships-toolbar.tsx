@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,16 +11,24 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useFilterNavigation } from "@/hooks/use-filter-navigation";
-import {
-  PAYMENT_LABELS,
-  STATUS_LABELS,
-} from "./membership-status-badges";
+import { PAYMENT_LABELS } from "./membership-status-badges";
 import { SavedViewsSelector } from "./saved-views-selector";
+import { SeasonSelector } from "./season-selector";
+import type { SeasonOption } from "@/types/membership-filters";
 
 const PAYMENT_OPTIONS = Object.entries(PAYMENT_LABELS);
-const STATUS_OPTIONS = Object.entries(STATUS_LABELS);
 
-export function MembershipsToolbar() {
+type Props = {
+  allSeasons: SeasonOption[];
+  currentSeasonId: string;
+};
+
+/**
+ * Scope first, then the filters: the season decides which rows exist at all,
+ * so it sits at the head of the row rather than beside the page's actions.
+ * The membership state left this row for the tabs above it.
+ */
+export function MembershipsToolbar({ allSeasons, currentSeasonId }: Props) {
   const { updateParam, updateParamDebounced, clearAll, searchParams } =
     useFilterNavigation();
 
@@ -29,7 +37,9 @@ export function MembershipsToolbar() {
   );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <SeasonSelector seasons={allSeasons} currentSeasonId={currentSeasonId} />
+
       <Input
         placeholder="Buscar por nombre, DNI o email..."
         defaultValue={searchParams.get("search") ?? ""}
@@ -55,23 +65,6 @@ export function MembershipsToolbar() {
       </Select>
 
       <Select
-        value={searchParams.get("membershipStatus") ?? "all"}
-        onValueChange={(v) => updateParam("membershipStatus", v)}
-      >
-        <SelectTrigger className="sm:w-44">
-          <SelectValue placeholder="Estado membresía" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Estado: Todos</SelectItem>
-          {STATUS_OPTIONS.map(([value, label]) => (
-            <SelectItem key={value} value={value}>
-              {label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select
         value={searchParams.get("federated") ?? "all"}
         onValueChange={(v) => updateParam("federated", v)}
       >
@@ -86,13 +79,6 @@ export function MembershipsToolbar() {
       </Select>
 
       <SavedViewsSelector />
-
-      <Button variant="outline" size="sm" className="gap-1.5" asChild>
-        <a href={`/admin/export?${searchParams.toString()}`} download>
-          <Download className="h-3.5 w-3.5" />
-          Exportar
-        </a>
-      </Button>
 
       {hasFilters && (
         <Button
