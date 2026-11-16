@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 import { getMembershipFee } from "@/lib/settings";
 import { fetchLicenseCatalog } from "@/lib/license-catalog";
 import { RenewalFlow } from "@/components/registration/renewal-flow";
-import { RegistrationHeader } from "@/components/registration/registration-header";
 
 export const metadata = {
   title: "Renovación - Club Vertikal",
@@ -17,12 +16,6 @@ export default async function RenovacionPage() {
   ]);
 
   return (
-    <>
-      <RegistrationHeader />
-      <RenewalFlow
-        licenseTypes={licenseTypes}
-        membershipFee={membershipFee}
-      />
-    </>
+    <RenewalFlow licenseTypes={licenseTypes} membershipFee={membershipFee} />
   );
 }

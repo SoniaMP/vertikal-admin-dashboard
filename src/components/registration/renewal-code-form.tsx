@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,8 @@ import type { RenewalPrefill } from "@/lib/renewal-prefill";
 type RenewalCodeFormProps = {
   dni: string;
   onVerified: (prefill: RenewalPrefill) => void;
+  /** Carries on with an empty form, for anyone who never gets the mail. */
+  onSkip: () => void;
   onRestart: () => void;
 };
 
@@ -21,6 +23,7 @@ const INVALID_MESSAGE =
 export function RenewalCodeForm({
   dni,
   onVerified,
+  onSkip,
   onRestart,
 }: RenewalCodeFormProps) {
   const [code, setCode] = useState("");
@@ -84,14 +87,27 @@ export function RenewalCodeForm({
         </p>
       )}
 
-      <div className="space-y-2">
-        <Button onClick={handleSubmit} disabled={isChecking} className="w-full">
-          {isChecking && <Loader2 className="mr-2 size-4 animate-spin" />}
-          Recuperar mis datos
+      {/* The way back is the way to a fresh code: there is nothing else to
+          return to from here. */}
+      <div className="flex flex-wrap justify-between gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onRestart}>
+          <ArrowLeft aria-hidden="true" />
+          Pedir otro código
         </Button>
-        <Button variant="ghost" onClick={onRestart} className="w-full">
-          No me ha llegado, pedir otro código
-        </Button>
+
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button type="button" variant="outline" onClick={onSkip}>
+            Continuar sin recuperar mis datos
+          </Button>
+          <Button type="button" onClick={handleSubmit} disabled={isChecking}>
+            Recuperar mis datos
+            {isChecking ? (
+              <Loader2 aria-hidden="true" className="animate-spin" />
+            ) : (
+              <ArrowRight aria-hidden="true" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
