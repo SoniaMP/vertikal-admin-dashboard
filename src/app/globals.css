@@ -348,12 +348,22 @@
    phone. One DOM order for both, so nothing is rendered twice. */
 .wizard-cols {
   display: grid;
-  grid-template-columns: 1fr;
+  /* `1fr` means `minmax(auto, 1fr)`, and that `auto` floor grows the column
+     to the min-content of what it holds. A select trigger is nowrap, so its
+     min-content is the whole label on a single line: one long modality name
+     stretched this column far past a phone's width and carried the step's
+     buttons off-screen with it. `minmax(0, ...)` keeps the column at the
+     width it is given, and the columns need `min-width: 0` for the same
+     reason, since a grid item has that same content-based floor. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 2.5rem;
+}
+.wizard-cols > * {
+  min-width: 0;
 }
 @media (min-width: 768px) {
   .wizard-cols {
-    grid-template-columns: clamp(200px, 26%, 290px) 1fr;
+    grid-template-columns: clamp(200px, 26%, 290px) minmax(0, 1fr);
     gap: 3.5rem;
     align-items: start;
   }
@@ -405,6 +415,27 @@
   outline: 3px solid var(--primary);
   outline-offset: 0;
   box-shadow: none;
+}
+
+/* A long modality or category name must not decide how wide the field is.
+   The trigger drops the primitive's `nowrap`, so the name wraps to a second
+   line and is cut with an ellipsis from there: enough for the member to
+   recognize what they picked, without a field that eats the screen. The
+   fixed `height` the fields share above becomes a floor, so a one-line
+   value still reads as the same box as the inputs around it. */
+.public-flow [data-slot="select-trigger"] {
+  height: auto;
+  min-height: 3.25rem;
+  padding-block: 0.75rem;
+  text-align: left;
+  white-space: normal;
+}
+.public-flow [data-slot="select-trigger"] > [data-slot="select-value"] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* A field whose error runs to a second line used to push its neighbour's
