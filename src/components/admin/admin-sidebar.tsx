@@ -31,9 +31,10 @@ export function AdminSidebar({ userName, userRole }: Props) {
         <Image
           src="/logo-horizontal-light.png"
           alt="Club Vertikal"
-          width={160}
-          height={40}
+          width={2654}
+          height={653}
           priority
+          className="h-auto w-[160px]"
         />
       </Link>
 

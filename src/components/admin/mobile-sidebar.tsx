@@ -45,9 +45,10 @@ export function MobileSidebar({ userName, userRole }: Props) {
         <Image
           src="/logo-horizontal-light.png"
           alt="Club Vertikal"
-          width={140}
-          height={28}
+          width={2654}
+          height={653}
           priority
+          className="h-auto w-[140px]"
         />
       </div>
 
@@ -61,8 +62,9 @@ export function MobileSidebar({ userName, userRole }: Props) {
               <Image
                 src="/logo-horizontal-light.png"
                 alt="Club Vertikal"
-                width={140}
-                height={28}
+                width={2654}
+                height={653}
+                className="h-auto w-[140px]"
               />
             </SheetTitle>
             <div className="mt-1 flex items-center gap-2">
