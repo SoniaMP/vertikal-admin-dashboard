@@ -13,7 +13,7 @@ type PayState = {
 };
 
 const CONSENT_MESSAGE =
-  "Debes aceptar la Política de Privacidad para continuar.";
+  "Debes leer y aceptar la Política de Privacidad para continuar.";
 
 /**
  * Why "Proceder al pago" cannot go through yet, or null when it can.
