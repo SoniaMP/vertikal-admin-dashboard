@@ -1,14 +1,19 @@
 export type PayBlocker = {
   message: string;
   /** What the member has to go and fix before paying. */
-  target: "license" | "consent";
+  target: "license" | "policy" | "consent";
 };
 
 type PayState = {
   /** False when the summary could not price the chosen license. */
   hasTotal: boolean;
+  /** False until the member has opened the privacy policy at least once. */
+  hasOpenedPolicy: boolean;
   hasAcceptedPrivacy: boolean;
 };
+
+const CONSENT_MESSAGE =
+  "Debes aceptar la Política de Privacidad para continuar.";
 
 /**
  * Why "Proceder al pago" cannot go through yet, or null when it can.
@@ -17,6 +22,11 @@ type PayState = {
  * out without a reason reads as a broken page, so the member taps it again and
  * gives up. The missing total comes first because it is the one the member
  * cannot fix from this screen.
+ *
+ * The unread policy and the unticked box say the same sentence on purpose, but
+ * they are separate targets because the box is disabled until the policy has
+ * been opened, and `focus()` on a disabled control does nothing at all. Sending
+ * the member to the link is what keeps the message from being a dead end.
  */
 export function payBlockReason(state: PayState): PayBlocker | null {
   if (!state.hasTotal) {
@@ -27,12 +37,12 @@ export function payBlockReason(state: PayState): PayBlocker | null {
     };
   }
 
+  if (!state.hasOpenedPolicy) {
+    return { target: "policy", message: CONSENT_MESSAGE };
+  }
+
   if (!state.hasAcceptedPrivacy) {
-    return {
-      target: "consent",
-      message:
-        "Marca la casilla de la Política de Privacidad para poder continuar.",
-    };
+    return { target: "consent", message: CONSENT_MESSAGE };
   }
 
   return null;

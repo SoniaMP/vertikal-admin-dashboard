@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { StepIndicator } from "@/components/registration/step-indicator";
 import { CourseRegistrationStep } from "./course-registration-step";
 import { CourseRegistrationSummary } from "./course-registration-summary";
+import { usePrivacyConsent } from "@/hooks/use-privacy-consent";
 
 const COURSE_STEPS = [
   { number: 1, label: "Datos e inscripción" },
@@ -38,6 +39,10 @@ export function CourseRegistrationWizard({
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Lives here, not in the summary: that screen unmounts whenever the
+  // member steps back, taking the answer with it.
+  const consent = usePrivacyConsent();
 
   const form = useForm<CourseRegistrationCheckoutInput>({
     resolver: zodResolver(courseRegistrationCheckoutSchema),
@@ -145,6 +150,7 @@ export function CourseRegistrationWizard({
             <CourseRegistrationSummary
               courseTitle={courseTitle}
               prices={prices}
+              consent={consent}
               onBack={() => setStep(1)}
               onSubmit={handleCheckout}
               isSubmitting={isSubmitting}

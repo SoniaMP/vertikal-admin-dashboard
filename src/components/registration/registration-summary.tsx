@@ -14,6 +14,7 @@ import type { WizardExit } from "./wizard-exit-button";
 import { payBlockReason } from "@/helpers/pay-block-reason";
 import { buildPriceBreakdown } from "@/helpers/price-breakdown";
 import type { PayBlocker } from "@/helpers/pay-block-reason";
+import type { PrivacyConsent } from "@/hooks/use-privacy-consent";
 import type { LicenseCatalogType } from "@/types";
 import type { RegistrationInput } from "@/validations/registration";
 
@@ -23,6 +24,8 @@ const LICENSE_STEP = 3;
 type RegistrationSummaryProps = {
   licenseTypes: LicenseCatalogType[];
   membershipFee: number;
+  /** Held by the wizard, so it survives a trip back to an earlier step. */
+  consent: PrivacyConsent;
   onEdit: (step: number) => void;
   /** One step back, which pops history. `onEdit` pushes, so it must not be
       used for a button labelled "Anterior": the two together loop. */
@@ -36,15 +39,16 @@ type RegistrationSummaryProps = {
 export function RegistrationSummary({
   licenseTypes,
   membershipFee,
+  consent,
   onEdit,
   onBack,
   onSubmit,
   isSubmitting,
   exit,
 }: RegistrationSummaryProps) {
-  const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(false);
   const [blocker, setBlocker] = useState<PayBlocker | null>(null);
   const consentRef = useRef<HTMLButtonElement>(null);
+  const policyRef = useRef<HTMLButtonElement>(null);
   const form = useFormContext<RegistrationInput>();
   const data = form.getValues();
   const breakdown = buildPriceBreakdown(data, licenseTypes, membershipFee);
@@ -52,20 +56,28 @@ export function RegistrationSummary({
   function handlePay() {
     const reason = payBlockReason({
       hasTotal: breakdown !== null,
-      hasAcceptedPrivacy,
+      hasOpenedPolicy: consent.hasOpenedPolicy,
+      hasAcceptedPrivacy: consent.isChecked,
     });
     setBlocker(reason);
     if (!reason) {
       onSubmit();
       return;
     }
+    // A disabled box cannot take focus, so an unread policy sends the
+    // member to the link that opens it instead.
+    if (reason.target === "policy") policyRef.current?.focus();
     if (reason.target === "consent") consentRef.current?.focus();
   }
 
-  function acceptPrivacy(isChecked: boolean) {
-    setHasAcceptedPrivacy(isChecked);
-    if (isChecked) setBlocker(null);
-  }
+  /** Clears the message as soon as the tick it asked for arrives. */
+  const consentWithFeedback: PrivacyConsent = {
+    ...consent,
+    accept: (isChecked) => {
+      consent.accept(isChecked);
+      if (isChecked) setBlocker(null);
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -110,9 +122,9 @@ export function RegistrationSummary({
       )}
 
       <ConsentCheckbox
-        isChecked={hasAcceptedPrivacy}
-        onCheckedChange={acceptPrivacy}
+        consent={consentWithFeedback}
         focusRef={consentRef}
+        policyRef={policyRef}
       />
 
       <SummaryPayAction

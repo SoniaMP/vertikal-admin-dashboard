@@ -15,6 +15,7 @@ import { WizardErrorBanner } from "./wizard-error-banner";
 import { PreviousLicenseNote } from "./previous-license-note";
 import { useRegistrationSteps } from "@/hooks/use-registration-steps";
 import { useRegistrationSubmit } from "@/hooks/use-registration-submit";
+import { usePrivacyConsent } from "@/hooks/use-privacy-consent";
 import {
   registrationSchema,
   type RegistrationInput,
@@ -74,6 +75,10 @@ export function RegistrationWizard({
     form,
     onError: setError,
   });
+
+  // Lives here, not in the summary: that screen unmounts whenever the
+  // member steps back, taking the answer with it.
+  const consent = usePrivacyConsent();
 
   const exit = WIZARD_EXITS[mode];
   const laterStepsExit = mode === "renewal" ? exit : undefined;
@@ -145,6 +150,7 @@ export function RegistrationWizard({
               <RegistrationSummary
                 licenseTypes={licenseTypes}
                 membershipFee={membershipFee}
+                consent={consent}
                 onEdit={goToStep}
                 onBack={goBack}
                 onSubmit={submit}

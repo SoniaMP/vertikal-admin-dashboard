@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { DataProtectionDialog } from "@/components/registration/data-protection-dialog";
+import { ConsentCheckbox } from "@/components/registration/consent-checkbox";
 import { formatPrice } from "@/helpers/price-calculator";
 import type { CourseRegistrationCheckoutInput } from "@/validations/course";
+import type { PrivacyConsent } from "@/hooks/use-privacy-consent";
 
 type PriceTier = {
   id: string;
@@ -19,6 +18,8 @@ type PriceTier = {
 type Props = {
   courseTitle: string;
   prices: PriceTier[];
+  /** Held by the wizard, so it survives a trip back to the form. */
+  consent: PrivacyConsent;
   onBack: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
@@ -27,11 +28,11 @@ type Props = {
 export function CourseRegistrationSummary({
   courseTitle,
   prices,
+  consent,
   onBack,
   onSubmit,
   isSubmitting,
 }: Props) {
-  const [hasAcceptedPrivacy, setHasAcceptedPrivacy] = useState(false);
   const form = useFormContext<CourseRegistrationCheckoutInput>();
   const data = form.getValues();
 
@@ -48,10 +49,7 @@ export function CourseRegistrationSummary({
         amountCents={selectedPrice?.amountCents}
       />
       <Separator />
-      <ConsentCheckbox
-        isChecked={hasAcceptedPrivacy}
-        onCheckedChange={setHasAcceptedPrivacy}
-      />
+      <ConsentCheckbox consent={consent} />
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" onClick={onBack}>
           <ArrowLeft aria-hidden="true" />
@@ -60,7 +58,7 @@ export function CourseRegistrationSummary({
         <Button
           type="button"
           onClick={onSubmit}
-          disabled={!hasAcceptedPrivacy || isSubmitting}
+          disabled={!consent.isChecked || isSubmitting}
         >
           {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
           {isSubmitting ? "Procesando..." : "Proceder al pago"}
@@ -136,45 +134,5 @@ function SummaryRow({ label, value, isBold }: SummaryRowProps) {
       <span className="text-muted-foreground">{label}</span>
       <span className={isBold ? "font-bold" : "font-medium"}>{value}</span>
     </div>
-  );
-}
-
-type ConsentCheckboxProps = {
-  isChecked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-};
-
-function ConsentCheckbox({ isChecked, onCheckedChange }: ConsentCheckboxProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  return (
-    <>
-      <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4">
-        <Checkbox
-          checked={isChecked}
-          onCheckedChange={(v) => onCheckedChange(v === true)}
-          className="mt-0.5"
-        />
-        <span className="text-sm leading-snug">
-          He leído y acepto la{" "}
-          <button
-            type="button"
-            className="text-primary underline underline-offset-2 hover:opacity-80"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsDialogOpen(true);
-            }}
-          >
-            Política de Privacidad
-          </button>{" "}
-          y consiento el tratamiento de mis datos personales conforme al RGPD.
-        </span>
-      </label>
-
-      <DataProtectionDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      />
-    </>
   );
 }
