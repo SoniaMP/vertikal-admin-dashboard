@@ -5,7 +5,7 @@
 | Servicio | Hosting | Dominio | Contenido |
 |----------|---------|---------|-----------|
 | Landing estática | Hostinger (hosting web) | `vertikal.club` / `www.vertikal.club` | Página informativa del club |
-| Webapp Next.js | Ionos VPS (Ubuntu + Docker) | `app.vertikal.club` | Registro, admin, Stripe |
+| Webapp Next.js | Ionos VPS (Ubuntu + Docker) | `app.clubvertikal.es` | Registro, admin, Stripe |
 
 Hostinger gestiona las DNS del dominio principal. Un registro A para el subdominio `app` apunta al VPS de Ionos donde corre la webapp con Docker + Caddy (HTTPS automático). SQLite se mantiene como BD.
 
@@ -27,7 +27,7 @@ Hostinger gestiona las DNS del dominio principal. Un registro A para el subdomin
 - Build args para `NEXT_PUBLIC_*` (se inyectan desde `.env` del host).
 
 ### 4. `Caddyfile`
-- Reverse proxy a `app:3000` con dominio `app.vertikal.club`.
+- Reverse proxy a `app:3000` con dominio `app.clubvertikal.es`.
 - Compresión gzip/zstd.
 - Headers de seguridad (HSTS, X-Frame-Options, X-Content-Type-Options).
 - Access log rotado.
@@ -38,8 +38,8 @@ Hostinger gestiona las DNS del dominio principal. Un registro A para el subdomin
 ### 6. `.env.production.example`
 - Template con todas las variables necesarias y comentarios:
   - `DATABASE_URL="file:/app/data/vertikal.db"`
-  - `NEXTAUTH_URL="https://app.vertikal.club"`
-  - `NEXT_PUBLIC_APP_URL="https://app.vertikal.club"`
+  - `NEXTAUTH_URL="https://app.clubvertikal.es"`
+  - `NEXT_PUBLIC_APP_URL="https://app.clubvertikal.es"`
   - Stripe live keys, Resend, NEXTAUTH_SECRET
 
 ### 7. `scripts/backup-db.sh`
@@ -70,7 +70,11 @@ Hostinger gestiona las DNS del dominio principal. Un registro A para el subdomin
 
 ## Parte 1: Configurar DNS en Hostinger
 
-En el panel de Hostinger → DNS Zone Editor para `vertikal.club`:
+En el panel de Hostinger → DNS Zone Editor para `clubvertikal.es`:
+
+> **Por confirmar:** el `Caddyfile` sirve `app.clubvertikal.es`, así que el registro `app`
+> va en esa zona. Queda por verificar en qué dominio está la landing estática — esta
+> guía la daba por `vertikal.club`.
 
 | Tipo | Nombre | Valor | TTL |
 |------|--------|-------|-----|
@@ -84,7 +88,7 @@ En el panel de Hostinger → DNS Zone Editor para `vertikal.club`:
 Verificar propagación:
 
 ```bash
-dig app.vertikal.club +short
+dig app.clubvertikal.es +short
 # Debe devolver la IP del VPS de Ionos
 ```
 
@@ -150,9 +154,9 @@ sudo chown deploy:deploy /opt/vertikal
 git clone TU_REPO_URL /opt/vertikal
 cd /opt/vertikal
 
-# Crear .env.production desde template
-cp .env.production.example .env.production
-nano .env.production   # rellenar con valores reales
+# Crear .env.production. Ojo: `.env.production.example` nunca llegó a existir en el repo;
+# las variables necesarias están listadas arriba, en "Archivos a crear → 6".
+nano .env.production
 ```
 
 ### 4. Construir y arrancar
@@ -165,17 +169,26 @@ docker compose up -d
 
 ### 5. Inicializar base de datos
 
+> El contenedor `app` **no puede ejecutar el CLI de Prisma**: el stage `runner` copia solo
+> unas pocas carpetas de `node_modules` y falta `valibot`, que `prisma` necesita. Todo lo que
+> sea CLI va por el servicio `migrate`, que se construye `FROM deps` con el `npm ci` entero
+> y monta el mismo volumen en lectura-escritura.
+
 ```bash
-docker compose exec app npx prisma migrate deploy
-docker compose exec app npx tsx prisma/seed.ts
+# Las migraciones ya se aplican solas al levantar: `app` depende de que `migrate` termine.
+# Para lanzarlas a mano:
+docker compose run --rm migrate npx prisma migrate deploy
+
+# El seed importa `src/lib/password.ts`, que la imagen `migrate` no copia. Se monta al vuelo:
+docker compose run --rm -v ./src:/app/src migrate npx tsx prisma/seed.ts
 ```
 
 ### 6. Verificar
 
 ```bash
 docker compose ps                                          # contenedores running
-curl -s https://app.vertikal.club/api/health               # {"status":"ok"}
-curl -vI https://app.vertikal.club 2>&1 | grep "SSL"      # certificado HTTPS
+curl -s https://app.clubvertikal.es/api/health               # {"status":"ok"}
+curl -vI https://app.clubvertikal.es 2>&1 | grep "SSL"      # certificado HTTPS
 ```
 
 ### 7. Programar backups automáticos
@@ -232,8 +245,8 @@ docker compose up -d
 
 En la landing estática de Hostinger, los botones de acción (CTA) deben enlazar a la webapp:
 
-- "Inscríbete" → `https://app.vertikal.club`
-- "Área de socios" / "Admin" → `https://app.vertikal.club/admin`
+- "Inscríbete" → `https://app.clubvertikal.es`
+- "Área de socios" / "Admin" → `https://app.clubvertikal.es/admin`
 
 ---
 
@@ -312,12 +325,29 @@ docker compose build --no-cache app && docker compose up -d app
 # Shell dentro del contenedor
 docker compose exec app sh
 
-# Estado de migraciones
-docker compose exec app npx prisma migrate status
+# Estado de migraciones (por `migrate`, no por `app`)
+docker compose run --rm migrate npx prisma migrate status
 
 # Backup manual
 docker compose run --rm backup
 ```
+
+### Consultar y modificar la base de datos
+
+Van por contenedores distintos, y no es evidente: el único que tiene el CLI `sqlite3` es
+`backup`, que monta la base en **solo lectura**; el que puede escribir es `migrate`, que
+tiene el CLI de Prisma. `app` no sirve para ninguna de las dos cosas.
+
+```bash
+# Leer (solo lectura, imposible romper nada)
+docker compose run --rm --entrypoint sh backup -c "sqlite3 -header -column /app/data/vertikal.db 'SELECT id, year FROM Season;'"
+
+# Escribir (backup antes, siempre)
+echo "UPDATE Season SET year = 2027 WHERE id = 'xxx';" | docker compose run --rm -T migrate npx prisma db execute --stdin
+```
+
+Evita los heredocs (`<<'SQL'`) por SSH: si el terminal añade sangría al delimitador de
+cierre, el comando se queda colgado esperando entrada y no llega a ejecutarse.
 
 ---
 
