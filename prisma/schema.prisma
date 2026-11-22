@@ -8,7 +8,9 @@ datasource db {
 
 model Season {
   id        String   @id @default(cuid())
-  name      String // e.g. "2025-2026"
+  name      String // e.g. "2025-2026". Superseded by `year`; dropped in UC-SET-01.
+  /// The season IS the calendar year. One year, one season.
+  year      Int      @unique
   startDate DateTime
   endDate   DateTime
   isActive  Boolean  @default(false)

@@ -45,11 +45,13 @@ async function main() {
   });
 
   if (!activeSeason) {
+    const currentYear = new Date().getFullYear();
     await prisma.season.create({
       data: {
-        name: "2026",
-        startDate: new Date("2026-01-01"),
-        endDate: new Date("2026-12-31"),
+        name: String(currentYear),
+        year: currentYear,
+        startDate: new Date(`${currentYear}-01-01`),
+        endDate: new Date(`${currentYear}-12-31`),
         isActive: true,
       },
     });
