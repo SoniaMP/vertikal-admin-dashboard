@@ -13,7 +13,11 @@ import { loginAction } from "@/app/admin/login/actions";
 const FIELD_STYLES =
   "h-13 rounded-none border-0 bg-[var(--field)] px-3.5 text-[17px] shadow-none focus-visible:border-0 focus-visible:ring-0 focus-visible:outline-3 focus-visible:outline-offset-0 focus-visible:outline-primary";
 
-export function LoginForm() {
+export function LoginForm({
+  hasExpiredSession = false,
+}: {
+  hasExpiredSession?: boolean;
+}) {
   const [state, formAction, isPending] = useActionState(loginAction, {
     error: "",
   });
@@ -23,6 +27,18 @@ export function LoginForm() {
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
+        </p>
+      )}
+
+      {/* The `expired` flag stays in the URL while the form posts back to it,
+          so a wrong password would otherwise show both messages at once. The
+          credentials error is the one that answers what just happened. */}
+      {hasExpiredSession && !state.error && (
+        <p
+          role="status"
+          className="border-l-[3px] border-primary bg-[var(--field)] px-3.5 py-3 text-sm text-foreground"
+        >
+          Tu sesión ha caducado por inactividad. Vuelve a entrar.
         </p>
       )}
 

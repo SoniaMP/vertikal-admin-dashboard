@@ -7,8 +7,15 @@ export const metadata = {
   title: "Acceso al panel - Club Vertikal",
 };
 
-export default async function AdminLoginPage() {
-  const seasonLabel = await fetchActiveSeasonLabel();
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ expired?: string }>;
+}) {
+  const [seasonLabel, { expired }] = await Promise.all([
+    fetchActiveSeasonLabel(),
+    searchParams,
+  ]);
 
   return (
     <div className="grid min-h-svh grid-rows-[auto_1fr] md:grid-cols-[38%_1fr] md:grid-rows-1">
@@ -20,7 +27,7 @@ export default async function AdminLoginPage() {
             Acceso al panel
           </h1>
 
-          <LoginForm />
+          <LoginForm hasExpiredSession={expired === "1"} />
 
           <p className="mt-5 text-sm text-muted-foreground">
             ¿Has perdido la contraseña? Escribe a{" "}
