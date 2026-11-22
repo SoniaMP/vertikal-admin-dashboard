@@ -8,6 +8,10 @@ const mockTransaction = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    season: {
+      findUnique: () =>
+        Promise.resolve({ year: new Date().getFullYear() }),
+    },
     membership: { count: (...args: unknown[]) => mockCount(...args) },
     licenseOffering: {
       deleteMany: (...args: unknown[]) => mockDeleteMany(...args),

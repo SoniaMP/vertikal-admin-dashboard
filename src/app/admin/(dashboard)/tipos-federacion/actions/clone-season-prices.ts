@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { isClosedSeason } from "@/helpers/closed-season";
 
 type SourceSeason = Prisma.SeasonGetPayload<{
   include: {
@@ -37,6 +38,13 @@ export async function cloneSeasonPrices(
     return {
       success: false,
       error: "No se puede clonar una temporada sobre sí misma.",
+    };
+  }
+
+  if (isClosedSeason(targetYear, new Date().getFullYear())) {
+    return {
+      success: false,
+      error: `La temporada ${targetYear} está cerrada: sus precios ya no se pueden cambiar.`,
     };
   }
 

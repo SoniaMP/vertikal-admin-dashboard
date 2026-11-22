@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { categorySchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { requireEditableSeason } from "@/lib/season-editable";
 
 const batchOfferingSchema = z.object({
   seasonId: z.string().min(1),
@@ -109,6 +110,9 @@ export async function batchUpsertOfferings(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
 
   const parsed = batchOfferingSchema.safeParse({ seasonId, typeId, entries });
   if (!parsed.success) {

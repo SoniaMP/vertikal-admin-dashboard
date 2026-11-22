@@ -14,6 +14,7 @@ import type {
 
 type Props = {
   seasonId: string;
+  isReadOnly: boolean;
   typeId: string;
   categories: CategoryWithCount[];
   subtypes: SubtypeWithCount[];
@@ -22,6 +23,7 @@ type Props = {
 
 export function OfferingMatrixSection({
   seasonId,
+  isReadOnly,
   typeId,
   categories,
   subtypes,
@@ -55,6 +57,7 @@ export function OfferingMatrixSection({
           ) : (
             <PriceTable
               seasonId={seasonId}
+              isReadOnly={isReadOnly}
               typeId={typeId}
               categories={categories}
               subtypes={subtypes}
@@ -69,6 +72,7 @@ export function OfferingMatrixSection({
 
 function PriceTable({
   seasonId,
+  isReadOnly,
   typeId,
   categories,
   subtypes,
@@ -113,15 +117,18 @@ function PriceTable({
                 category={cat}
                 subtypes={subtypes}
                 offerings={offerings}
+                isReadOnly={isReadOnly}
               />
             ))}
           </tbody>
         </table>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button size="sm" type="submit" disabled={isPending}>
-        {isPending ? "Guardando..." : "Guardar precios"}
-      </Button>
+      {!isReadOnly && (
+        <Button size="sm" type="submit" disabled={isPending}>
+          {isPending ? "Guardando..." : "Guardar precios"}
+        </Button>
+      )}
     </form>
   );
 }
@@ -130,10 +137,12 @@ function PriceRow({
   category,
   subtypes,
   offerings,
+  isReadOnly,
 }: {
   category: CategoryWithCount;
   subtypes: SubtypeWithCount[];
   offerings: LicenseOffering[];
+  isReadOnly: boolean;
 }) {
   const getDefault = (subtypeId: string) => {
     const offering = offerings.find(
@@ -165,6 +174,7 @@ function PriceRow({
             defaultValue={getDefault(sub.id)}
             placeholder="€"
             className="h-8 w-24 text-center"
+            disabled={isReadOnly}
           />
         </td>
       ))}

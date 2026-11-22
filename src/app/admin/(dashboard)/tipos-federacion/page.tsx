@@ -4,10 +4,12 @@ import { fetchAdminLicenseCatalog } from "@/lib/admin-license-catalog";
 import { buildCatalogYears } from "@/helpers/catalog-years";
 import { selectCatalogYear } from "@/helpers/selected-catalog-year";
 import { selectClonableYears } from "@/helpers/clonable-years";
+import { isClosedSeason } from "@/helpers/closed-season";
 import { formatLicenseCatalogFinding } from "@/helpers/license-catalog-finding";
 import { CatalogYearSelector } from "@/components/admin/catalog-year-selector";
 import { CatalogYearEmpty } from "@/components/admin/catalog-year-empty";
 import { ClonePricesButton } from "@/components/admin/clone-prices-button";
+import { ClosedSeasonNotice } from "@/components/admin/closed-season-notice";
 import { LicenseTypesTable } from "@/components/admin/license-types-table";
 import { CreateLicenseTypeButton } from "@/components/admin/create-license-type-button";
 import { StandaloneSections } from "@/components/admin/standalone-sections";
@@ -34,6 +36,7 @@ export default async function FederationTypesPage({ searchParams }: Props) {
   const yearsWithPrices = seasonsOnRecord
     .filter((season) => season._count.offerings > 0)
     .map((season) => season.year);
+  const isReadOnly = isClosedSeason(selectedYear, currentYear);
   const season = await prisma.season.findUnique({
     where: { year: selectedYear },
   });
@@ -46,9 +49,15 @@ export default async function FederationTypesPage({ searchParams }: Props) {
         currentYear={currentYear}
         clonableYears={selectClonableYears(yearsWithPrices, selectedYear)}
         willOverwrite={yearsWithPrices.includes(selectedYear)}
+        isReadOnly={isReadOnly}
       />
+      {isReadOnly && <ClosedSeasonNotice year={selectedYear} />}
       {season ? (
-        <CatalogSections seasonId={season.id} year={selectedYear} />
+        <CatalogSections
+          seasonId={season.id}
+          year={selectedYear}
+          isReadOnly={isReadOnly}
+        />
       ) : (
         <CatalogYearEmpty year={selectedYear} />
       )}
@@ -62,6 +71,7 @@ type HeaderProps = {
   currentYear: number;
   clonableYears: number[];
   willOverwrite: boolean;
+  isReadOnly: boolean;
 };
 
 function CatalogHeader({
@@ -70,9 +80,8 @@ function CatalogHeader({
   currentYear,
   clonableYears,
   willOverwrite,
+  isReadOnly,
 }: HeaderProps) {
-  // A closed year is history: it is read, not refilled.
-  const isPastYear = selectedYear < currentYear;
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
@@ -89,7 +98,7 @@ function CatalogHeader({
           selectedYear={selectedYear}
           currentYear={currentYear}
         />
-        {!isPastYear && (
+        {!isReadOnly && (
           <ClonePricesButton
             targetYear={selectedYear}
             sourceYears={clonableYears}
@@ -105,9 +114,11 @@ function CatalogHeader({
 async function CatalogSections({
   seasonId,
   year,
+  isReadOnly,
 }: {
   seasonId: string;
   year: number;
+  isReadOnly: boolean;
 }) {
   const { licenseTypes, categories, supplements, supplementGroups } =
     await fetchAdminLicenseCatalog(seasonId);
@@ -128,12 +139,14 @@ async function CatalogSections({
         categories={categories}
         seasonId={seasonId}
         seasonName={String(year)}
+        isReadOnly={isReadOnly}
       />
       <StandaloneSections
         categories={categories}
         supplements={supplements}
         supplementGroups={supplementGroups}
         seasonId={seasonId}
+        isReadOnly={isReadOnly}
       />
     </div>
   );

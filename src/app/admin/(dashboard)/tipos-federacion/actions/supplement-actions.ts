@@ -9,6 +9,7 @@ import {
   supplementGroupPriceSchema,
 } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { requireEditableSeason } from "@/lib/season-editable";
 
 // --- Supplement actions ---
 
@@ -85,6 +86,9 @@ export async function upsertSupplementPrice(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
 
   const parsed = supplementPriceSchema.safeParse({
     seasonId,
@@ -175,6 +179,9 @@ export async function upsertSupplementGroupPrice(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
 
   const parsed = supplementGroupPriceSchema.safeParse({
     seasonId,

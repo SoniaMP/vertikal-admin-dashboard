@@ -9,12 +9,14 @@ type Props = {
   licenseType: LicenseTypeWithRelations;
   categories: CategoryWithCount[];
   seasonId: string;
+  isReadOnly: boolean;
 };
 
 export function DetailSections({
   licenseType: lt,
   categories,
   seasonId,
+  isReadOnly,
 }: Props) {
   return (
     <>
@@ -25,6 +27,7 @@ export function DetailSections({
       />
       <OfferingMatrixSection
         seasonId={seasonId}
+        isReadOnly={isReadOnly}
         typeId={lt.id}
         categories={categories}
         subtypes={lt.subtypes}

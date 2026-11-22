@@ -8,6 +8,10 @@ const mockTransaction = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    season: {
+      findUnique: () =>
+        Promise.resolve({ year: new Date().getFullYear() }),
+    },
     supplementPrice: {
       upsert: (...args: unknown[]) => mockUpsert(...args),
     },
