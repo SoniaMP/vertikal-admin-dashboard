@@ -67,10 +67,22 @@ export async function cloneSeasonPrices(
     };
   }
 
-  await prisma.$transaction(async (tx) => {
-    const targetId = target?.id ?? (await createSeason(tx, targetYear)).id;
-    await copySeasonCatalog(tx, source.id, targetId);
-  });
+  // The copy is one transaction, so a failure anywhere leaves the target year
+  // exactly as it was. Catching it turns a rolled-back clone into a message
+  // the admin can read instead of a crashed screen that says nothing about
+  // whether the year survived.
+  try {
+    await prisma.$transaction(async (tx) => {
+      const targetId = target?.id ?? (await createSeason(tx, targetYear)).id;
+      await copySeasonCatalog(tx, source.id, targetId);
+    });
+  } catch (error) {
+    console.error("cloneSeasonPrices failed", error);
+    return {
+      success: false,
+      error: `No se pudo clonar sobre la temporada ${targetYear}. No se ha cambiado nada; inténtalo de nuevo.`,
+    };
+  }
 
   revalidatePath("/admin/tipos-federacion");
   return { success: true };

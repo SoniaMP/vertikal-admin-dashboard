@@ -109,4 +109,29 @@ describe("cloneSeasonPrices", () => {
       "season-2027",
     );
   });
+
+  it("runs the whole copy inside a single transaction", async () => {
+    mockSeasonFindUnique
+      .mockResolvedValueOnce(SOURCE)
+      .mockResolvedValueOnce({ id: "season-2027", _count: { memberships: 0 } });
+
+    await clone(currentYear, currentYear + 1);
+
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports a failure mid-copy instead of leaving it half done", async () => {
+    mockSeasonFindUnique
+      .mockResolvedValueOnce(SOURCE)
+      .mockResolvedValueOnce({ id: "season-2027", _count: { memberships: 0 } });
+    mockCopyCatalog.mockRejectedValueOnce(new Error("FK constraint failed"));
+
+    const result = await clone(currentYear, currentYear + 1);
+
+    expect(result.success).toBe(false);
+    // The rollback is the database's job; what this guards is that the action
+    // lets the transaction reject instead of swallowing it and reporting
+    // success over a half-copied year.
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+  });
 });
