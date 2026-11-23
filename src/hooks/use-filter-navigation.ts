@@ -32,8 +32,10 @@ export function useFilterNavigation() {
 
   const clearAll = useCallback(() => {
     const params = new URLSearchParams();
-    const seasonId = searchParams.get("seasonId");
-    if (seasonId) params.set("seasonId", seasonId);
+    // Clearing the filters keeps the season: it is which rows exist, not a
+    // narrowing of them.
+    const year = searchParams.get("year");
+    if (year) params.set("year", year);
     router.push(`/admin?${params.toString()}`);
   }, [router, searchParams]);
 

@@ -12,7 +12,7 @@ type Props = {
     status: string;
     paymentStatus: string;
     createdAt: Date;
-    season: { name: string };
+    season: { year: number };
     member: { dni: string };
   };
 };
@@ -26,7 +26,7 @@ type Props = {
 export function MembershipDetailMeta({ membership: m }: Props) {
   return (
     <div className="flex flex-wrap items-center gap-2 pl-[4.5rem] text-sm text-muted-foreground">
-      <span>Temporada {m.season.name}</span>
+      <span>Temporada {m.season.year}</span>
       <span aria-hidden="true">·</span>
       <span>DNI {m.member.dni}</span>
       <span aria-hidden="true">·</span>

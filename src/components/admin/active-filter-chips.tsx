@@ -23,7 +23,8 @@ const FILTER_LABELS: Record<string, string> = {
 };
 
 const EXCLUDED_KEYS = new Set([
-  "seasonId",
+  // The season is the scope of the page, not a filter to clear.
+  "year",
   "sortBy",
   "sortDir",
   "page",

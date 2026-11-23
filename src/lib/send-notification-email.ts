@@ -69,7 +69,7 @@ export async function sendClubMembershipNotification(
       externalLicense,
       supplements: membership.supplements.map((s) => s.supplement.name),
       totalAmountCents: membership.totalAmount,
-      seasonName: membership.season.name,
+      seasonName: String(membership.season.year),
     }),
   );
 

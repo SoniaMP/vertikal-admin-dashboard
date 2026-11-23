@@ -4,8 +4,49 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { isValidHexColor } from "@/lib/email-branding";
-import { NOTIFICATION_KEYS } from "@/lib/settings";
+import {
+  NOTIFICATION_KEYS,
+  MAX_SEASON_ROLLOVER_DAYS,
+} from "@/lib/settings";
 import { z } from "zod";
+
+/**
+ * Sets how early the next season starts taking enrolments.
+ *
+ * Changing it moves which season every new registration lands in, so it also
+ * clears the public pages: they decide what to show from this number.
+ */
+export async function updateSeasonRolloverDays(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const authError = await requireAuth();
+  if (authError) return authError;
+
+  const days = parseInt(String(formData.get("rolloverDays")), 10);
+
+  if (!Number.isInteger(days) || days < 0) {
+    return { success: false, error: "Los días deben ser un número entero" };
+  }
+
+  if (days > MAX_SEASON_ROLLOVER_DAYS) {
+    return {
+      success: false,
+      error: `Como mucho ${MAX_SEASON_ROLLOVER_DAYS} días: más que eso dejaría de ser un relevo`,
+    };
+  }
+
+  await prisma.appSetting.upsert({
+    where: { key: "SEASON_ROLLOVER_DAYS" },
+    update: { value: String(days) },
+    create: { key: "SEASON_ROLLOVER_DAYS", value: String(days) },
+  });
+
+  revalidatePath("/admin/ajustes");
+  revalidatePath("/registro");
+  revalidatePath("/admin");
+  return { success: true };
+}
 
 export async function updateMembershipFee(
   _prevState: ActionResult,

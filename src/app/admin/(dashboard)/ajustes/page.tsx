@@ -1,17 +1,24 @@
-import { getMembershipFee, getNotificationEmails } from "@/lib/settings";
+import {
+  getMembershipFee,
+  getNotificationEmails,
+  getSeasonRolloverDays,
+} from "@/lib/settings";
+import { formatRolloverWindow } from "@/helpers/rollover-window-label";
 import { getEmailBranding } from "@/lib/email-branding";
 import { MembershipFeeForm } from "@/components/admin/membership-fee-form";
 import { EmailBrandingForm } from "@/components/admin/email-branding-form";
 import { NotificationEmailsForm } from "@/components/admin/notification-emails-form";
+import { SeasonRolloverForm } from "@/components/admin/season-rollover-form";
 import { SettingsSection } from "@/components/admin/settings-section";
 
 export default async function AjustesPage() {
-  const [membershipFeeCents, branding, membershipEmails, courseEmails] =
+  const [membershipFeeCents, branding, membershipEmails, courseEmails, rolloverDays] =
     await Promise.all([
       getMembershipFee(),
       getEmailBranding(),
       getNotificationEmails("membership"),
       getNotificationEmails("course"),
+      getSeasonRolloverDays(),
     ]);
   const membershipFeeEuros = membershipFeeCents / 100;
 
@@ -32,6 +39,16 @@ export default async function AjustesPage() {
         description="Lo que paga cada socio por pertenecer al club, antes de cualquier licencia federativa. Solo afecta a las altas nuevas: las ya cobradas guardan el precio que tenían."
       >
         <MembershipFeeForm currentFeeEuros={membershipFeeEuros} />
+      </SettingsSection>
+
+      <SettingsSection
+        title="Relevo de temporada"
+        description="La temporada es el año natural, y se calcula sola: no hay que crearla ni marcarla. Lo único que se configura es cuántos días antes de fin de año una alta ya cuenta para la temporada siguiente, que es cuando la gente empieza a apuntarse."
+      >
+        <SeasonRolloverForm
+          currentDays={rolloverDays}
+          windowLabel={formatRolloverWindow(new Date(), rolloverDays)}
+        />
       </SettingsSection>
 
       <SettingsSection

@@ -14,13 +14,13 @@ import { useFilterNavigation } from "@/hooks/use-filter-navigation";
 import { PAYMENT_LABELS } from "./membership-status-badges";
 import { SavedViewsSelector } from "./saved-views-selector";
 import { SeasonSelector } from "./season-selector";
-import type { SeasonOption } from "@/types/membership-filters";
 
 const PAYMENT_OPTIONS = Object.entries(PAYMENT_LABELS);
 
 type Props = {
-  allSeasons: SeasonOption[];
-  currentSeasonId: string;
+  years: number[];
+  selectedYear: number;
+  activeYear: number;
 };
 
 /**
@@ -28,17 +28,25 @@ type Props = {
  * so it sits at the head of the row rather than beside the page's actions.
  * The membership state left this row for the tabs above it.
  */
-export function MembershipsToolbar({ allSeasons, currentSeasonId }: Props) {
+export function MembershipsToolbar({
+  years,
+  selectedYear,
+  activeYear,
+}: Props) {
   const { updateParam, updateParamDebounced, clearAll, searchParams } =
     useFilterNavigation();
 
   const hasFilters = Array.from(searchParams.keys()).some(
-    (k) => !["seasonId", "sortBy", "sortDir", "page"].includes(k),
+    (k) => !["year", "sortBy", "sortDir", "page"].includes(k),
   );
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-      <SeasonSelector seasons={allSeasons} currentSeasonId={currentSeasonId} />
+      <SeasonSelector
+        years={years}
+        selectedYear={selectedYear}
+        activeYear={activeYear}
+      />
 
       <Input
         placeholder="Buscar por nombre, DNI o email..."

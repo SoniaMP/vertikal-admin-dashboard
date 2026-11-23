@@ -12,7 +12,7 @@ const PENDING = {
   status: "PENDING_PAYMENT",
   paymentStatus: "PENDING",
   totalAmount: 3500,
-  season: { name: "2026" },
+  season: { year: 2026 },
 };
 
 beforeEach(() => vi.clearAllMocks());

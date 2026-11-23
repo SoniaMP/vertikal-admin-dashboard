@@ -1,10 +1,9 @@
-import { getActiveSeason } from "@/lib/settings";
 import {
   fetchMembershipList,
-  fetchAllSeasons,
   fetchFilterOptions,
   fetchSeasonMetrics,
 } from "@/lib/admin-queries";
+import { resolveSelectedSeason } from "@/lib/selected-season";
 import { parseFilterParams } from "@/lib/filter-params";
 import { fetchLicenseCatalog } from "@/lib/license-catalog";
 import { MembershipsToolbar } from "@/components/admin/memberships-toolbar";
@@ -27,12 +26,14 @@ export default async function AdminRegistrationsPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [activeSeason, allSeasons] = await Promise.all([
-    getActiveSeason(),
-    fetchAllSeasons(),
-  ]);
+  const rawYear = typeof params.year === "string" ? params.year : undefined;
+  // The selector offers years, not stored rows: a season is a calendar year.
+  // A year nobody has registered into yet resolves to no season, and the
+  // table simply comes up empty.
+  const { years, selectedYear, activeYear, seasonId } =
+    await resolveSelectedSeason(rawYear);
 
-  const filters = parseFilterParams(params, activeSeason.id);
+  const filters = parseFilterParams(params, seasonId);
   const appliedFilters = applyViewOverrides(filters);
 
   const [catalog, filterOptions, metrics, { memberships, total, pageSize }] =
@@ -55,8 +56,9 @@ export default async function AdminRegistrationsPage({
       <SeasonMetricsCards metrics={metrics} />
       <MembershipStatusTabs />
       <MembershipsToolbar
-        allSeasons={allSeasons}
-        currentSeasonId={filters.seasonId}
+        years={years}
+        selectedYear={selectedYear}
+        activeYear={activeYear}
       />
       <AdvancedFiltersPanel filterOptions={filterOptions} />
       <ActiveFilterChips filterOptions={filterOptions} />

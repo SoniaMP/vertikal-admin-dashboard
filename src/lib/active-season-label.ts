@@ -1,15 +1,19 @@
-import { prisma } from "@/lib/prisma";
-import { formatSeasonLabel } from "@/helpers/season-label";
+import { resolveTargetSeasonYear } from "@/helpers/target-season-year";
+import { getSeasonRolloverDays } from "@/lib/settings";
 
 /**
- * The active season's label, or null when none is configured or the database
- * cannot be reached. Unlike `getActiveSeason()`, this never throws: the login
- * page has to render even when the data behind a decorative line does not.
+ * The season in force, as a line to print, or null when the database cannot
+ * be reached. Unlike `getActiveSeason()`, this neither creates the row nor
+ * throws: the login page has to render even when the data behind a
+ * decorative line does not.
  */
 export async function fetchActiveSeasonLabel(): Promise<string | null> {
   try {
-    const season = await prisma.season.findFirst({ where: { isActive: true } });
-    return season ? formatSeasonLabel(season.name) : null;
+    const year = resolveTargetSeasonYear(
+      new Date(),
+      await getSeasonRolloverDays(),
+    );
+    return `Temporada ${year}`;
   } catch {
     return null;
   }

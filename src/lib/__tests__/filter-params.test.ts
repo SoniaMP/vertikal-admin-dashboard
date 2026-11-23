@@ -39,13 +39,13 @@ describe("parseFilterParams", () => {
     expect(result).toEqual(makeFilters());
   });
 
-  it("uses provided seasonId over default", () => {
-    const result = parseFilterParams({ seasonId: "season-2" }, DEFAULT_SEASON);
-    expect(result.seasonId).toBe("season-2");
+  it("takes the season the caller resolved from the year", () => {
+    const result = parseFilterParams({}, DEFAULT_SEASON);
+    expect(result.seasonId).toBe(DEFAULT_SEASON);
   });
 
-  it("falls back to default seasonId when param is missing", () => {
-    const result = parseFilterParams({}, DEFAULT_SEASON);
+  it("ignores a seasonId in the URL, which could name a year never offered", () => {
+    const result = parseFilterParams({ seasonId: "season-2" }, DEFAULT_SEASON);
     expect(result.seasonId).toBe(DEFAULT_SEASON);
   });
 

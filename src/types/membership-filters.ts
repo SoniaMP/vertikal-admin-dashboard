@@ -30,6 +30,5 @@ export type MembershipFilterState = {
 
 export type SeasonOption = {
   id: string;
-  name: string;
-  isActive: boolean;
+  year: number;
 };

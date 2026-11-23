@@ -181,11 +181,10 @@ export async function fetchFilterOptions(): Promise<FilterOptions> {
 // ── Auxiliary ──
 
 export async function fetchAllSeasons(): Promise<SeasonOption[]> {
-  const seasons = await prisma.season.findMany({
-    select: { id: true, name: true, isActive: true },
-    orderBy: { startDate: "desc" },
+  return prisma.season.findMany({
+    select: { id: true, year: true },
+    orderBy: { year: "desc" },
   });
-  return seasons;
 }
 
 export async function getPreviousSeason(
@@ -193,16 +192,15 @@ export async function getPreviousSeason(
 ): Promise<SeasonOption | null> {
   const current = await prisma.season.findUnique({
     where: { id: currentSeasonId },
-    select: { startDate: true },
+    select: { year: true },
   });
   if (!current) return null;
 
-  const previous = await prisma.season.findFirst({
-    where: { startDate: { lt: current.startDate } },
-    orderBy: { startDate: "desc" },
-    select: { id: true, name: true, isActive: true },
+  return prisma.season.findFirst({
+    where: { year: { lt: current.year } },
+    orderBy: { year: "desc" },
+    select: { id: true, year: true },
   });
-  return previous;
 }
 
 // ── Internal helpers ──

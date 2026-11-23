@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getActiveSeason } from "@/lib/settings";
+import { resolveSelectedSeason } from "@/lib/selected-season";
 import { parseFilterParams } from "@/lib/filter-params";
 import { buildMembershipWhere } from "@/lib/admin-queries";
 import { prisma } from "@/lib/prisma";
@@ -8,9 +8,11 @@ import { buildCsv } from "@/lib/csv-utils";
 const MAX_ROWS = 5000;
 
 export async function GET(request: NextRequest) {
-  const activeSeason = await getActiveSeason();
   const params = Object.fromEntries(request.nextUrl.searchParams.entries());
-  const filters = parseFilterParams(params, activeSeason.id);
+  // Same resolution as the screen, so the file holds the year being looked at
+  // rather than whichever one is in force today.
+  const { seasonId } = await resolveSelectedSeason(params.year);
+  const filters = parseFilterParams(params, seasonId);
   const where = buildMembershipWhere(filters);
 
   const memberships = await prisma.membership.findMany({

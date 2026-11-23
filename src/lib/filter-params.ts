@@ -23,7 +23,7 @@ type RawParams = Record<string, string | string[] | undefined>;
 
 export function parseFilterParams(
   params: RawParams,
-  defaultSeasonId: string,
+  seasonId: string,
 ): MembershipFilterState {
   const str = (key: string) => (typeof params[key] === "string" ? params[key] : "");
 
@@ -31,7 +31,9 @@ export function parseFilterParams(
   const rawDir = str("sortDir") as SortDirection;
 
   return {
-    seasonId: str("seasonId") || defaultSeasonId,
+    // Resolved from the year by the caller. Never read from the URL: a
+    // season id there could point at a year the selector never offered.
+    seasonId,
     search: str("search"),
     paymentStatus: str("paymentStatus"),
     membershipStatus: str("membershipStatus"),

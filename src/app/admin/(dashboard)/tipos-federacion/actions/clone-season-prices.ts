@@ -94,13 +94,5 @@ export async function cloneSeasonPrices(
  * off it.
  */
 function createSeason(tx: Prisma.TransactionClient, year: number) {
-  return tx.season.create({
-    data: {
-      name: String(year),
-      year,
-      startDate: new Date(`${year}-01-01`),
-      endDate: new Date(`${year}-12-31`),
-      isActive: false,
-    },
-  });
+  return tx.season.create({ data: { year } });
 }

@@ -30,7 +30,7 @@ type LicenceSource = {
   externalLicenseLabel: string | null;
   type: { name: string } | null;
   subtype: { name: string } | null;
-  season: { name: string };
+  season: { year: number };
 };
 
 /**
@@ -51,7 +51,7 @@ function describeLicense(
     return membership.externalLicenseLabel
       ? {
           label: membership.externalLicenseLabel,
-          seasonName: membership.season.name,
+          seasonName: String(membership.season.year),
         }
       : null;
   }
@@ -62,7 +62,10 @@ function describeLicense(
 
   if (parts.length === 0) return null;
 
-  return { label: parts.join(" - "), seasonName: membership.season.name };
+  return {
+    label: parts.join(" - "),
+    seasonName: String(membership.season.year),
+  };
 }
 
 /**
@@ -84,7 +87,7 @@ export async function fetchRenewalPrefill(
         orderBy: { createdAt: "desc" },
         take: 1,
         include: {
-          season: { select: { name: true } },
+          season: { select: { year: true } },
           type: { select: { name: true } },
           subtype: { select: { name: true } },
         },

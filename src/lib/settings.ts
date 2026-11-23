@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { resolveTargetSeasonYear } from "@/helpers/target-season-year";
 
 const DEFAULT_MEMBERSHIP_FEE = 2000; // 20.00 EUR in cents
+
+/** Enrolments for next season open this many days before the year turns. */
+export const DEFAULT_SEASON_ROLLOVER_DAYS = 15;
+
+/** More than a season of lead time would stop being a rollover window. */
+export const MAX_SEASON_ROLLOVER_DAYS = 120;
 
 export async function getMembershipFee(): Promise<number> {
   const setting = await prisma.appSetting.findUnique({
@@ -45,16 +52,47 @@ export async function getNotificationEmails(
 }
 
 /**
- * Get the currently active season, or throw if none exists.
+ * How many days before the year turns the next season starts taking people.
  */
-export async function getActiveSeason() {
-  const season = await prisma.season.findFirst({
-    where: { isActive: true },
+export async function getSeasonRolloverDays(): Promise<number> {
+  const setting = await prisma.appSetting.findUnique({
+    where: { key: "SEASON_ROLLOVER_DAYS" },
   });
 
-  if (!season) {
-    throw new Error("No active season configured");
-  }
+  if (!setting) return DEFAULT_SEASON_ROLLOVER_DAYS;
 
-  return season;
+  const parsed = parseInt(setting.value, 10);
+  const isUsable =
+    Number.isFinite(parsed) && parsed >= 0 && parsed <= MAX_SEASON_ROLLOVER_DAYS;
+  return isUsable ? parsed : DEFAULT_SEASON_ROLLOVER_DAYS;
+}
+
+/**
+ * The season in force right now.
+ *
+ * It is calculated from the calendar, never marked by hand: there is no
+ * active flag to forget to move and no date range to keep aligned. The row
+ * exists only so prices and memberships have something to hang from, so it is
+ * created the first time a year needs it.
+ *
+ * This cannot fail for want of configuration. Every year has a season, by
+ * definition, whether or not anybody has set its prices yet — whether there
+ * is anything to sell is a separate question, asked of the catalog.
+ */
+export async function getActiveSeason() {
+  const year = resolveTargetSeasonYear(
+    new Date(),
+    await getSeasonRolloverDays(),
+  );
+
+  const existing = await prisma.season.findUnique({ where: { year } });
+  if (existing) return existing;
+
+  try {
+    return await prisma.season.create({ data: { year } });
+  } catch {
+    // Another request got there first; the year is unique, so there is now
+    // exactly one row and it is the one we wanted.
+    return prisma.season.findUniqueOrThrow({ where: { year } });
+  }
 }

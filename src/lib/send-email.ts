@@ -36,7 +36,7 @@ export async function sendMembershipConfirmationEmail(
       externalLicenseLabel: membership.externalLicenseLabel,
       totalAmountCents: membership.totalAmount,
       supplements: membership.supplements.map((s) => s.supplement.name),
-      seasonName: membership.season.name,
+      seasonName: String(membership.season.year),
     }),
   );
 
@@ -44,7 +44,7 @@ export async function sendMembershipConfirmationEmail(
   await resend.emails.send({
     from: getEmailFrom(),
     to: membership.member.email,
-    subject: `Confirmación de inscripción — ${membership.season.name}`,
+    subject: `Confirmación de inscripción — ${membership.season.year}`,
     html,
   });
 

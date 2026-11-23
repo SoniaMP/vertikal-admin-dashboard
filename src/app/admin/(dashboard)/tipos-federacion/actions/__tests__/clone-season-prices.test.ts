@@ -87,7 +87,7 @@ describe("cloneSeasonPrices", () => {
 
     expect(result.success).toBe(true);
     expect(tx.season.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ year: currentYear + 1, isActive: false }),
+      data: { year: currentYear + 1 },
     });
     expect(mockCopyCatalog).toHaveBeenCalledWith(
       tx,

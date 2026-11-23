@@ -24,7 +24,7 @@ export async function fetchPendingMembership(
       status: true,
       paymentStatus: true,
       totalAmount: true,
-      season: { select: { name: true } },
+      season: { select: { year: true } },
     },
   });
 
@@ -34,6 +34,6 @@ export async function fetchPendingMembership(
 
   return {
     totalAmount: membership.totalAmount,
-    seasonName: membership.season.name,
+    seasonName: String(membership.season.year),
   };
 }

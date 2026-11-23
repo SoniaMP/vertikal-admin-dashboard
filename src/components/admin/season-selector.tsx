@@ -8,34 +8,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { SeasonOption } from "@/types/membership-filters";
 
 type Props = {
-  seasons: SeasonOption[];
-  currentSeasonId: string;
+  years: number[];
+  selectedYear: number;
+  /** The year new registrations land in today, marked so nobody has to guess. */
+  activeYear: number;
 };
 
-export function SeasonSelector({ seasons, currentSeasonId }: Props) {
+/**
+ * Picks which season's registrations to look at.
+ *
+ * The options are years, not stored rows: a season is a calendar year, so a
+ * year with nothing in it yet is still a season you can look at — it just
+ * comes up empty.
+ */
+export function SeasonSelector({ years, selectedYear, activeYear }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  function handleChange(seasonId: string) {
+  function handleChange(year: string) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("seasonId", seasonId);
+    params.set("year", year);
     params.delete("page");
     router.push(`/admin?${params.toString()}`);
   }
 
   return (
-    <Select value={currentSeasonId} onValueChange={handleChange}>
+    <Select value={String(selectedYear)} onValueChange={handleChange}>
       <SelectTrigger className="w-48">
         <SelectValue placeholder="Temporada" />
       </SelectTrigger>
       <SelectContent>
-        {seasons.map((s) => (
-          <SelectItem key={s.id} value={s.id}>
-            {s.name}
-            {s.isActive ? " (Actual)" : ""}
+        {years.map((year) => (
+          <SelectItem key={year} value={String(year)}>
+            {year}
+            {year === activeYear ? " (Actual)" : ""}
           </SelectItem>
         ))}
       </SelectContent>

@@ -6,14 +6,13 @@ datasource db {
   provider = "sqlite"
 }
 
+/// A season IS a calendar year. The row exists only so prices and
+/// memberships have something to hang from; it is created the first time a
+/// year needs it and never marked, dated or named. Which season is in force
+/// is calculated — see `getActiveSeason()`.
 model Season {
   id        String   @id @default(cuid())
-  name      String // e.g. "2025-2026". Superseded by `year`; dropped in UC-SET-01.
-  /// The season IS the calendar year. One year, one season.
   year      Int      @unique
-  startDate DateTime
-  endDate   DateTime
-  isActive  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

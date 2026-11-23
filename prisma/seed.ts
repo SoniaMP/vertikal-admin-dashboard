@@ -39,23 +39,15 @@ async function main() {
     });
   }
 
-  // Ensure an active season exists
-  const activeSeason = await prisma.season.findFirst({
-    where: { isActive: true },
+  // The season is the calendar year, so there is nothing to choose: make sure
+  // this year has its row. The app provisions it on its own too, but seeding
+  // it keeps a fresh database from starting out empty.
+  const currentYear = new Date().getFullYear();
+  await prisma.season.upsert({
+    where: { year: currentYear },
+    update: {},
+    create: { year: currentYear },
   });
-
-  if (!activeSeason) {
-    const currentYear = new Date().getFullYear();
-    await prisma.season.create({
-      data: {
-        name: String(currentYear),
-        year: currentYear,
-        startDate: new Date(`${currentYear}-01-01`),
-        endDate: new Date(`${currentYear}-12-31`),
-        isActive: true,
-      },
-    });
-  }
 
   // Default membership fee: 20.00 EUR (in cents)
   await prisma.appSetting.upsert({
