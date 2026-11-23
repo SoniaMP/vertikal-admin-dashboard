@@ -6,6 +6,7 @@ import { z } from "zod";
 import { categorySchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { requireEditableCatalogRow } from "@/lib/catalog-editable";
 import { newCatalogIdentity } from "@/lib/catalog-identity";
 
 const batchOfferingSchema = z.object({
@@ -56,6 +57,9 @@ export async function updateCategory(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("category", id);
+  if (closedError) return closedError;
+
   const parsed = categorySchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -78,6 +82,9 @@ export async function toggleCategoryActive(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("category", id);
+  if (closedError) return closedError;
+
   await prisma.category.update({
     where: { id },
     data: { active: isActive },
@@ -89,6 +96,9 @@ export async function toggleCategoryActive(
 export async function deleteCategory(id: string): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("category", id);
+  if (closedError) return closedError;
 
   const membershipCount = await prisma.membership.count({
     where: { categoryId: id },

@@ -19,6 +19,8 @@ import {
   toggleSubtypeActive,
   deleteSubtype,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { PropagationPrompt } from "./propagation-prompt";
+import type { PropagationRequest } from "@/types/catalog-propagation";
 import { SubtypeFormDialog } from "./subtype-form-dialog";
 import { resolveLicenseVisibility } from "@/helpers/license-visibility";
 
@@ -30,10 +32,18 @@ type Props = {
 export function SubtypeActions({ subtype, membershipCount }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [propagation, setPropagation] = useState<PropagationRequest | null>(
+    null,
+  );
 
   function handleToggle() {
     startTransition(async () => {
-      await toggleSubtypeActive(subtype.id, !subtype.active);
+      const result = await toggleSubtypeActive(subtype.id, !subtype.active);
+      // Retiring something in one year says nothing about the others, so the
+      // change stops here unless the admin says otherwise.
+      if (result.success) {
+        setPropagation({ model: "licenseSubtype", id: subtype.id, scope: "state" });
+      }
     });
   }
 
@@ -114,6 +124,11 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
         onOpenChange={setIsEditOpen}
         licenseTypeId={subtype.licenseTypeId}
         subtype={subtype}
+      />
+      <PropagationPrompt
+        request={propagation}
+        entityLabel="esta modalidad"
+        onDone={() => setPropagation(null)}
       />
     </div>
   );

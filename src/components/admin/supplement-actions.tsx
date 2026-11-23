@@ -5,6 +5,8 @@ import type { Supplement, SupplementGroup } from "@prisma/client";
 import { Pencil, Power } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toggleSupplementActive } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { PropagationPrompt } from "./propagation-prompt";
+import type { PropagationRequest } from "@/types/catalog-propagation";
 import { SupplementFormDialog } from "./supplement-form-dialog";
 
 type SupplementGroupWithSupplements = SupplementGroup & {
@@ -19,10 +21,18 @@ type Props = {
 export function SupplementActions({ supplement, supplementGroups }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [propagation, setPropagation] = useState<PropagationRequest | null>(
+    null,
+  );
 
   function handleToggle() {
     startTransition(async () => {
-      await toggleSupplementActive(supplement.id, !supplement.active);
+      const result = await toggleSupplementActive(supplement.id, !supplement.active);
+      // Retiring something in one year says nothing about the others, so the
+      // change stops here unless the admin says otherwise.
+      if (result.success) {
+        setPropagation({ model: "supplement", id: supplement.id, scope: "state" });
+      }
     });
   }
 
@@ -55,6 +65,11 @@ export function SupplementActions({ supplement, supplementGroups }: Props) {
         seasonId={supplement.seasonId}
         supplement={supplement}
         supplementGroups={supplementGroups}
+      />
+      <PropagationPrompt
+        request={propagation}
+        entityLabel="este suplemento"
+        onDone={() => setPropagation(null)}
       />
     </div>
   );

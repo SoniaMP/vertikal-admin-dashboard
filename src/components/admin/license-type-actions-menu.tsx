@@ -1,24 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Eye, Pencil, Power, Trash2 } from "lucide-react";
+import { Eye, Pencil, Power } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  toggleLicenseTypeActive,
-  deleteLicenseType,
-} from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { toggleLicenseTypeActive } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { DeleteLicenseTypeButton } from "./delete-license-type-button";
 import { LicenseTypeFormDialog } from "./license-type-form-dialog";
+import { PropagationPrompt } from "./propagation-prompt";
+import type { PropagationRequest } from "@/types/catalog-propagation";
 import { LicensePreviewDialog } from "./license-preview-dialog";
 import { resolveLicenseVisibility } from "@/helpers/license-visibility";
 import type {
@@ -42,21 +31,28 @@ export function LicenseTypeActions({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [propagation, setPropagation] = useState<PropagationRequest | null>(
+    null,
+  );
   const isDraft = resolveLicenseVisibility(licenseType) === "draft";
 
   function handleToggle() {
     startTransition(async () => {
-      await toggleLicenseTypeActive(licenseType.id, !licenseType.active);
+      const result = await toggleLicenseTypeActive(
+        licenseType.id,
+        !licenseType.active,
+      );
+      // Retiring a federation in one year says nothing about the others, so
+      // the change stops here unless the admin says otherwise.
+      if (result.success) {
+        setPropagation({
+          model: "licenseType",
+          id: licenseType.id,
+          scope: "state",
+        });
+      }
     });
   }
-
-  function handleDelete() {
-    startTransition(async () => {
-      await deleteLicenseType(licenseType.id);
-    });
-  }
-
-  const hasMemberships = membershipCount > 0;
 
   return (
     <div className="flex items-center gap-1">
@@ -92,41 +88,11 @@ export function LicenseTypeActions({
           <Power className="h-4 w-4" />
         </Button>
       )}
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={isPending || hasMemberships}
-            aria-label="Eliminar"
-            title={
-              hasMemberships
-                ? "No se puede eliminar: tiene registros asociados"
-                : "Eliminar"
-            }
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              ¿Eliminar &ldquo;{licenseType.name}&rdquo;?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción eliminará permanentemente el tipo de federativa y todos
-              sus subtipos y precios asociados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteLicenseTypeButton
+        licenseTypeId={licenseType.id}
+        name={licenseType.name}
+        hasMemberships={membershipCount > 0}
+      />
       <LicenseTypeFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
@@ -139,6 +105,11 @@ export function LicenseTypeActions({
         licenseType={licenseType}
         categories={categories}
         seasonName={seasonName}
+      />
+      <PropagationPrompt
+        request={propagation}
+        entityLabel="esta federativa"
+        onDone={() => setPropagation(null)}
       />
     </div>
   );

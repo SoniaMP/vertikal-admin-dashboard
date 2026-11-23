@@ -10,6 +10,7 @@ import {
 } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { requireEditableCatalogRow } from "@/lib/catalog-editable";
 import { newCatalogIdentity } from "@/lib/catalog-identity";
 
 // --- Supplement actions ---
@@ -53,6 +54,9 @@ export async function updateSupplement(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("supplement", id);
+  if (closedError) return closedError;
+
   const groupId = (formData.get("supplementGroupId") as string) || null;
 
   const parsed = supplementSchema.safeParse({
@@ -77,6 +81,9 @@ export async function toggleSupplementActive(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("supplement", id);
+  if (closedError) return closedError;
 
   await prisma.supplement.update({
     where: { id },
@@ -153,6 +160,9 @@ export async function updateSupplementGroup(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("supplementGroup", id);
+  if (closedError) return closedError;
+
   const parsed = supplementGroupSchema.safeParse({
     name: formData.get("name"),
   });
@@ -172,6 +182,9 @@ export async function deleteSupplementGroup(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("supplementGroup", id);
+  if (closedError) return closedError;
 
   await prisma.$transaction(async (tx) => {
     await tx.supplement.updateMany({

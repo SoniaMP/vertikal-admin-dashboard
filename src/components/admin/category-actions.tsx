@@ -19,6 +19,8 @@ import {
   toggleCategoryActive,
   deleteCategory,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { PropagationPrompt } from "./propagation-prompt";
+import type { PropagationRequest } from "@/types/catalog-propagation";
 import { CategoryFormDialog } from "./category-form-dialog";
 
 type Props = {
@@ -29,10 +31,18 @@ type Props = {
 export function CategoryActions({ category, membershipCount }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [propagation, setPropagation] = useState<PropagationRequest | null>(
+    null,
+  );
 
   function handleToggle() {
     startTransition(async () => {
-      await toggleCategoryActive(category.id, !category.active);
+      const result = await toggleCategoryActive(category.id, !category.active);
+      // Retiring something in one year says nothing about the others, so the
+      // change stops here unless the admin says otherwise.
+      if (result.success) {
+        setPropagation({ model: "category", id: category.id, scope: "state" });
+      }
     });
   }
 
@@ -108,6 +118,11 @@ export function CategoryActions({ category, membershipCount }: Props) {
         onOpenChange={setIsEditOpen}
         category={category}
         seasonId={category.seasonId}
+      />
+      <PropagationPrompt
+        request={propagation}
+        entityLabel="esta categoría"
+        onDone={() => setPropagation(null)}
       />
     </div>
   );

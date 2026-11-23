@@ -9,12 +9,33 @@ const mockTransaction = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    season: {
+      findUnique: () => Promise.resolve({ year: new Date().getFullYear() }),
+    },
     licenseOffering: {
       findMany: (...args: unknown[]) => mockOfferingFindMany(...args),
       count: (...args: unknown[]) => mockOfferingCount(...args),
     },
-    licenseType: { update: (...args: unknown[]) => mockTypeUpdate(...args) },
+    licenseType: {
+      update: (...args: unknown[]) => mockTypeUpdate(...args),
+      findUnique: () =>
+        Promise.resolve({
+          name: "x",
+          description: "",
+          active: true,
+          lineageId: "lin-1",
+          seasonId: "season-1",
+        }),
+    },
     licenseSubtype: {
+      findUnique: () =>
+        Promise.resolve({
+          name: "x",
+          description: "",
+          active: true,
+          lineageId: "lin-1",
+          seasonId: "season-1",
+        }),
       update: (...args: unknown[]) => mockSubtypeUpdate(...args),
       updateMany: (...args: unknown[]) => mockSubtypeUpdateMany(...args),
     },

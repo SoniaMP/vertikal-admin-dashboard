@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { licenseTypeSchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { requireEditableCatalogRow } from "@/lib/catalog-editable";
 import { newCatalogIdentity } from "@/lib/catalog-identity";
 import { getActiveSeason } from "@/lib/settings";
 
@@ -43,6 +44,9 @@ export async function updateLicenseType(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("licenseType", id);
+  if (closedError) return closedError;
 
   const parsed = licenseTypeSchema.safeParse({
     name: formData.get("name"),
@@ -86,6 +90,9 @@ export async function publishLicenseType(id: string): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("licenseType", id);
+  if (closedError) return closedError;
+
   const sellableSubtypeIds = await findSellableSubtypeIds(id);
   if (sellableSubtypeIds.length === 0) {
     return {
@@ -117,6 +124,9 @@ export async function toggleLicenseTypeActive(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("licenseType", id);
+  if (closedError) return closedError;
+
   await prisma.licenseType.update({
     where: { id },
     data: { active: isActive },
@@ -130,6 +140,9 @@ export async function deleteLicenseType(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("licenseType", id);
+  if (closedError) return closedError;
 
   const membershipCount = await prisma.membership.count({
     where: { typeId: id },

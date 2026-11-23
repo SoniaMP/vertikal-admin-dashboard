@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import type { Supplement, SupplementGroup } from "@prisma/client";
 import {
   Dialog,
@@ -12,16 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   createSupplement,
   updateSupplement,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { PropagationPrompt } from "./propagation-prompt";
+import { SupplementGroupPicker } from "./supplement-group-picker";
+import type { PropagationRequest } from "@/types/catalog-propagation";
 
 type SupplementGroupWithSupplements = SupplementGroup & {
   supplements: Supplement[];
@@ -36,7 +32,6 @@ type Props = {
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
-const NO_GROUP = "__none__";
 
 export function SupplementFormDialog({
   open,
@@ -46,100 +41,103 @@ export function SupplementFormDialog({
   supplementGroups = [],
 }: Props) {
   const isEditing = !!supplement;
-  const [selectedGroup, setSelectedGroup] = useState(
-    supplement?.supplementGroupId ?? NO_GROUP,
-  );
-  const [prevOpen, setPrevOpen] = useState(open);
-
-  if (open && !prevOpen) {
-    setSelectedGroup(supplement?.supplementGroupId ?? NO_GROUP);
-    setPrevOpen(true);
-  } else if (!open && prevOpen) {
-    setPrevOpen(false);
-  }
 
   const action = isEditing
     ? updateSupplement.bind(null, supplement.id)
     : createSupplement;
 
-  const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
+  const editedId = supplement?.id;
 
-  useEffect(() => {
-    if (state.success) onOpenChange(false);
-  }, [state, onOpenChange]);
+  const [error, setError] = useState<string>();
+  const [propagation, setPropagation] = useState<PropagationRequest | null>(
+    null,
+  );
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setError(undefined);
+    const formData = new FormData(event.currentTarget);
+
+    startTransition(async () => {
+      const result = await action(INITIAL_STATE, formData);
+
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+
+      onOpenChange(false);
+      // The edit is saved, and only in the year on screen. Whether it should
+      // also reach the other open seasons is a separate question, asked after
+      // the fact so that saying nothing leaves the other years alone.
+      if (editedId) {
+        setPropagation({ model: "supplement", id: editedId, scope: "texts" });
+      }
+    });
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "Editar suplemento" : "Nuevo suplemento"}
-          </DialogTitle>
-        </DialogHeader>
-        <form action={formAction} className="space-y-4">
-          {/* The season owns the row: a new one belongs to the year on screen. */}
-          <input type="hidden" name="seasonId" value={seasonId} />
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {isEditing ? "Editar suplemento" : "Nuevo suplemento"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* The season owns the row: a new one belongs to the year on screen. */}
+            <input type="hidden" name="seasonId" value={seasonId} />
 
-          <div className="space-y-2">
-            <Label htmlFor="sup-name">Nombre</Label>
-            <Input
-              id="sup-name"
-              name="name"
-              defaultValue={supplement?.name ?? ""}
-              required
-              minLength={2}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sup-description">Descripción</Label>
-            <Input
-              id="sup-description"
-              name="description"
-              defaultValue={supplement?.description ?? ""}
-              required
-              minLength={5}
-            />
-          </div>
-          {supplementGroups.length > 0 && (
             <div className="space-y-2">
-              <Label>Grupo (opcional)</Label>
-              <input
-                type="hidden"
-                name="supplementGroupId"
-                value={selectedGroup !== NO_GROUP ? selectedGroup : ""}
+              <Label htmlFor="sup-name">Nombre</Label>
+              <Input
+                id="sup-name"
+                name="name"
+                defaultValue={supplement?.name ?? ""}
+                required
+                minLength={2}
               />
-              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sin grupo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_GROUP}>Sin grupo</SelectItem>
-                  {supplementGroups.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>
-                      {g.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
-          )}
-          {state.error && (
-            <p className="text-sm text-destructive">{state.error}</p>
-          )}
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Guardando..." : "Guardar"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="space-y-2">
+              <Label htmlFor="sup-description">Descripción</Label>
+              <Input
+                id="sup-description"
+                name="description"
+                defaultValue={supplement?.description ?? ""}
+                required
+                minLength={5}
+              />
+            </div>
+            <SupplementGroupPicker
+              groups={supplementGroups}
+              defaultGroupId={supplement?.supplementGroupId ?? null}
+            />
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Guardando..." : "Guardar"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <PropagationPrompt
+        request={propagation}
+        entityLabel="este suplemento"
+        onDone={() => setPropagation(null)}
+      />
+    </>
   );
 }

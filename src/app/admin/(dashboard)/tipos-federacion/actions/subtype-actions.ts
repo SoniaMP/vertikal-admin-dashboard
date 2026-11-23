@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { licenseSubtypeSchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { requireEditableCatalogRow } from "@/lib/catalog-editable";
 import { newCatalogIdentity } from "@/lib/catalog-identity";
 import { getActiveSeason } from "@/lib/settings";
 
@@ -58,6 +59,9 @@ export async function updateSubtype(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("licenseSubtype", id);
+  if (closedError) return closedError;
+
   const parsed = licenseSubtypeSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -80,6 +84,9 @@ export async function updateSubtype(
 export async function publishSubtype(id: string): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("licenseSubtype", id);
+  if (closedError) return closedError;
 
   const season = await getActiveSeason();
   const pricedCount = await prisma.licenseOffering.count({
@@ -113,6 +120,9 @@ export async function toggleSubtypeActive(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const closedError = await requireEditableCatalogRow("licenseSubtype", id);
+  if (closedError) return closedError;
+
   await prisma.licenseSubtype.update({
     where: { id },
     data: { active: isActive },
@@ -124,6 +134,9 @@ export async function toggleSubtypeActive(
 export async function deleteSubtype(id: string): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const closedError = await requireEditableCatalogRow("licenseSubtype", id);
+  if (closedError) return closedError;
 
   const membershipCount = await prisma.membership.count({
     where: { subtypeId: id },

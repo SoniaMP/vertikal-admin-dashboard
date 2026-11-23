@@ -34,3 +34,8 @@ export {
   deleteSupplementGroup,
   upsertSupplementGroupPrice,
 } from "./actions/supplement-actions";
+
+export {
+  findPropagationTargets,
+  propagateCatalogChange,
+} from "./actions/propagation-actions";

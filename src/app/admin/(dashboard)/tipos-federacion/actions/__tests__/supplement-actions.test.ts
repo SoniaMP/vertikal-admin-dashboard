@@ -20,9 +20,25 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: (...args: unknown[]) => mockDeleteMany(...args),
     },
     supplement: {
+      findUnique: () =>
+        Promise.resolve({
+          name: "x",
+          description: "",
+          active: true,
+          lineageId: "lin-1",
+          seasonId: "season-1",
+        }),
       updateMany: (...args: unknown[]) => mockUpdateMany(...args),
     },
     supplementGroup: {
+      findUnique: () =>
+        Promise.resolve({
+          name: "x",
+          description: "",
+          active: true,
+          lineageId: "lin-1",
+          seasonId: "season-1",
+        }),
       delete: (...args: unknown[]) => mockDelete(...args),
     },
     $transaction: (fn: (tx: unknown) => Promise<void>) =>
