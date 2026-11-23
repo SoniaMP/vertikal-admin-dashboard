@@ -59,6 +59,13 @@ describe("MembershipModeStep with nothing the club can sell", () => {
     expect(notice.textContent).toContain("darte de alta como socio");
   });
 
+  it("keeps saying what the club's own licence is while it is closed", () => {
+    render(<Harness closed />);
+
+    expect(screen.queryByText(/Tramitamos tu licencia/)).not.toBeNull();
+    expect(screen.queryByText(/No disponible todavía/)).not.toBeNull();
+  });
+
   it("offers both routes as usual once the season has prices", () => {
     render(<Harness closed={false} />);
 

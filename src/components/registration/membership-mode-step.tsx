@@ -4,16 +4,15 @@ import { useFormContext } from "react-hook-form";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WizardExitButton, type WizardExit } from "./wizard-exit-button";
-import { Card, CardContent } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import {
   FormField,
   FormItem,
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
 import { ClubLicensesClosedNotice } from "./club-licenses-closed-notice";
+import { MembershipModeOption } from "./membership-mode-option";
 import type { RegistrationInput } from "@/validations/registration";
 
 type MembershipModeStepProps = {
@@ -83,47 +82,15 @@ export function MembershipModeStep({
                 }
                 className="grid gap-3"
               >
-                {MODE_OPTIONS.map((option) => {
-                  const isDisabled =
-                    clubLicensesClosed && option.value === CLUB_MODE;
-
-                  return (
-                    <label
-                      key={option.value}
-                      className={cn(
-                        isDisabled ? "cursor-not-allowed" : "cursor-pointer",
-                      )}
-                    >
-                      <Card
-                        className={cn(
-                          "transition-colors",
-                          isDisabled && "opacity-50",
-                          toRadioValue(field.value) === option.value
-                            ? "border-primary ring-2 ring-primary/20"
-                            : !isDisabled && "hover:border-primary/50",
-                        )}
-                      >
-                        <CardContent className="flex items-start gap-3 p-4">
-                          <RadioGroupItem
-                            value={option.value}
-                            disabled={isDisabled}
-                            className="mt-1"
-                          />
-                          <div className="flex-1">
-                            <span className="text-base font-bold">
-                              {option.title}
-                            </span>
-                            <p className="mt-1 text-sm font-normal text-muted-foreground">
-                              {isDisabled
-                                ? `No disponible todavía para la temporada ${seasonYear}.`
-                                : option.description}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </label>
-                  );
-                })}
+                {MODE_OPTIONS.map((option) => (
+                  <MembershipModeOption
+                    key={option.value}
+                    option={option}
+                    isSelected={toRadioValue(field.value) === option.value}
+                    isClosed={clubLicensesClosed && option.value === CLUB_MODE}
+                    closedNote={`No disponible todavía para la temporada ${seasonYear}.`}
+                  />
+                ))}
               </RadioGroup>
             </FormControl>
             <FormMessage />
