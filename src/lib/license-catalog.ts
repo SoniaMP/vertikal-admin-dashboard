@@ -17,7 +17,7 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
       // Drafts never reach the public wizard: `publishedAt` is the admin
       // saying this federation is ready to be sold.
       prisma.licenseType.findMany({
-        where: { active: true, publishedAt: { not: null } },
+        where: { seasonId: season.id, active: true, publishedAt: { not: null } },
         include: {
           subtypes: {
             where: { active: true, publishedAt: { not: null } },
@@ -31,7 +31,7 @@ export async function fetchLicenseCatalog(): Promise<LicenseCatalogType[]> {
         include: { category: true },
       }),
       prisma.supplement.findMany({
-        where: { active: true },
+        where: { seasonId: season.id, active: true },
         include: { supplementGroup: true },
         orderBy: { name: "asc" },
       }),

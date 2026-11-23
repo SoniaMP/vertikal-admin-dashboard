@@ -12,6 +12,7 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
   const [licenseTypes, categories, supplements, supplementGroups] =
     await Promise.all([
       prisma.licenseType.findMany({
+        where: { seasonId },
         include: {
           _count: { select: { memberships: true } },
           subtypes: {
@@ -26,10 +27,12 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
         orderBy: { createdAt: "asc" },
       }),
       prisma.category.findMany({
+        where: { seasonId },
         include: { _count: { select: { memberships: true } } },
         orderBy: { createdAt: "asc" },
       }),
       prisma.supplement.findMany({
+        where: { seasonId },
         include: {
           supplementGroup: true,
           prices: { where: { seasonId } },
@@ -37,6 +40,7 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
         orderBy: { createdAt: "asc" },
       }),
       prisma.supplementGroup.findMany({
+        where: { seasonId },
         include: {
           supplements: true,
           groupPrices: { where: { seasonId } },

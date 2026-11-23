@@ -19,12 +19,18 @@ import {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  seasonId: string;
   category?: Category;
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
 
-export function CategoryFormDialog({ open, onOpenChange, category }: Props) {
+export function CategoryFormDialog({
+  open,
+  onOpenChange,
+  seasonId,
+  category,
+}: Props) {
   const isEditing = !!category;
 
   const action = isEditing
@@ -50,6 +56,8 @@ export function CategoryFormDialog({ open, onOpenChange, category }: Props) {
           onSubmit={(e) => e.stopPropagation()}
           className="space-y-4"
         >
+          {/* The season owns the row: a new one belongs to the year on screen. */}
+          <input type="hidden" name="seasonId" value={seasonId} />
           <div className="space-y-2">
             <Label htmlFor="cat-name">Nombre</Label>
             <Input

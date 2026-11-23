@@ -10,6 +10,7 @@ import {
 } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { newCatalogIdentity } from "@/lib/catalog-identity";
 
 // --- Supplement actions ---
 
@@ -19,6 +20,10 @@ export async function createSupplement(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const seasonId = String(formData.get("seasonId") ?? "");
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
 
   const groupId = (formData.get("supplementGroupId") as string) || null;
 
@@ -33,7 +38,9 @@ export async function createSupplement(
     return { success: false, error: firstError };
   }
 
-  await prisma.supplement.create({ data: parsed.data });
+  await prisma.supplement.create({
+    data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
+  });
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }
@@ -118,6 +125,10 @@ export async function createSupplementGroup(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const seasonId = String(formData.get("seasonId") ?? "");
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
+
   const parsed = supplementGroupSchema.safeParse({
     name: formData.get("name"),
   });
@@ -127,7 +138,9 @@ export async function createSupplementGroup(
     return { success: false, error: firstError };
   }
 
-  await prisma.supplementGroup.create({ data: parsed.data });
+  await prisma.supplementGroup.create({
+    data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
+  });
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }

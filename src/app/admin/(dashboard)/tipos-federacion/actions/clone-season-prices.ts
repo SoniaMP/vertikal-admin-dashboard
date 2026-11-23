@@ -2,23 +2,21 @@
 
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { copySeasonCatalog } from "@/lib/season-catalog-copy";
 import { revalidatePath } from "next/cache";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { isClosedSeason } from "@/helpers/closed-season";
 
-type SourceSeason = Prisma.SeasonGetPayload<{
-  include: {
-    offerings: true;
-    supplementPrices: true;
-    supplementGroupPrices: true;
-  };
-}>;
-
 /**
- * Copy a whole year of prices onto another year.
+ * Copy a whole year of catalog onto another year.
+ *
+ * Everything travels: federations, modalities, categories, supplements and
+ * their prices, each with the state it had — retired arrives retired, a draft
+ * arrives a draft. Nothing is filtered out, because deciding what still
+ * applies next year is the admin's job, not this function's.
  *
  * Overwriting is the point: the target ends up matching the source exactly, so
- * the admin starts from last year's numbers and edits the handful that moved.
+ * the admin starts from last year's setup and edits the handful that moved.
  * It is also why a year that already has memberships is refused — those rows
  * point at the offerings this would delete, and the price somebody was charged
  * is not ours to rewrite.
@@ -50,11 +48,7 @@ export async function cloneSeasonPrices(
 
   const source = await prisma.season.findUnique({
     where: { year: sourceYear },
-    include: {
-      offerings: true,
-      supplementPrices: true,
-      supplementGroupPrices: true,
-    },
+    select: { id: true },
   });
 
   if (!source) {
@@ -75,8 +69,7 @@ export async function cloneSeasonPrices(
 
   await prisma.$transaction(async (tx) => {
     const targetId = target?.id ?? (await createSeason(tx, targetYear)).id;
-    await clearPrices(tx, targetId);
-    await copyPrices(tx, source, targetId);
+    await copySeasonCatalog(tx, source.id, targetId);
   });
 
   revalidatePath("/admin/tipos-federacion");
@@ -97,43 +90,5 @@ function createSeason(tx: Prisma.TransactionClient, year: number) {
       endDate: new Date(`${year}-12-31`),
       isActive: false,
     },
-  });
-}
-
-async function clearPrices(tx: Prisma.TransactionClient, seasonId: string) {
-  await tx.licenseOffering.deleteMany({ where: { seasonId } });
-  await tx.supplementPrice.deleteMany({ where: { seasonId } });
-  await tx.supplementGroupPrice.deleteMany({ where: { seasonId } });
-}
-
-async function copyPrices(
-  tx: Prisma.TransactionClient,
-  source: SourceSeason,
-  seasonId: string,
-) {
-  await tx.licenseOffering.createMany({
-    data: source.offerings.map((offering) => ({
-      seasonId,
-      typeId: offering.typeId,
-      subtypeId: offering.subtypeId,
-      categoryId: offering.categoryId,
-      price: offering.price,
-    })),
-  });
-
-  await tx.supplementPrice.createMany({
-    data: source.supplementPrices.map((price) => ({
-      seasonId,
-      supplementId: price.supplementId,
-      price: price.price,
-    })),
-  });
-
-  await tx.supplementGroupPrice.createMany({
-    data: source.supplementGroupPrices.map((price) => ({
-      seasonId,
-      groupId: price.groupId,
-      price: price.price,
-    })),
   });
 }

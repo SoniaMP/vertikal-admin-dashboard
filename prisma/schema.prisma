@@ -17,6 +17,11 @@ model Season {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  licenseTypes          LicenseType[]
+  licenseSubtypes       LicenseSubtype[]
+  categories            Category[]
+  supplements           Supplement[]
+  supplementGroups      SupplementGroup[]
   offerings             LicenseOffering[]
   supplementPrices      SupplementPrice[]
   supplementGroupPrices SupplementGroupPrice[]
@@ -24,49 +29,71 @@ model Season {
 }
 
 model LicenseType {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
+  /// The season this row belongs to. The catalog is per season: a change
+  /// made in one year never reaches another unless the admin says so.
+  seasonId    String
+  /// Shared by every row descended from the same original, so a federation
+  /// can be followed across years even after its name or price changed.
+  lineageId   String
   name        String
   description String
-  active      Boolean  @default(true)
+  active      Boolean   @default(true)
   /// Null while the type is a draft, so it stays out of the public wizard
   /// until an admin publishes it. Set once and never cleared: retiring a
   /// published type is `active = false`, which is a different thing.
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
+  season      Season            @relation(fields: [seasonId], references: [id])
   subtypes    LicenseSubtype[]
   offerings   LicenseOffering[]
   memberships Membership[]
+
+  @@index([seasonId])
+  @@index([lineageId])
 }
 
 model LicenseSubtype {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
+  seasonId      String
+  lineageId     String
   name          String
   description   String
-  active        Boolean  @default(true)
+  active        Boolean   @default(true)
   /// Same draft marker as on LicenseType: a new modality of an already
   /// published federation stays hidden until it has prices.
   publishedAt   DateTime?
   licenseTypeId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
+  season      Season            @relation(fields: [seasonId], references: [id])
   licenseType LicenseType       @relation(fields: [licenseTypeId], references: [id])
   offerings   LicenseOffering[]
   memberships Membership[]
+
+  @@index([seasonId])
+  @@index([lineageId])
 }
 
 model Category {
   id          String   @id @default(cuid())
+  seasonId    String
+  lineageId   String
   name        String
   description String
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  season      Season            @relation(fields: [seasonId], references: [id])
   offerings   LicenseOffering[]
   memberships Membership[]
+
+  @@index([seasonId])
+  @@index([lineageId])
 }
 
 model LicenseOffering {
@@ -89,17 +116,25 @@ model LicenseOffering {
 
 model SupplementGroup {
   id        String   @id @default(cuid())
+  seasonId  String
+  lineageId String
   name      String
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  season      Season                 @relation(fields: [seasonId], references: [id])
   supplements Supplement[]
   groupPrices SupplementGroupPrice[]
+
+  @@index([seasonId])
+  @@index([lineageId])
 }
 
 model Supplement {
   id                String   @id @default(cuid())
+  seasonId          String
+  lineageId         String
   name              String
   description       String
   active            Boolean  @default(true)
@@ -107,9 +142,13 @@ model Supplement {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  season                Season                 @relation(fields: [seasonId], references: [id])
   supplementGroup       SupplementGroup?       @relation(fields: [supplementGroupId], references: [id])
   prices                SupplementPrice[]
   membershipSupplements MembershipSupplement[]
+
+  @@index([seasonId])
+  @@index([lineageId])
 }
 
 model SupplementPrice {

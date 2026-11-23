@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { licenseTypeSchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { requireEditableSeason } from "@/lib/season-editable";
+import { newCatalogIdentity } from "@/lib/catalog-identity";
 import { getActiveSeason } from "@/lib/settings";
 
 export async function createLicenseType(
@@ -12,6 +14,10 @@ export async function createLicenseType(
 ): Promise<ActionResult> {
   const authError = await requireAuth();
   if (authError) return authError;
+
+  const seasonId = String(formData.get("seasonId") ?? "");
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
 
   const parsed = licenseTypeSchema.safeParse({
     name: formData.get("name"),
@@ -23,7 +29,9 @@ export async function createLicenseType(
     return { success: false, error: firstError };
   }
 
-  await prisma.licenseType.create({ data: parsed.data });
+  await prisma.licenseType.create({
+    data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
+  });
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }

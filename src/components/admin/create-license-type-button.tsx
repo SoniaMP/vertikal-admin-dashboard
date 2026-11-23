@@ -5,7 +5,11 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LicenseTypeFormDialog } from "./license-type-form-dialog";
 
-export function CreateLicenseTypeButton() {
+type Props = {
+  seasonId: string;
+};
+
+export function CreateLicenseTypeButton({ seasonId }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -14,7 +18,11 @@ export function CreateLicenseTypeButton() {
         <Plus className="h-4 w-4 mr-1" />
         Nuevo tipo
       </Button>
-      <LicenseTypeFormDialog open={isOpen} onOpenChange={setIsOpen} />
+      <LicenseTypeFormDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        seasonId={seasonId}
+      />
     </>
   );
 }

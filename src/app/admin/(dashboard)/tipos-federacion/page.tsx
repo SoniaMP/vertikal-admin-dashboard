@@ -1,3 +1,4 @@
+import type { Season } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getActiveSeason } from "@/lib/settings";
 import { fetchAdminLicenseCatalog } from "@/lib/admin-license-catalog";
@@ -10,6 +11,7 @@ import { CatalogYearSelector } from "@/components/admin/catalog-year-selector";
 import { CatalogYearEmpty } from "@/components/admin/catalog-year-empty";
 import { ClonePricesButton } from "@/components/admin/clone-prices-button";
 import { ClosedSeasonNotice } from "@/components/admin/closed-season-notice";
+import { ClosedSeasonCatalog } from "@/components/admin/closed-season-catalog";
 import { LicenseTypesTable } from "@/components/admin/license-types-table";
 import { CreateLicenseTypeButton } from "@/components/admin/create-license-type-button";
 import { StandaloneSections } from "@/components/admin/standalone-sections";
@@ -18,6 +20,12 @@ type Props = {
   searchParams: Promise<{ year?: string }>;
 };
 
+/**
+ * Two screens behind one route. An open year is an editor: prices, drafts,
+ * every control the catalog needs. A closed year is a report of what the club
+ * charged, and nothing on it can be touched — not even the names, which are
+ * shared across every season and would quietly rewrite the live catalog.
+ */
 export default async function FederationTypesPage({ searchParams }: Props) {
   const [params, activeSeason, seasonsOnRecord] = await Promise.all([
     searchParams,
@@ -33,10 +41,10 @@ export default async function FederationTypesPage({ searchParams }: Props) {
     currentYear,
   );
   const selectedYear = selectCatalogYear(params.year, years, activeSeason.year);
+  const isClosed = isClosedSeason(selectedYear, currentYear);
   const yearsWithPrices = seasonsOnRecord
     .filter((season) => season._count.offerings > 0)
     .map((season) => season.year);
-  const isReadOnly = isClosedSeason(selectedYear, currentYear);
   const season = await prisma.season.findUnique({
     where: { year: selectedYear },
   });
@@ -49,18 +57,11 @@ export default async function FederationTypesPage({ searchParams }: Props) {
         currentYear={currentYear}
         clonableYears={selectClonableYears(yearsWithPrices, selectedYear)}
         willOverwrite={yearsWithPrices.includes(selectedYear)}
-        isReadOnly={isReadOnly}
+        isClosed={isClosed}
+        seasonId={season?.id ?? null}
       />
-      {isReadOnly && <ClosedSeasonNotice year={selectedYear} />}
-      {season ? (
-        <CatalogSections
-          seasonId={season.id}
-          year={selectedYear}
-          isReadOnly={isReadOnly}
-        />
-      ) : (
-        <CatalogYearEmpty year={selectedYear} />
-      )}
+      {isClosed && <ClosedSeasonNotice year={selectedYear} />}
+      <CatalogBody season={season} year={selectedYear} isClosed={isClosed} />
     </div>
   );
 }
@@ -71,7 +72,8 @@ type HeaderProps = {
   currentYear: number;
   clonableYears: number[];
   willOverwrite: boolean;
-  isReadOnly: boolean;
+  isClosed: boolean;
+  seasonId: string | null;
 };
 
 function CatalogHeader({
@@ -80,7 +82,8 @@ function CatalogHeader({
   currentYear,
   clonableYears,
   willOverwrite,
-  isReadOnly,
+  isClosed,
+  seasonId,
 }: HeaderProps) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
@@ -98,27 +101,51 @@ function CatalogHeader({
           selectedYear={selectedYear}
           currentYear={currentYear}
         />
-        {!isReadOnly && (
-          <ClonePricesButton
-            targetYear={selectedYear}
-            sourceYears={clonableYears}
-            willOverwrite={willOverwrite}
-          />
+        {!isClosed && (
+          <>
+            <ClonePricesButton
+              targetYear={selectedYear}
+              sourceYears={clonableYears}
+              willOverwrite={willOverwrite}
+            />
+            {seasonId && <CreateLicenseTypeButton seasonId={seasonId} />}
+          </>
         )}
-        <CreateLicenseTypeButton />
       </div>
     </div>
+  );
+}
+
+type BodyProps = {
+  season: Season | null;
+  year: number;
+  isClosed: boolean;
+};
+
+function CatalogBody({ season, year, isClosed }: BodyProps) {
+  if (!season) {
+    return isClosed ? (
+      <p className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
+        En {year} no hubo temporada.
+      </p>
+    ) : (
+      <CatalogYearEmpty year={year} />
+    );
+  }
+
+  return isClosed ? (
+    <ClosedSeasonCatalog seasonId={season.id} year={year} />
+  ) : (
+    <CatalogSections seasonId={season.id} year={year} />
   );
 }
 
 async function CatalogSections({
   seasonId,
   year,
-  isReadOnly,
 }: {
   seasonId: string;
   year: number;
-  isReadOnly: boolean;
 }) {
   const { licenseTypes, categories, supplements, supplementGroups } =
     await fetchAdminLicenseCatalog(seasonId);
@@ -139,14 +166,12 @@ async function CatalogSections({
         categories={categories}
         seasonId={seasonId}
         seasonName={String(year)}
-        isReadOnly={isReadOnly}
       />
       <StandaloneSections
         categories={categories}
         supplements={supplements}
         supplementGroups={supplementGroups}
         seasonId={seasonId}
-        isReadOnly={isReadOnly}
       />
     </div>
   );

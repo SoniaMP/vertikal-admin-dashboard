@@ -19,6 +19,7 @@ import {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  seasonId: string;
   group?: SupplementGroup;
 };
 
@@ -27,6 +28,7 @@ const INITIAL_STATE = { success: false, error: undefined };
 export function SupplementGroupFormDialog({
   open,
   onOpenChange,
+  seasonId,
   group,
 }: Props) {
   const isEditing = !!group;
@@ -50,6 +52,9 @@ export function SupplementGroupFormDialog({
           </DialogTitle>
         </DialogHeader>
         <form action={formAction} className="space-y-4">
+          {/* The season owns the row: a new one belongs to the year on screen. */}
+          <input type="hidden" name="seasonId" value={seasonId} />
+
           <div className="space-y-2">
             <Label htmlFor="grp-name">Nombre</Label>
             <Input

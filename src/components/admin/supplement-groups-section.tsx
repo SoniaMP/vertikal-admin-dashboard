@@ -23,13 +23,11 @@ type SupplementGroupWithPrices = SupplementGroup & {
 type Props = {
   supplementGroups: SupplementGroupWithPrices[];
   seasonId: string;
-  isReadOnly: boolean;
 };
 
 export function SupplementGroupsSection({
   supplementGroups,
   seasonId,
-  isReadOnly,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -52,15 +50,12 @@ export function SupplementGroupsSection({
       {isExpanded && (
         <div className="mt-3 space-y-2">
           {supplementGroups.length === 0 && (
-            <p className="text-sm text-muted-foreground">Sin grupos todavía.</p>
+            <p className="text-sm text-muted-foreground">
+              Sin grupos todavía.
+            </p>
           )}
           {supplementGroups.map((grp) => (
-            <GroupRow
-              key={grp.id}
-              group={grp}
-              seasonId={seasonId}
-              isReadOnly={isReadOnly}
-            />
+            <GroupRow key={grp.id} group={grp} seasonId={seasonId} />
           ))}
           <Button
             variant="outline"
@@ -74,6 +69,7 @@ export function SupplementGroupsSection({
           <SupplementGroupFormDialog
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
+            seasonId={seasonId}
           />
         </div>
       )}
@@ -84,11 +80,9 @@ export function SupplementGroupsSection({
 function GroupRow({
   group,
   seasonId,
-  isReadOnly,
 }: {
   group: SupplementGroupWithPrices;
   seasonId: string;
-  isReadOnly: boolean;
 }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -121,7 +115,7 @@ function GroupRow({
             defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
             placeholder="€"
             className="h-7 w-20 text-center text-xs"
-            disabled={isPending || isReadOnly}
+            disabled={isPending}
             onBlur={(e) => handlePriceSave(e.target.value)}
           />
         </div>
@@ -155,6 +149,7 @@ function GroupRow({
       <SupplementGroupFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+        seasonId={group.seasonId}
         group={group}
       />
     </div>

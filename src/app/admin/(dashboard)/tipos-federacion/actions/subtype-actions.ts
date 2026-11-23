@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { licenseSubtypeSchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
+import { requireEditableSeason } from "@/lib/season-editable";
+import { newCatalogIdentity } from "@/lib/catalog-identity";
 import { getActiveSeason } from "@/lib/settings";
 
 export async function createSubtype(
@@ -24,8 +26,25 @@ export async function createSubtype(
     return { success: false, error: firstError };
   }
 
+  const parent = await prisma.licenseType.findUnique({
+    where: { id: licenseTypeId },
+    select: { seasonId: true },
+  });
+
+  if (!parent) {
+    return { success: false, error: "La federativa no existe." };
+  }
+
+  const closedError = await requireEditableSeason(parent.seasonId);
+  if (closedError) return closedError;
+
   await prisma.licenseSubtype.create({
-    data: { ...parsed.data, licenseTypeId },
+    data: {
+      ...newCatalogIdentity(),
+      seasonId: parent.seasonId,
+      ...parsed.data,
+      licenseTypeId,
+    },
   });
   revalidatePath("/admin/tipos-federacion");
   return { success: true };

@@ -30,6 +30,7 @@ type SupplementGroupWithSupplements = SupplementGroup & {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  seasonId: string;
   supplement?: Supplement;
   supplementGroups?: SupplementGroupWithSupplements[];
 };
@@ -40,6 +41,7 @@ const NO_GROUP = "__none__";
 export function SupplementFormDialog({
   open,
   onOpenChange,
+  seasonId,
   supplement,
   supplementGroups = [],
 }: Props) {
@@ -75,6 +77,9 @@ export function SupplementFormDialog({
           </DialogTitle>
         </DialogHeader>
         <form action={formAction} className="space-y-4">
+          {/* The season owns the row: a new one belongs to the year on screen. */}
+          <input type="hidden" name="seasonId" value={seasonId} />
+
           <div className="space-y-2">
             <Label htmlFor="sup-name">Nombre</Label>
             <Input

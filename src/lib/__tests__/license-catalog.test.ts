@@ -41,7 +41,7 @@ describe("fetchLicenseCatalog", () => {
     mockGroupPriceFindMany.mockResolvedValue([]);
   });
 
-  it("asks the database only for published types and modalities", async () => {
+  it("asks the database only for this season's published types and modalities", async () => {
     const { fetchLicenseCatalog } = await import("../license-catalog");
     mockTypeFindMany.mockResolvedValue([]);
     mockOfferingFindMany.mockResolvedValue([]);
@@ -49,7 +49,7 @@ describe("fetchLicenseCatalog", () => {
     await fetchLicenseCatalog();
 
     expect(mockTypeFindMany).toHaveBeenCalledWith({
-      where: { active: true, publishedAt: { not: null } },
+      where: { seasonId: "season-1", active: true, publishedAt: { not: null } },
       include: {
         subtypes: {
           where: { active: true, publishedAt: { not: null } },

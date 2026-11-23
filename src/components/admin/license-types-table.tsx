@@ -51,7 +51,6 @@ type Props = {
   licenseTypes: LicenseTypeWithRelations[];
   categories: CategoryWithCount[];
   seasonId: string;
-  isReadOnly: boolean;
   seasonName: string;
 };
 
@@ -59,7 +58,6 @@ export function LicenseTypesTable({
   licenseTypes,
   categories,
   seasonId,
-  isReadOnly,
   seasonName,
 }: Props) {
   if (licenseTypes.length === 0) {
@@ -79,7 +77,6 @@ export function LicenseTypesTable({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
-            isReadOnly={isReadOnly}
             seasonName={seasonName}
           />
         ))}
@@ -91,7 +88,6 @@ export function LicenseTypesTable({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
-            isReadOnly={isReadOnly}
             seasonName={seasonName}
           />
         ))}
@@ -104,7 +100,6 @@ type RowProps = {
   licenseType: LicenseTypeWithRelations;
   categories: CategoryWithCount[];
   seasonId: string;
-  isReadOnly: boolean;
   seasonName: string;
 };
 
@@ -112,7 +107,6 @@ function DesktopRow({
   licenseType: lt,
   categories,
   seasonId,
-  isReadOnly,
   seasonName,
 }: RowProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -184,7 +178,6 @@ function DesktopRow({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
-            isReadOnly={isReadOnly}
           />
         </CollapsibleContent>
       </div>
@@ -196,7 +189,6 @@ function MobileCard({
   licenseType: lt,
   categories,
   seasonId,
-  isReadOnly,
   seasonName,
 }: RowProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -238,7 +230,6 @@ function MobileCard({
             licenseType={lt}
             categories={categories}
             seasonId={seasonId}
-            isReadOnly={isReadOnly}
           />
         </CollapsibleContent>
       </div>

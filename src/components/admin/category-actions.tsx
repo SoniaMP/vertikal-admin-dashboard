@@ -107,6 +107,7 @@ export function CategoryActions({ category, membershipCount }: Props) {
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         category={category}
+        seasonId={category.seasonId}
       />
     </div>
   );

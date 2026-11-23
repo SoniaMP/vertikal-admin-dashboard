@@ -27,14 +27,12 @@ type Props = {
   supplements: SupplementWithPrice[];
   supplementGroups: SupplementGroupWithSupplements[];
   seasonId: string;
-  isReadOnly: boolean;
 };
 
 export function SupplementsSection({
   supplements,
   supplementGroups,
   seasonId,
-  isReadOnly,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -67,7 +65,6 @@ export function SupplementsSection({
               supplement={sup}
               supplementGroups={supplementGroups}
               seasonId={seasonId}
-              isReadOnly={isReadOnly}
             />
           ))}
           <Button
@@ -82,6 +79,7 @@ export function SupplementsSection({
           <SupplementFormDialog
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
+            seasonId={seasonId}
             supplementGroups={supplementGroups}
           />
         </div>
@@ -94,12 +92,10 @@ function SupplementRow({
   supplement,
   supplementGroups,
   seasonId,
-  isReadOnly,
 }: {
   supplement: SupplementWithPrice;
   supplementGroups: SupplementGroupWithSupplements[];
   seasonId: string;
-  isReadOnly: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const seasonPrice = supplement.prices[0]?.price;
@@ -131,7 +127,7 @@ function SupplementRow({
             defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
             placeholder="€"
             className="h-7 w-20 text-center text-xs"
-            disabled={isPending || isReadOnly}
+            disabled={isPending}
             onBlur={(e) => handlePriceSave(e.target.value)}
           />
         )}

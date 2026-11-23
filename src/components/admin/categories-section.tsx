@@ -14,9 +14,10 @@ type CategoryWithCount = Category & {
 
 type Props = {
   categories: CategoryWithCount[];
+  seasonId: string;
 };
 
-export function CategoriesSection({ categories }: Props) {
+export function CategoriesSection({ categories, seasonId }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -56,6 +57,7 @@ export function CategoriesSection({ categories }: Props) {
           <CategoryFormDialog
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
+            seasonId={seasonId}
           />
         </div>
       )}

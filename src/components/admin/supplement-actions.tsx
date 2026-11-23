@@ -52,6 +52,7 @@ export function SupplementActions({ supplement, supplementGroups }: Props) {
       <SupplementFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+        seasonId={supplement.seasonId}
         supplement={supplement}
         supplementGroups={supplementGroups}
       />

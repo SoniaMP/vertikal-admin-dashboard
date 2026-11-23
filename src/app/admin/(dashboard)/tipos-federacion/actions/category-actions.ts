@@ -6,6 +6,7 @@ import { z } from "zod";
 import { categorySchema } from "@/validations/license";
 import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
+import { newCatalogIdentity } from "@/lib/catalog-identity";
 
 const batchOfferingSchema = z.object({
   seasonId: z.string().min(1),
@@ -26,6 +27,10 @@ export async function createCategory(
   const authError = await requireAuth();
   if (authError) return authError;
 
+  const seasonId = String(formData.get("seasonId") ?? "");
+  const closedError = await requireEditableSeason(seasonId);
+  if (closedError) return closedError;
+
   const parsed = categorySchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -36,7 +41,9 @@ export async function createCategory(
     return { success: false, error: firstError };
   }
 
-  await prisma.category.create({ data: parsed.data });
+  await prisma.category.create({
+    data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
+  });
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }

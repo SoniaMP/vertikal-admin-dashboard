@@ -28,7 +28,6 @@ type Props = {
   supplements: SupplementWithPrice[];
   supplementGroups: SupplementGroupWithPrices[];
   seasonId: string;
-  isReadOnly: boolean;
 };
 
 export function StandaloneSections({
@@ -36,21 +35,18 @@ export function StandaloneSections({
   supplements,
   supplementGroups,
   seasonId,
-  isReadOnly,
 }: Props) {
   return (
     <div className="space-y-6">
-      <CategoriesSection categories={categories} />
+      <CategoriesSection categories={categories} seasonId={seasonId} />
       <SupplementGroupsSection
         supplementGroups={supplementGroups}
         seasonId={seasonId}
-        isReadOnly={isReadOnly}
       />
       <SupplementsSection
         supplements={supplements}
         supplementGroups={supplementGroups}
         seasonId={seasonId}
-        isReadOnly={isReadOnly}
       />
     </div>
   );

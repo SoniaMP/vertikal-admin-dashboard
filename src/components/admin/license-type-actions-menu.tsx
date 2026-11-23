@@ -130,6 +130,7 @@ export function LicenseTypeActions({
       <LicenseTypeFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+        seasonId={licenseType.seasonId}
         licenseType={licenseType}
       />
       <LicensePreviewDialog
