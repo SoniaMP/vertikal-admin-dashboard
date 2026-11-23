@@ -48,6 +48,7 @@ export default async function FederationTypesPage({ searchParams }: Props) {
   const season = await prisma.season.findUnique({
     where: { year: selectedYear },
   });
+  const clonableYears = selectClonableYears(yearsWithPrices, selectedYear);
 
   return (
     <div className="space-y-6">
@@ -55,13 +56,18 @@ export default async function FederationTypesPage({ searchParams }: Props) {
         years={years}
         selectedYear={selectedYear}
         currentYear={currentYear}
-        clonableYears={selectClonableYears(yearsWithPrices, selectedYear)}
+        clonableYears={clonableYears}
         willOverwrite={yearsWithPrices.includes(selectedYear)}
         isClosed={isClosed}
         seasonId={season?.id ?? null}
       />
       {isClosed && <ClosedSeasonNotice year={selectedYear} />}
-      <CatalogBody season={season} year={selectedYear} isClosed={isClosed} />
+      <CatalogBody
+        season={season}
+        year={selectedYear}
+        isClosed={isClosed}
+        canClone={clonableYears.length > 0}
+      />
     </div>
   );
 }
@@ -120,16 +126,17 @@ type BodyProps = {
   season: Season | null;
   year: number;
   isClosed: boolean;
+  canClone: boolean;
 };
 
-function CatalogBody({ season, year, isClosed }: BodyProps) {
+function CatalogBody({ season, year, isClosed, canClone }: BodyProps) {
   if (!season) {
     return isClosed ? (
-      <p className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
+      <p className="py-8 text-center text-muted-foreground">
         En {year} no hubo temporada.
       </p>
     ) : (
-      <CatalogYearEmpty year={year} />
+      <CatalogYearEmpty year={year} canClone={canClone} />
     );
   }
 

@@ -130,8 +130,14 @@
    near-black. The club's green stays on the band and on what the data says
    (paid, federated), which is where it can still be read. Scoped to
    .admin-shell so the public flow and the login keep their own scales.
+
+   The body carries the same tokens whenever the shell is on screen, because
+   a dialog, a menu and a toast portal to <body> and would otherwise fall
+   back to the public flow's scale: that is what made the confirm of a
+   permanent delete offer a green "Eliminar".
    --------------------------------------------------------------------- */
-.admin-shell {
+.admin-shell,
+body:has(.admin-shell) {
   --background: #f4f6f2;
   --card: #ffffff;
   --popover: #ffffff;
@@ -168,6 +174,13 @@
   --pill-negative-bg: #ffedea;  --pill-negative-ink: #831c1e;
   --pill-warning-bg: #fffbeb;   --pill-warning-ink: #92400e;
   --pill-neutral-bg: #eceee8;   --pill-neutral-ink: #35383a;
+}
+
+/* What floats is a surface, not ground. The shell paints its own pale ground
+   and covers the viewport, so the body underneath stays white and a portaled
+   dialog comes up white with it. */
+body:has(.admin-shell) {
+  --background: #ffffff;
 }
 
 /* A surface is separated by its edge or by a step in tone, never by both an

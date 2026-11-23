@@ -9,6 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+/* 12px grey, no fill band, like every other table in the panel. */
+const HEAD = "h-9 px-2 align-middle text-xs font-normal text-muted-foreground";
+const HEAD_NUM = `${HEAD} text-right`;
+const ROW = "h-12";
+
+/* A section title outranks the column labels under it, as on the open year. */
+const SECTION_TITLE = "text-sm font-medium text-muted-foreground";
+
 type Props = {
   seasonId: string;
   year: number;
@@ -31,7 +39,7 @@ export async function ClosedSeasonCatalog({ seasonId, year }: Props) {
 
   if (hasNothing) {
     return (
-      <p className="rounded-lg border border-dashed py-16 text-center text-sm text-muted-foreground">
+      <p className="py-8 text-center text-muted-foreground">
         En {year} no se llegó a poner precio a nada.
       </p>
     );
@@ -41,20 +49,20 @@ export async function ClosedSeasonCatalog({ seasonId, year }: Props) {
     <div className="space-y-8">
       {licenses.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-foreground">Licencias</h2>
+          <h2 className={SECTION_TITLE}>Licencias</h2>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Federativa</TableHead>
-                <TableHead>Modalidad</TableHead>
-                <TableHead>Categoría</TableHead>
-                <TableHead className="text-right">Precio</TableHead>
-                <TableHead className="text-right">Contratadas</TableHead>
+                <TableHead className={HEAD}>Federativa</TableHead>
+                <TableHead className={HEAD}>Modalidad</TableHead>
+                <TableHead className={HEAD}>Categoría</TableHead>
+                <TableHead className={HEAD_NUM}>Precio</TableHead>
+                <TableHead className={HEAD_NUM}>Contratadas</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {licenses.map((license) => (
-                <TableRow key={license.id}>
+                <TableRow key={license.id} className={ROW}>
                   <TableCell>{license.type.name}</TableCell>
                   <TableCell>{license.subtype.name}</TableCell>
                   <TableCell>{license.category.name}</TableCell>
@@ -103,17 +111,17 @@ function PricedList({ title, rows }: { title: string; rows: Row[] }) {
 
   return (
     <section className="space-y-2">
-      <h2 className="text-sm font-medium text-foreground">{title}</h2>
+      <h2 className={SECTION_TITLE}>{title}</h2>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead className="text-right">Precio</TableHead>
+            <TableHead className={HEAD}>Nombre</TableHead>
+            <TableHead className={HEAD_NUM}>Precio</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.id} className={ROW}>
               <TableCell>{row.name}</TableCell>
               <TableCell className="text-right tabular-nums">
                 {formatPrice(row.price)}

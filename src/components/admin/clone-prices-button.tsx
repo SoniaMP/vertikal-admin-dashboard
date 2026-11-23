@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -60,7 +61,7 @@ export function ClonePricesButton({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Copy className="mr-1 h-4 w-4" />
+          <Copy className="h-4 w-4" />
           Clonar precios
         </Button>
       </DialogTrigger>
@@ -69,15 +70,15 @@ export function ClonePricesButton({
           <DialogTitle>Clonar precios a {targetYear}</DialogTitle>
           <DialogDescription>
             {willOverwrite
-              ? `Se reemplazarán TODOS los precios que ${targetYear} tiene ahora mismo. No se puede deshacer.`
+              ? `Se reemplazarán todos los precios que ${targetYear} tiene ahora mismo. No se puede deshacer.`
               : `Se copiarán las licencias y los suplementos con sus precios. Después podrás ajustar los que cambien.`}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Copiar desde</p>
+          <Label htmlFor="clone-source-year">Copiar desde</Label>
           <Select value={sourceYear} onValueChange={setSourceYear}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger id="clone-source-year" className="w-40">
               <SelectValue placeholder="Temporada" />
             </SelectTrigger>
             <SelectContent>

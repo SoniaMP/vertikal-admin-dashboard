@@ -113,7 +113,7 @@ export function SubtypeActions({ subtype, membershipCount }: Props) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>

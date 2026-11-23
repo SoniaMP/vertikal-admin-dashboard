@@ -69,7 +69,7 @@ export function DeleteLicenseTypeButton({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Eliminar</AlertDialogAction>
+          <AlertDialogAction variant="destructive" onClick={handleDelete}>Eliminar</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
