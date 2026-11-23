@@ -10,11 +10,13 @@ import type { LicenseCatalogType } from "@/types";
 
 type RenewalFlowProps = {
   licenseTypes: LicenseCatalogType[];
+  seasonYear: number;
   membershipFee: number;
 };
 
 export function RenewalFlow({
   licenseTypes,
+  seasonYear,
   membershipFee,
 }: RenewalFlowProps) {
   const [prefill, setPrefill] = useState<RenewalPrefill | null>(null);
@@ -41,6 +43,7 @@ export function RenewalFlow({
   return (
     <RegistrationWizard
       licenseTypes={licenseTypes}
+      seasonYear={seasonYear}
       membershipFee={membershipFee}
       mode="renewal"
       defaultValues={prefill?.member}

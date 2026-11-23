@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { ClubLicensesClosedNotice } from "./club-licenses-closed-notice";
 import type { RegistrationInput } from "@/validations/registration";
 
 type MembershipModeStepProps = {
@@ -20,6 +21,9 @@ type MembershipModeStepProps = {
   onBack: () => void;
   /** Shown beside "Anterior" when the flow offers a way out of itself. */
   exit?: WizardExit;
+  /** True while the season has nothing the club can sell. */
+  clubLicensesClosed?: boolean;
+  seasonYear: number;
 };
 
 const CLUB_MODE = "club";
@@ -51,11 +55,15 @@ export function MembershipModeStep({
   onNext,
   onBack,
   exit,
+  clubLicensesClosed = false,
+  seasonYear,
 }: MembershipModeStepProps) {
   const form = useFormContext<RegistrationInput>();
 
   return (
     <div className="space-y-6">
+      {clubLicensesClosed && <ClubLicensesClosedNotice year={seasonYear} />}
+
       <FormField
         control={form.control}
         name="hasClubLicense"
@@ -75,30 +83,47 @@ export function MembershipModeStep({
                 }
                 className="grid gap-3"
               >
-                {MODE_OPTIONS.map((option) => (
-                  <label key={option.value} className="cursor-pointer">
-                    <Card
+                {MODE_OPTIONS.map((option) => {
+                  const isDisabled =
+                    clubLicensesClosed && option.value === CLUB_MODE;
+
+                  return (
+                    <label
+                      key={option.value}
                       className={cn(
-                        "transition-colors",
-                        toRadioValue(field.value) === option.value
-                          ? "border-primary ring-2 ring-primary/20"
-                          : "hover:border-primary/50",
+                        isDisabled ? "cursor-not-allowed" : "cursor-pointer",
                       )}
                     >
-                      <CardContent className="flex items-start gap-3 p-4">
-                        <RadioGroupItem value={option.value} className="mt-1" />
-                        <div className="flex-1">
-                          <span className="text-base font-bold">
-                            {option.title}
-                          </span>
-                          <p className="mt-1 text-sm font-normal text-muted-foreground">
-                            {option.description}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </label>
-                ))}
+                      <Card
+                        className={cn(
+                          "transition-colors",
+                          isDisabled && "opacity-50",
+                          toRadioValue(field.value) === option.value
+                            ? "border-primary ring-2 ring-primary/20"
+                            : !isDisabled && "hover:border-primary/50",
+                        )}
+                      >
+                        <CardContent className="flex items-start gap-3 p-4">
+                          <RadioGroupItem
+                            value={option.value}
+                            disabled={isDisabled}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <span className="text-base font-bold">
+                              {option.title}
+                            </span>
+                            <p className="mt-1 text-sm font-normal text-muted-foreground">
+                              {isDisabled
+                                ? `No disponible todavía para la temporada ${seasonYear}.`
+                                : option.description}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </label>
+                  );
+                })}
               </RadioGroup>
             </FormControl>
             <FormMessage />

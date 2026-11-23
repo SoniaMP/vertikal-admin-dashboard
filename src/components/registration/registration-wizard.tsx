@@ -40,6 +40,8 @@ const WIZARD_EXITS: Record<"new" | "renewal", WizardExit> = {
 type RegistrationWizardProps = {
   licenseTypes: LicenseCatalogType[];
   membershipFee: number;
+  /** The season being joined, named in the notice when it has nothing to sell. */
+  seasonYear: number;
   mode?: "new" | "renewal";
   defaultValues?: Partial<RegistrationInput>;
   /** Shown on step 3 when a renewing member had a license last season. */
@@ -51,11 +53,17 @@ type RegistrationWizardProps = {
 export function RegistrationWizard({
   licenseTypes,
   membershipFee,
+  seasonYear,
   mode = "new",
   defaultValues,
   previousLicense = null,
   header,
 }: RegistrationWizardProps) {
+  // A season nobody has priced yet sells no licences, but it still takes
+  // members: somebody federated elsewhere only needs the socio fee. So the
+  // alta stays open and only the club branch closes.
+  const clubLicensesClosed = licenseTypes.length === 0;
+
   const form = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
     // Steps advance through `trigger`, not `handleSubmit`, so `isSubmitted`
@@ -65,7 +73,13 @@ export function RegistrationWizard({
     // clears each message as the member moves on without flashing errors at
     // every keystroke across the eleven fields of step one.
     mode: "onTouched",
-    defaultValues: { ...EMPTY_REGISTRATION_VALUES, ...defaultValues },
+    defaultValues: {
+      ...EMPTY_REGISTRATION_VALUES,
+      ...defaultValues,
+      // Last season's answer cannot stand when that branch is shut, and
+      // there is nothing to choose between when only one option is left.
+      ...(clubLicensesClosed ? { hasClubLicense: false } : {}),
+    },
   });
 
   const { currentStep, goToStep, error, setError, goNext, goBack } =
@@ -125,6 +139,8 @@ export function RegistrationWizard({
                 onNext={goNext}
                 onBack={goBack}
                 exit={laterStepsExit}
+                clubLicensesClosed={clubLicensesClosed}
+                seasonYear={seasonYear}
               />
             )}
 
