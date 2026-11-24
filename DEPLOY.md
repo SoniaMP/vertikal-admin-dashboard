@@ -145,6 +145,20 @@ docker --version
 docker compose version
 ```
 
+### 2b. Swap (imprescindible)
+
+`next build` necesita más RAM de la que tiene el VPS. Sin swap, la máquina se queda
+congelada a mitad del build (le pasó al despliegue de noviembre de 2026: ni SSH respondía
+y hubo que reiniciar desde el panel de Ionos). Se configura una sola vez:
+
+```bash
+free -h                                   # si "Swap:" sale a 0B, seguir
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h                                   # debe salir Swap: 2.0Gi
+```
+
 ### 3. Clonar repo y configurar
 
 ```bash
@@ -250,6 +264,13 @@ En la landing estática de Hostinger, los botones de acción (CTA) deben enlazar
 
 ---
 
+## Redespliegue
+
+**Nunca `docker compose down` antes del build.** La web debe seguir sirviendo con la imagen
+anterior mientras se compila; `up -d` cambia al contenedor nuevo y solo corta unos segundos.
+Con `down` delante, la web queda caída todo lo que dure el build, y si el build se cuelga,
+caída hasta que alguien lo arregle.
+
 ## Redespliegue (sin migraciones de BD)
 
 ```bash
@@ -257,13 +278,15 @@ ssh deploy@TU_IP_IONOS
 cd /opt/vertikal
 
 git pull origin main
-docker compose down
-docker compose build --no-cache
-docker compose up -d
+docker compose build          # la web sigue funcionando mientras compila
+docker compose up -d          # cambia a la versión nueva
 
 # Verificar
 docker compose logs app
 ```
+
+`--no-cache` solo hace falta si el build sale raro (dependencias que no se actualizan):
+recompila todo desde cero y tarda y consume bastante más.
 
 ## Redespliegue (con migraciones de BD)
 
@@ -273,19 +296,25 @@ Si hay nuevos ficheros en `prisma/migrations/`, hacer backup antes.
 ssh deploy@TU_IP_IONOS
 cd /opt/vertikal
 
-# 1. Backup de la BD
-docker compose cp app:/app/data/vertikal.db ./backups/vertikal-$(date +%Y%m%d-%H%M%S).db
+# 1. Backup de la BD (comprobar que aparece un fichero de hoy)
+docker compose --profile backup run --rm backup
+ls -la backups/
 
-# 2. Pull, build, deploy
+# 2. Ver qué migraciones faltan
+docker compose run --rm migrate npx prisma migrate status
+
+# 3. Pull y build, con la web todavía en marcha
 git pull origin main
-docker compose down
-docker compose build --no-cache
+docker compose build
+
+# 4. Desplegar: aplica las migraciones y arranca la versión nueva
 docker compose up -d
 
-# 3. Verificar migración
+# 5. Verificar migración ("Database schema is up to date")
 docker compose logs migrate
+docker compose run --rm migrate npx prisma migrate status
 
-# 4. Verificar app
+# 6. Verificar app
 docker compose logs app
 ```
 
@@ -360,7 +389,15 @@ Verificar que `.env.production` en el VPS tiene:
 NEXTAUTH_URL="https://app.clubvertikal.es"
 AUTH_TRUST_HOST=true
 ```
-Luego reiniciar: `docker compose down && docker compose up -d` (no hace falta rebuild, son env vars de runtime).
+Luego aplicar: `docker compose up -d app` (no hace falta rebuild, son env vars de runtime). `docker compose restart` **no** vuelve a leer `.env.production`: hay que recrear el contenedor con `up -d`.
+
+### El build se queda colgado (no avanzan ni los segundos)
+
+Falta de memoria. Desde otra sesión SSH: `free -h` y `sudo dmesg -T | grep -i oom | tail`.
+Si ni SSH entra, reiniciar el VPS desde el panel de Ionos. Tras el reinicio la web **no
+vuelve sola** (`app` y `caddy` no tienen `restart:` en `docker-compose.yml`):
+`docker compose up -d` la levanta con la imagen anterior. Añadir swap (Parte 2 → 2b) y
+repetir el build.
 
 ### La migración falla
 
