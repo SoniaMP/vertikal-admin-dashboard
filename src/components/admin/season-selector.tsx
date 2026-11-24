@@ -36,14 +36,14 @@ export function SeasonSelector({ years, selectedYear, activeYear }: Props) {
 
   return (
     <Select value={String(selectedYear)} onValueChange={handleChange}>
-      <SelectTrigger className="w-48">
+      <SelectTrigger className="w-40" aria-label="Temporada">
         <SelectValue placeholder="Temporada" />
       </SelectTrigger>
       <SelectContent>
         {years.map((year) => (
           <SelectItem key={year} value={String(year)}>
             {year}
-            {year === activeYear ? " (Actual)" : ""}
+            {year === activeYear ? " (actual)" : ""}
           </SelectItem>
         ))}
       </SelectContent>

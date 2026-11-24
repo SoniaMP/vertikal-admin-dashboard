@@ -24,8 +24,8 @@ export function CatalogYearEmpty({ year, canClone }: Props) {
       </p>
       <p className="max-w-[52ch] text-xs">
         {canClone
-          ? `Empieza clonando los de otra temporada, con el botón de arriba. Mientras siga así, nadie podrá inscribirse cuando ${year} entre en vigor.`
-          : `Mientras siga así, nadie podrá inscribirse cuando ${year} entre en vigor.`}
+          ? `Empieza clonando los de otra temporada, con el botón de arriba. Mientras siga así, nadie podrá federarse con el club cuando ${year} entre en vigor.`
+          : `Mientras siga así, nadie podrá federarse con el club cuando ${year} entre en vigor.`}
       </p>
     </div>
   );

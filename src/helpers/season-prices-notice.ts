@@ -25,7 +25,8 @@ export type SeasonPricesInput = {
  * This is the admin-side half of the public "plazo no abierto" screen: the
  * member is told to come back later, and the club is told why, with the link
  * that fixes it. A season with no prices sells nothing, so this is the one
- * state that silently closes the club to everybody.
+ * state that silently closes the club's own licences: the alta stays open
+ * only for somebody who already holds one from elsewhere.
  */
 export function buildSeasonPricesNotice(
   input: SeasonPricesInput,
@@ -35,7 +36,7 @@ export function buildSeasonPricesNotice(
   if (!activeHasPrices) {
     return {
       id: "season-prices-missing",
-      message: `Nadie puede inscribirse: la temporada ${activeYear} está vigente y no tiene ni un precio. El registro público dice que el plazo todavía no está abierto.`,
+      message: `Nadie puede federarse con el club: la temporada ${activeYear} está vigente y no tiene ni un precio. El alta solo admite a quien ya trae licencia de fuera.`,
       actionLabel: "Poner precios",
       actionHref: `/admin/tipos-federacion?year=${activeYear}`,
     };

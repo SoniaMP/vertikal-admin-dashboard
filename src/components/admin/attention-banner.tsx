@@ -8,6 +8,10 @@ import type { AttentionNotice } from "@/helpers/attention-notices";
  * nobody opens. It renders nothing when there is nothing to fix: a strip that
  * is always occupied is one the eye learns to skip.
  *
+ * It speaks in the panel's own warning tone, the one the status pills use,
+ * and separates itself by that tint alone: a saturated border on top of it
+ * made the strip the loudest thing on every screen, above the page's title.
+ *
  * Deliberately server-only. Hiding the action link on the screen it points to
  * would need `usePathname`, and a client component in a layout hydrates
  * without the route the server rendered with, which breaks hydration. A link
@@ -28,7 +32,7 @@ export async function AttentionBanner() {
 
 function NoticeRow({ notice }: { notice: AttentionNotice }) {
   return (
-    <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+    <div className="flex items-start gap-2 rounded-md bg-[var(--pill-warning-bg)] p-3 text-sm text-[var(--pill-warning-ink)]">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
       <p className="flex-1">{notice.message}</p>
       <Link

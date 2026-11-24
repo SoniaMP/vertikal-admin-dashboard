@@ -51,7 +51,7 @@ describe("buildSeasonPricesNotice", () => {
     });
 
     expect(notice?.id).toBe("season-prices-missing");
-    expect(notice?.message).toContain("Nadie puede inscribirse");
+    expect(notice?.message).toContain("Nadie puede federarse con el club");
     expect(notice?.actionHref).toBe("/admin/tipos-federacion?year=2026");
   });
 

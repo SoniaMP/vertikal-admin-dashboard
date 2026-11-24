@@ -31,8 +31,8 @@ export async function fetchAttentionNotices(): Promise<AttentionNotice[]> {
     courseCount,
   });
 
-  // The season goes first: a club nobody can register into outranks a missing
-  // notification address.
+  // The season goes first: a club that cannot sell its own licences outranks
+  // a missing notification address.
   return seasonNotice ? [seasonNotice, ...notices] : notices;
 }
 

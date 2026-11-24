@@ -31,7 +31,7 @@ export function CatalogYearSelector({ years, selectedYear, currentYear }: Props)
 
   return (
     <Select value={String(selectedYear)} onValueChange={handleYearChange}>
-      <SelectTrigger className="w-40">
+      <SelectTrigger className="w-40" aria-label="Temporada">
         <SelectValue placeholder="Año" />
       </SelectTrigger>
       <SelectContent>
