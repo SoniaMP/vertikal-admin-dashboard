@@ -32,7 +32,7 @@ export async function updateSeasonRolloverDays(
   if (days > MAX_SEASON_ROLLOVER_DAYS) {
     return {
       success: false,
-      error: `Como mucho ${MAX_SEASON_ROLLOVER_DAYS} días: más que eso dejaría de ser un relevo`,
+      error: `Como mucho ${MAX_SEASON_ROLLOVER_DAYS} días de antelación`,
     };
   }
 

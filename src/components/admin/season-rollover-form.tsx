@@ -40,9 +40,7 @@ export function SeasonRolloverForm({ currentDays, windowLabel }: Props) {
 
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state.success && (
-        <p className="text-sm text-green-600">
-          Guardado. Recarga para ver la fecha nueva.
-        </p>
+        <p className="text-sm text-green-600">Guardado</p>
       )}
 
       <Button type="submit" disabled={isPending}>

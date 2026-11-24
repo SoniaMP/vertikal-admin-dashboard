@@ -42,8 +42,8 @@ export default async function AjustesPage() {
       </SettingsSection>
 
       <SettingsSection
-        title="Relevo de temporada"
-        description="La temporada es el año natural, y se calcula sola: no hay que crearla ni marcarla. Lo único que se configura es cuántos días antes de fin de año una alta ya cuenta para la temporada siguiente, que es cuando la gente empieza a apuntarse."
+        title="Cuándo empieza la temporada siguiente"
+        description="La temporada es el año natural y se calcula sola: no hay que crearla ni marcarla. Aquí solo se elige con cuántos días de antelación las altas de diciembre pasan a contar para el año siguiente."
       >
         <SeasonRolloverForm
           currentDays={rolloverDays}
