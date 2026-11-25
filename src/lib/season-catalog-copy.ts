@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { copySeasonEntities } from "@/lib/season-entity-copy";
 import { copySeasonPrices } from "@/lib/season-price-copy";
+import { clearSeasonCatalog } from "@/lib/season-catalog-clear";
 
 /**
  * Replaces a season's whole catalog with a copy of another season's.
@@ -21,19 +22,4 @@ export async function copySeasonCatalog(
 
   const maps = await copySeasonEntities(tx, sourceId, targetId);
   await copySeasonPrices(tx, sourceId, targetId, maps);
-}
-
-/** Prices first, then the rows they point at. */
-async function clearSeasonCatalog(
-  tx: Prisma.TransactionClient,
-  seasonId: string,
-): Promise<void> {
-  await tx.licenseOffering.deleteMany({ where: { seasonId } });
-  await tx.supplementPrice.deleteMany({ where: { seasonId } });
-  await tx.supplementGroupPrice.deleteMany({ where: { seasonId } });
-  await tx.licenseSubtype.deleteMany({ where: { seasonId } });
-  await tx.licenseType.deleteMany({ where: { seasonId } });
-  await tx.supplement.deleteMany({ where: { seasonId } });
-  await tx.supplementGroup.deleteMany({ where: { seasonId } });
-  await tx.category.deleteMany({ where: { seasonId } });
 }

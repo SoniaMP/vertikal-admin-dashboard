@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Season } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getActiveSeason } from "@/lib/settings";
@@ -9,11 +10,10 @@ import { isClosedSeason } from "@/helpers/closed-season";
 import { formatLicenseCatalogFinding } from "@/helpers/license-catalog-finding";
 import { CatalogYearSelector } from "@/components/admin/catalog-year-selector";
 import { CatalogYearEmpty } from "@/components/admin/catalog-year-empty";
-import { ClonePricesButton } from "@/components/admin/clone-prices-button";
+import { CatalogYearActions } from "@/components/admin/catalog-year-actions";
 import { ClosedSeasonNotice } from "@/components/admin/closed-season-notice";
 import { ClosedSeasonCatalog } from "@/components/admin/closed-season-catalog";
 import { LicenseTypesTable } from "@/components/admin/license-types-table";
-import { CreateLicenseTypeButton } from "@/components/admin/create-license-type-button";
 import { StandaloneSections } from "@/components/admin/standalone-sections";
 
 type Props = {
@@ -47,6 +47,7 @@ export default async function FederationTypesPage({ searchParams }: Props) {
     .map((season) => season.year);
   const season = await prisma.season.findUnique({
     where: { year: selectedYear },
+    include: { _count: { select: { memberships: true } } },
   });
   const clonableYears = selectClonableYears(yearsWithPrices, selectedYear);
 
@@ -56,10 +57,18 @@ export default async function FederationTypesPage({ searchParams }: Props) {
         years={years}
         selectedYear={selectedYear}
         currentYear={currentYear}
-        clonableYears={clonableYears}
-        willOverwrite={yearsWithPrices.includes(selectedYear)}
-        isClosed={isClosed}
-        seasonId={season?.id ?? null}
+        actions={
+          !isClosed && (
+            <CatalogYearActions
+              year={selectedYear}
+              seasonId={season?.id ?? null}
+              clonableYears={clonableYears}
+              hasPrices={yearsWithPrices.includes(selectedYear)}
+              hasMemberships={(season?._count.memberships ?? 0) > 0}
+              isActiveYear={selectedYear === activeSeason.year}
+            />
+          )
+        }
       />
       {isClosed && <ClosedSeasonNotice year={selectedYear} />}
       <CatalogBody
@@ -76,20 +85,15 @@ type HeaderProps = {
   years: number[];
   selectedYear: number;
   currentYear: number;
-  clonableYears: number[];
-  willOverwrite: boolean;
-  isClosed: boolean;
-  seasonId: string | null;
+  /** Year-wide controls; left out on a closed year. */
+  actions: ReactNode;
 };
 
 function CatalogHeader({
   years,
   selectedYear,
   currentYear,
-  clonableYears,
-  willOverwrite,
-  isClosed,
-  seasonId,
+  actions,
 }: HeaderProps) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
@@ -107,16 +111,7 @@ function CatalogHeader({
           selectedYear={selectedYear}
           currentYear={currentYear}
         />
-        {!isClosed && (
-          <>
-            <ClonePricesButton
-              targetYear={selectedYear}
-              sourceYears={clonableYears}
-              willOverwrite={willOverwrite}
-            />
-            {seasonId && <CreateLicenseTypeButton seasonId={seasonId} />}
-          </>
-        )}
+        {actions}
       </div>
     </div>
   );
