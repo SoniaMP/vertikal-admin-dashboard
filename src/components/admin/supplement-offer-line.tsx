@@ -1,15 +1,17 @@
 import { Badge } from "@/components/ui/badge";
-import type { SupplementBlocker } from "@/helpers/supplement-block-reason";
+import type { GroupBlocker } from "@/helpers/group-block-reason";
 import type { OfferedType } from "@/helpers/offered-license-types";
 
-const BLOCKER_TEXT: Record<SupplementBlocker, string> = {
+const BLOCKER_TEXT: Record<GroupBlocker, string> = {
   retired: "retirado",
+  "no-members": "sin suplementos",
   unpriced: "sin precio",
   "no-federations": "sin federativas",
 };
 
 type Props = {
-  blocker: SupplementBlocker | null;
+  /** A supplement's reason or a group's; a group has one more. */
+  blocker: GroupBlocker | null;
   offeredTypes: OfferedType[];
 };
 

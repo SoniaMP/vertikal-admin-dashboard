@@ -6,7 +6,6 @@ import type {
   SupplementGroupPrice,
 } from "@prisma/client";
 import { CategoriesSection } from "./categories-section";
-import { SupplementGroupsSection } from "./supplement-groups-section";
 import { SupplementsSection } from "./supplements-section";
 import type { SelectableLicenseType } from "./license-type-checklist";
 
@@ -44,11 +43,6 @@ export function StandaloneSections({
   return (
     <div className="space-y-6">
       <CategoriesSection categories={categories} seasonId={seasonId} />
-      <SupplementGroupsSection
-        supplementGroups={supplementGroups}
-        licenseTypes={licenseTypes}
-        seasonId={seasonId}
-      />
       <SupplementsSection
         supplements={supplements}
         supplementGroups={supplementGroups}

@@ -37,6 +37,13 @@ type Props = {
   seasonId: string;
 };
 
+/**
+ * One standalone supplement: its own price, its own federations.
+ *
+ * A grouped one never reaches this row — it is listed inside its group, which
+ * is where the price and the federations it would otherwise appear to own can
+ * actually be changed.
+ */
 export function SupplementRow({
   supplement,
   supplementGroups,
@@ -47,7 +54,6 @@ export function SupplementRow({
 }: Props) {
   const [isPending, startTransition] = useTransition();
   const seasonPrice = supplement.prices[0]?.price;
-  const group = supplement.supplementGroup;
 
   function handlePriceSave(value: string) {
     const amount = parseFloat(value);
@@ -67,20 +73,16 @@ export function SupplementRow({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <span className="font-medium truncate">{supplement.name}</span>
-          {group ? (
-            <Badge variant="outline">Grupo: {group.name}</Badge>
-          ) : (
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
-              placeholder="€"
-              className="h-7 w-20 text-center text-xs"
-              disabled={isPending}
-              onBlur={(event) => handlePriceSave(event.target.value)}
-            />
-          )}
+          <Input
+            type="number"
+            step="0.01"
+            min="0"
+            defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
+            placeholder="€"
+            className="h-7 w-20 text-center text-xs"
+            disabled={isPending}
+            onBlur={(event) => handlePriceSave(event.target.value)}
+          />
           <Badge variant={supplement.active ? "default" : "secondary"}>
             {supplement.active ? "Activo" : "Inactivo"}
           </Badge>

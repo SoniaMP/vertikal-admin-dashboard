@@ -33,6 +33,8 @@ type Props = {
   licenseTypes: SelectableLicenseType[];
   /** The federations this supplement is offered in today. */
   selectedTypeIds: string[];
+  /** Preselects a group when adding from inside one. */
+  defaultGroupId?: string;
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -45,6 +47,7 @@ export function SupplementFormDialog({
   supplementGroups = [],
   licenseTypes,
   selectedTypeIds,
+  defaultGroupId,
 }: Props) {
   const isEditing = !!supplement;
 
@@ -120,7 +123,9 @@ export function SupplementFormDialog({
             <SupplementOfferFields
               groups={supplementGroups}
               licenseTypes={licenseTypes}
-              defaultGroupId={supplement?.supplementGroupId ?? null}
+              defaultGroupId={
+                supplement?.supplementGroupId ?? defaultGroupId ?? null
+              }
               selectedTypeIds={selectedTypeIds}
             />
             {error && (
