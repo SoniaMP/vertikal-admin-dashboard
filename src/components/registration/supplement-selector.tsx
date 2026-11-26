@@ -76,8 +76,13 @@ function GroupSection({
           +{formatPrice(group.price)}
         </span>
       </div>
+      {/* The member has never heard of a supplement group, so the wording
+          names a kind of fare instead of explaining the billing: "precio
+          único" is what a menu or a season ticket says, and it answers the
+          only question they have — whether ticking two costs double. The
+          amount is not repeated; it is on the line above. */}
       <p className="text-xs text-muted-foreground">
-        Selecciona uno o varios. El precio del grupo se cobra una sola vez.
+        Precio único, elijas lo que elijas.
       </p>
       <div className="grid gap-1">
         {supplements.map((supplement) => (
