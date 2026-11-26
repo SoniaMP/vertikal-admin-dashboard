@@ -2,9 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAuth, type ActionResult } from "@/lib/actions";
-import { findOpenLineageSiblings } from "@/lib/catalog-lineage";
+import {
+  findOpenLineageSiblings,
+  type LineageSibling,
+} from "@/lib/catalog-lineage";
 import { propagateCatalogEdit } from "@/lib/catalog-propagation";
-import { readCatalogRow } from "@/lib/catalog-row";
+import { readCatalogRow, type CatalogRow } from "@/lib/catalog-row";
+import { propagationDiffers } from "@/helpers/propagation-differs";
 import { prisma } from "@/lib/prisma";
 import type {
   CatalogModelName,
@@ -30,18 +34,25 @@ const NOTHING_TO_ASK: PropagationTargets = {
 };
 
 /**
- * The other open seasons where this same entity exists, as years.
+ * The other open seasons this edit would actually change, as years.
  *
  * Called right after a save so the panel can ask whether the change should
  * also apply there. An empty list means there is nothing to ask: the entity
- * only exists in the year on screen, or the rest are closed years that are
- * never offered.
+ * only exists in the year on screen, the rest are closed years that are never
+ * offered, or — most often — those years already say the same thing, so
+ * carrying the edit over would write nothing.
+ *
+ * That last case is why the scope is a parameter. An admin opens the edit form
+ * to tick a federation and saves without touching the name; asking them about
+ * a name that already matches next year trains them to dismiss the question
+ * unread, which is the one way it can do harm.
  */
 export async function findPropagationTargets(
   model: string,
   id: string,
+  scope: string,
 ): Promise<PropagationTargets> {
-  if (!isCatalogModel(model)) return NOTHING_TO_ASK;
+  if (!isCatalogModel(model) || !isScope(scope)) return NOTHING_TO_ASK;
 
   const authError = await requireAuth();
   if (authError) return NOTHING_TO_ASK;
@@ -63,8 +74,27 @@ export async function findPropagationTargets(
     name: row.name,
     active: row.active,
     sourceYear: season.year,
-    years: siblings.map((sibling) => sibling.year),
+    years: await selectDifferingYears(model, row, siblings, scope),
   };
+}
+
+/** The sibling years where saying yes would write something new. */
+async function selectDifferingYears(
+  model: CatalogModelName,
+  source: CatalogRow,
+  siblings: LineageSibling[],
+  scope: PropagationScope,
+): Promise<number[]> {
+  const pairs = await Promise.all(
+    siblings.map(async (sibling) => ({
+      year: sibling.year,
+      row: await readCatalogRow(model, sibling.id),
+    })),
+  );
+
+  return pairs
+    .filter(({ row }) => row !== null && propagationDiffers(source, row, scope))
+    .map(({ year }) => year);
 }
 
 /** Carries the edit just saved onto the same entity in the other open seasons. */

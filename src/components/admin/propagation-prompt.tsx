@@ -52,12 +52,15 @@ export function PropagationPrompt({ request, entityLabel, onDone }: Props) {
     if (!request) return;
 
     let isCurrent = true;
-    findPropagationTargets(request.model, request.id).then((targets) => {
-      if (!isCurrent) return;
-      // No other open season has it: nothing to ask, so nothing is shown.
-      if (targets.years.length === 0) onDone();
-      else setAnswered({ request, targets });
-    });
+    findPropagationTargets(request.model, request.id, request.scope).then(
+      (targets) => {
+        if (!isCurrent) return;
+        // Nothing to ask: no other open season has it, or the ones that do
+        // already say the same, so saying yes would write nothing.
+        if (targets.years.length === 0) onDone();
+        else setAnswered({ request, targets });
+      },
+    );
 
     return () => {
       isCurrent = false;
