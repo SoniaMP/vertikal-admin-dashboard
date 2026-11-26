@@ -12,6 +12,14 @@ import { requireAuth, type ActionResult } from "@/lib/actions";
 import { requireEditableSeason } from "@/lib/season-editable";
 import { requireEditableCatalogRow } from "@/lib/catalog-editable";
 import { newCatalogIdentity } from "@/lib/catalog-identity";
+import { replaceTypeLinks } from "@/lib/supplement-type-links";
+
+function readTypeIds(formData: FormData): string[] {
+  return formData
+    .getAll("typeIds")
+    .map(String)
+    .filter((id) => id.length > 0);
+}
 
 // --- Supplement actions ---
 
@@ -39,9 +47,13 @@ export async function createSupplement(
     return { success: false, error: firstError };
   }
 
-  await prisma.supplement.create({
+  const created = await prisma.supplement.create({
     data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
   });
+  await replaceTypeLinks(
+    { supplementId: created.id },
+    readTypeIds(formData),
+  );
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }
@@ -71,6 +83,7 @@ export async function updateSupplement(
   }
 
   await prisma.supplement.update({ where: { id }, data: parsed.data });
+  await replaceTypeLinks({ supplementId: id }, readTypeIds(formData));
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }
@@ -145,9 +158,10 @@ export async function createSupplementGroup(
     return { success: false, error: firstError };
   }
 
-  await prisma.supplementGroup.create({
+  const created = await prisma.supplementGroup.create({
     data: { ...newCatalogIdentity(), seasonId, ...parsed.data },
   });
+  await replaceTypeLinks({ groupId: created.id }, readTypeIds(formData));
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }
@@ -173,6 +187,7 @@ export async function updateSupplementGroup(
   }
 
   await prisma.supplementGroup.update({ where: { id }, data: parsed.data });
+  await replaceTypeLinks({ groupId: id }, readTypeIds(formData));
   revalidatePath("/admin/tipos-federacion");
   return { success: true };
 }

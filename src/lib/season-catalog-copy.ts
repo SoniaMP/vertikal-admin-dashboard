@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { copySeasonEntities } from "@/lib/season-entity-copy";
 import { copySeasonPrices } from "@/lib/season-price-copy";
 import { clearSeasonCatalog } from "@/lib/season-catalog-clear";
+import { copySeasonSupplementLinks } from "@/lib/season-link-copy";
 
 /**
  * Replaces a season's whole catalog with a copy of another season's.
@@ -12,6 +13,10 @@ import { clearSeasonCatalog } from "@/lib/season-catalog-clear";
  *
  * The caller has already refused targets that carry memberships, so wiping
  * what was there cannot orphan anything a member paid for.
+ *
+ * Clearing the target leaves no orphan links behind: the join tables cascade
+ * from both of their ends, verified against the real adapter rather than
+ * assumed, so deleting the federations takes their links with them.
  */
 export async function copySeasonCatalog(
   tx: Prisma.TransactionClient,
@@ -22,4 +27,5 @@ export async function copySeasonCatalog(
 
   const maps = await copySeasonEntities(tx, sourceId, targetId);
   await copySeasonPrices(tx, sourceId, targetId, maps);
+  await copySeasonSupplementLinks(tx, sourceId, maps);
 }

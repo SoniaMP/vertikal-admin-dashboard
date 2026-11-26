@@ -36,6 +36,7 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
         include: {
           supplementGroup: true,
           prices: { where: { seasonId } },
+          typeLinks: true,
         },
         orderBy: { createdAt: "asc" },
       }),
@@ -44,6 +45,7 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
         include: {
           supplements: true,
           groupPrices: { where: { seasonId } },
+          typeLinks: true,
         },
         orderBy: { createdAt: "asc" },
       }),

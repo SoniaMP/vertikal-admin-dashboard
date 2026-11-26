@@ -5,6 +5,8 @@ const mockOfferingFindMany = vi.fn();
 const mockSupplementFindMany = vi.fn();
 const mockSupplementPriceFindMany = vi.fn();
 const mockGroupPriceFindMany = vi.fn();
+const mockLinkFindMany = vi.fn();
+const mockGroupLinkFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -18,6 +20,12 @@ vi.mock("@/lib/prisma", () => ({
     },
     supplementGroupPrice: {
       findMany: (...a: unknown[]) => mockGroupPriceFindMany(...a),
+    },
+    licenseTypeSupplement: {
+      findMany: (...a: unknown[]) => mockLinkFindMany(...a),
+    },
+    licenseTypeSupplementGroup: {
+      findMany: (...a: unknown[]) => mockGroupLinkFindMany(...a),
     },
   },
 }));
@@ -33,12 +41,53 @@ const CATEGORY = {
   active: true,
 };
 
+function publishedType(id: string) {
+  return {
+    id,
+    name: `FERM ${id}`,
+    description: "",
+    active: true,
+    subtypes: [
+      {
+        id: `st-${id}`,
+        name: "BÁSICA A",
+        description: "",
+        active: true,
+        licenseTypeId: id,
+      },
+    ],
+  };
+}
+
+function offering(typeId: string) {
+  return {
+    typeId,
+    subtypeId: `st-${typeId}`,
+    categoryId: "cat-1",
+    price: 1500,
+    category: CATEGORY,
+  };
+}
+
+function standalone(id: string, name: string) {
+  return {
+    id,
+    name,
+    description: "",
+    active: true,
+    supplementGroupId: null,
+    supplementGroup: null,
+  };
+}
+
 describe("fetchLicenseCatalog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSupplementFindMany.mockResolvedValue([]);
     mockSupplementPriceFindMany.mockResolvedValue([]);
     mockGroupPriceFindMany.mockResolvedValue([]);
+    mockLinkFindMany.mockResolvedValue([]);
+    mockGroupLinkFindMany.mockResolvedValue([]);
   });
 
   it("asks the database only for this season's published types and modalities", async () => {
@@ -147,6 +196,10 @@ describe("fetchLicenseCatalog", () => {
     mockSupplementPriceFindMany.mockResolvedValue([
       { supplementId: "sup-priced", price: 1200 },
     ]);
+    mockLinkFindMany.mockResolvedValue([
+      { typeId: "lt-1", supplementId: "sup-priced" },
+      { typeId: "lt-1", supplementId: "sup-unpriced" },
+    ]);
 
     const catalog = await fetchLicenseCatalog();
 
@@ -179,5 +232,45 @@ describe("fetchLicenseCatalog", () => {
     const catalog = await fetchLicenseCatalog();
 
     expect(catalog).toEqual([]);
+  });
+
+  it("drops a priced supplement that no federation offers", async () => {
+    const { fetchLicenseCatalog } = await import("../license-catalog");
+    mockTypeFindMany.mockResolvedValue([publishedType("lt-1")]);
+    mockOfferingFindMany.mockResolvedValue([offering("lt-1")]);
+    mockSupplementFindMany.mockResolvedValue([standalone("sup-1", "Tarjeta")]);
+    mockSupplementPriceFindMany.mockResolvedValue([
+      { supplementId: "sup-1", price: 1200 },
+    ]);
+
+    const catalog = await fetchLicenseCatalog();
+
+    expect(catalog[0].supplements).toEqual([]);
+  });
+
+  it("offers a supplement only in the federation it is linked to", async () => {
+    const { fetchLicenseCatalog } = await import("../license-catalog");
+    mockTypeFindMany.mockResolvedValue([
+      publishedType("lt-1"),
+      publishedType("lt-2"),
+    ]);
+    mockOfferingFindMany.mockResolvedValue([
+      offering("lt-1"),
+      offering("lt-2"),
+    ]);
+    mockSupplementFindMany.mockResolvedValue([standalone("sup-1", "Tarjeta")]);
+    mockSupplementPriceFindMany.mockResolvedValue([
+      { supplementId: "sup-1", price: 1200 },
+    ]);
+    mockLinkFindMany.mockResolvedValue([
+      { typeId: "lt-2", supplementId: "sup-1" },
+    ]);
+
+    const catalog = await fetchLicenseCatalog();
+
+    expect(catalog.find((t) => t.id === "lt-1")?.supplements).toEqual([]);
+    expect(
+      catalog.find((t) => t.id === "lt-2")?.supplements.map((s) => s.name),
+    ).toEqual(["Tarjeta"]);
   });
 });

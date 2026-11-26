@@ -4,6 +4,7 @@ import { createFakeCatalogTx } from "./helpers/fake-catalog-tx";
 
 const mockCopyEntities = vi.fn();
 const mockCopyPrices = vi.fn();
+const mockCopyLinks = vi.fn();
 
 vi.mock("@/lib/season-entity-copy", () => ({
   copySeasonEntities: (...args: unknown[]) => mockCopyEntities(...args),
@@ -11,6 +12,10 @@ vi.mock("@/lib/season-entity-copy", () => ({
 
 vi.mock("@/lib/season-price-copy", () => ({
   copySeasonPrices: (...args: unknown[]) => mockCopyPrices(...args),
+}));
+
+vi.mock("@/lib/season-link-copy", () => ({
+  copySeasonSupplementLinks: (...args: unknown[]) => mockCopyLinks(...args),
 }));
 
 const MAPS = { types: new Map(), subtypes: new Map() };
@@ -92,6 +97,22 @@ describe("copySeasonCatalog", () => {
       "season-2026",
       "season-2027",
       MAPS,
+    );
+  });
+
+  it("feeds the same id maps into the link copy", async () => {
+    const fake = await copyCatalog();
+
+    // No target season goes in: a link is a pair of ids, and the federation it
+    // names already belongs to the year it was copied into.
+    expect(mockCopyLinks).toHaveBeenCalledWith(fake.tx, "season-2026", MAPS);
+  });
+
+  it("copies the links only once the rows they point at exist", async () => {
+    await copyCatalog();
+
+    expect(mockCopyEntities.mock.invocationCallOrder[0]).toBeLessThan(
+      mockCopyLinks.mock.invocationCallOrder[0],
     );
   });
 });

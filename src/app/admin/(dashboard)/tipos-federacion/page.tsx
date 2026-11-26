@@ -173,6 +173,7 @@ async function CatalogSections({
         categories={categories}
         supplements={supplements}
         supplementGroups={supplementGroups}
+        licenseTypes={licenseTypes}
         seasonId={seasonId}
       />
     </div>

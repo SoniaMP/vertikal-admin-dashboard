@@ -11,9 +11,13 @@ const CATALOG_MODELS = [
   "licenseOffering",
   "supplementPrice",
   "supplementGroupPrice",
+  "licenseTypeSupplement",
+  "licenseTypeSupplementGroup",
 ] as const;
 
 type CatalogModel = (typeof CATALOG_MODELS)[number];
+
+type FindWhere = { seasonId?: string; type?: { seasonId: string } };
 
 /**
  * An in-memory stand-in for a Prisma transaction client, limited to the
@@ -23,6 +27,11 @@ type CatalogModel = (typeof CATALOG_MODELS)[number];
  * of on call arguments. `calls` keeps the order, which is the only way to
  * check that a wipe happened before the copy and that children went before
  * the parents they point at.
+ *
+ * A link row carries no season of its own — it is a pair of ids — so the two
+ * join tables are queried through their federation. Seeded link rows take a
+ * `seasonId` anyway, purely so this fake can answer that query; the copy only
+ * ever reads the ids.
  */
 export function createFakeCatalogTx(
   seed: Partial<Record<CatalogModel, Row[]>> = {},
@@ -34,9 +43,10 @@ export function createFakeCatalogTx(
   for (const model of CATALOG_MODELS) {
     created[model] = [];
     tx[model] = {
-      findMany: vi.fn(async ({ where }: { where: { seasonId: string } }) =>
-        (seed[model] ?? []).filter((row) => row.seasonId === where.seasonId),
-      ),
+      findMany: vi.fn(async ({ where }: { where: FindWhere }) => {
+        const seasonId = where.seasonId ?? where.type?.seasonId;
+        return (seed[model] ?? []).filter((row) => row.seasonId === seasonId);
+      }),
       create: vi.fn(async ({ data }: { data: Row }) => {
         calls.push(`create:${model}`);
         created[model].push(data);

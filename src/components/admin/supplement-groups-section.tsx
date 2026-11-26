@@ -14,19 +14,27 @@ import {
   upsertSupplementGroupPrice,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { SupplementGroupFormDialog } from "./supplement-group-form-dialog";
+import { SupplementOfferLine } from "./supplement-offer-line";
+import { buildAdminSellabilityLookups } from "@/helpers/admin-sellability-lookups";
+import { groupBlockReason } from "@/helpers/group-block-reason";
+import { selectOfferedTypes } from "@/helpers/offered-license-types";
+import type { SelectableLicenseType } from "./license-type-checklist";
 
 type SupplementGroupWithPrices = SupplementGroup & {
   supplements: Supplement[];
   groupPrices: SupplementGroupPrice[];
+  typeLinks: { typeId: string }[];
 };
 
 type Props = {
   supplementGroups: SupplementGroupWithPrices[];
+  licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };
 
 export function SupplementGroupsSection({
   supplementGroups,
+  licenseTypes,
   seasonId,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -54,8 +62,13 @@ export function SupplementGroupsSection({
               Sin grupos todavía.
             </p>
           )}
-          {supplementGroups.map((grp) => (
-            <GroupRow key={grp.id} group={grp} seasonId={seasonId} />
+          {supplementGroups.map((group) => (
+            <GroupRow
+              key={group.id}
+              group={group}
+              licenseTypes={licenseTypes}
+              seasonId={seasonId}
+            />
           ))}
           <Button
             variant="outline"
@@ -70,6 +83,8 @@ export function SupplementGroupsSection({
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
             seasonId={seasonId}
+            licenseTypes={licenseTypes}
+            selectedTypeIds={[]}
           />
         </div>
       )}
@@ -79,9 +94,11 @@ export function SupplementGroupsSection({
 
 function GroupRow({
   group,
+  licenseTypes,
   seasonId,
 }: {
   group: SupplementGroupWithPrices;
+  licenseTypes: SelectableLicenseType[];
   seasonId: string;
 }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -146,11 +163,20 @@ function GroupRow({
           Suplementos: {group.supplements.map((s) => s.name).join(", ")}
         </p>
       )}
+      <SupplementOfferLine
+        blocker={groupBlockReason(group, buildAdminSellabilityLookups([], [group]))}
+        offeredTypes={selectOfferedTypes(
+          group.typeLinks.map((link) => link.typeId),
+          licenseTypes,
+        )}
+      />
       <SupplementGroupFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         seasonId={group.seasonId}
         group={group}
+        licenseTypes={licenseTypes}
+        selectedTypeIds={group.typeLinks.map((link) => link.typeId)}
       />
     </div>
   );

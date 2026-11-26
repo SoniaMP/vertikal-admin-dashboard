@@ -16,7 +16,8 @@ import {
   updateSupplement,
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { PropagationPrompt } from "./propagation-prompt";
-import { SupplementGroupPicker } from "./supplement-group-picker";
+import { SupplementOfferFields } from "./supplement-offer-fields";
+import type { SelectableLicenseType } from "./license-type-checklist";
 import type { PropagationRequest } from "@/types/catalog-propagation";
 
 type SupplementGroupWithSupplements = SupplementGroup & {
@@ -29,6 +30,9 @@ type Props = {
   seasonId: string;
   supplement?: Supplement;
   supplementGroups?: SupplementGroupWithSupplements[];
+  licenseTypes: SelectableLicenseType[];
+  /** The federations this supplement is offered in today. */
+  selectedTypeIds: string[];
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -39,6 +43,8 @@ export function SupplementFormDialog({
   seasonId,
   supplement,
   supplementGroups = [],
+  licenseTypes,
+  selectedTypeIds,
 }: Props) {
   const isEditing = !!supplement;
 
@@ -111,9 +117,11 @@ export function SupplementFormDialog({
                 minLength={5}
               />
             </div>
-            <SupplementGroupPicker
+            <SupplementOfferFields
               groups={supplementGroups}
+              licenseTypes={licenseTypes}
               defaultGroupId={supplement?.supplementGroupId ?? null}
+              selectedTypeIds={selectedTypeIds}
             />
             {error && (
               <p className="text-sm text-destructive">{error}</p>

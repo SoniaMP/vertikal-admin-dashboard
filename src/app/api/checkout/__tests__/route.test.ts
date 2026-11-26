@@ -6,6 +6,8 @@ const mockOfferingFind = vi.fn();
 const mockSupplementFindMany = vi.fn();
 const mockSupplementPriceFindMany = vi.fn();
 const mockGroupPriceFindMany = vi.fn();
+const mockLinkFindMany = vi.fn();
+const mockGroupLinkFindMany = vi.fn();
 const mockMemberUpsert = vi.fn();
 const mockMembershipCreate = vi.fn();
 const mockMembershipUpdate = vi.fn();
@@ -26,6 +28,12 @@ vi.mock("@/lib/prisma", () => ({
     },
     supplementGroupPrice: {
       findMany: (...args: unknown[]) => mockGroupPriceFindMany(...args),
+    },
+    licenseTypeSupplement: {
+      findMany: (...args: unknown[]) => mockLinkFindMany(...args),
+    },
+    licenseTypeSupplementGroup: {
+      findMany: (...args: unknown[]) => mockGroupLinkFindMany(...args),
     },
     member: {
       upsert: (...args: unknown[]) => mockMemberUpsert(...args),
@@ -115,6 +123,10 @@ function setupHappyPath() {
     { supplementId: "sup-1", price: 1000 },
   ]);
   mockGroupPriceFindMany.mockResolvedValue([]);
+  mockLinkFindMany.mockResolvedValue([
+    { typeId: "type-1", supplementId: "sup-1" },
+  ]);
+  mockGroupLinkFindMany.mockResolvedValue([]);
   mockMemberUpsert.mockResolvedValue({ id: "member-1" });
   mockMembershipFindUnique.mockResolvedValue(null);
   mockMembershipCreate.mockResolvedValue({ id: "ms-123" });
@@ -163,6 +175,19 @@ describe("POST /api/checkout", () => {
     expect(response.status).toBe(400);
     const data = await response.json();
     expect(data.error).toBe("Suplementos inválidos");
+  });
+
+  it("returns 400 when the supplement is not offered in the chosen federation", async () => {
+    setupHappyPath();
+    mockLinkFindMany.mockResolvedValue([]);
+
+    const request = createRequest(validBody);
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBe("Suplementos inválidos");
+    expect(mockSessionCreate).not.toHaveBeenCalled();
   });
 
   it("upserts member, creates membership, and returns Stripe session URL", async () => {

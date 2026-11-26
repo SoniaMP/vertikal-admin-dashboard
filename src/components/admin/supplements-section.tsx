@@ -1,41 +1,55 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import type {
   Supplement,
   SupplementGroup,
   SupplementPrice,
+  SupplementGroupPrice,
 } from "@prisma/client";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { upsertSupplementPrice } from "@/app/admin/(dashboard)/tipos-federacion/actions";
-import { SupplementActions } from "./supplement-actions";
+import { buildAdminSellabilityLookups } from "@/helpers/admin-sellability-lookups";
+import { supplementBlockReason } from "@/helpers/supplement-block-reason";
+import { selectOfferedTypes } from "@/helpers/offered-license-types";
+import { SupplementRow } from "./supplement-row";
 import { SupplementFormDialog } from "./supplement-form-dialog";
+import type { SelectableLicenseType } from "./license-type-checklist";
 
 type SupplementWithPrice = Supplement & {
   supplementGroup: SupplementGroup | null;
   prices: SupplementPrice[];
+  typeLinks: { typeId: string }[];
 };
 
-type SupplementGroupWithSupplements = SupplementGroup & {
+type SupplementGroupWithPrices = SupplementGroup & {
   supplements: Supplement[];
+  groupPrices: SupplementGroupPrice[];
+  typeLinks: { typeId: string }[];
 };
 
 type Props = {
   supplements: SupplementWithPrice[];
-  supplementGroups: SupplementGroupWithSupplements[];
+  supplementGroups: SupplementGroupWithPrices[];
+  licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };
 
 export function SupplementsSection({
   supplements,
   supplementGroups,
+  licenseTypes,
   seasonId,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  // The panel judges what is on sale with the wizard's own rule, so the two
+  // can never disagree about why an extra is missing.
+  const lookups = buildAdminSellabilityLookups(supplements, supplementGroups);
+  const linksByGroupId = new Map(
+    supplementGroups.map((group) => [group.id, group.typeLinks]),
+  );
 
   return (
     <div className="rounded-lg border px-4 py-3">
@@ -59,14 +73,29 @@ export function SupplementsSection({
               Sin suplementos todavía.
             </p>
           )}
-          {supplements.map((sup) => (
-            <SupplementRow
-              key={sup.id}
-              supplement={sup}
-              supplementGroups={supplementGroups}
-              seasonId={seasonId}
-            />
-          ))}
+          {supplements.map((supplement) => {
+            // A grouped supplement is offered where its group is.
+            const links =
+              supplement.supplementGroupId === null
+                ? supplement.typeLinks
+                : (linksByGroupId.get(supplement.supplementGroupId) ?? []);
+            const typeIds = links.map((link) => link.typeId);
+
+            return (
+              <SupplementRow
+                key={supplement.id}
+                supplement={supplement}
+                supplementGroups={supplementGroups}
+                licenseTypes={licenseTypes}
+                offer={{
+                  blocker: supplementBlockReason(supplement, lookups),
+                  offeredTypes: selectOfferedTypes(typeIds, licenseTypes),
+                }}
+                selectedTypeIds={supplement.typeLinks.map((l) => l.typeId)}
+                seasonId={seasonId}
+              />
+            );
+          })}
           <Button
             variant="outline"
             size="sm"
@@ -81,64 +110,11 @@ export function SupplementsSection({
             onOpenChange={setIsCreateOpen}
             seasonId={seasonId}
             supplementGroups={supplementGroups}
+            licenseTypes={licenseTypes}
+            selectedTypeIds={[]}
           />
         </div>
       )}
-    </div>
-  );
-}
-
-function SupplementRow({
-  supplement,
-  supplementGroups,
-  seasonId,
-}: {
-  supplement: SupplementWithPrice;
-  supplementGroups: SupplementGroupWithSupplements[];
-  seasonId: string;
-}) {
-  const [isPending, startTransition] = useTransition();
-  const seasonPrice = supplement.prices[0]?.price;
-  const hasGroup = !!supplement.supplementGroup;
-
-  function handlePriceSave(value: string) {
-    const num = parseFloat(value);
-    if (isNaN(num) || num <= 0) return;
-    const cents = Math.round(num * 100);
-    startTransition(async () => {
-      await upsertSupplementPrice(supplement.id, seasonId, cents);
-    });
-  }
-
-  return (
-    <div className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-      <div className="flex items-center gap-3 min-w-0">
-        <span className="font-medium truncate">{supplement.name}</span>
-        {hasGroup && (
-          <Badge variant="outline">
-            Grupo: {supplement.supplementGroup!.name}
-          </Badge>
-        )}
-        {!hasGroup && (
-          <Input
-            type="number"
-            step="0.01"
-            min="0"
-            defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
-            placeholder="€"
-            className="h-7 w-20 text-center text-xs"
-            disabled={isPending}
-            onBlur={(e) => handlePriceSave(e.target.value)}
-          />
-        )}
-        <Badge variant={supplement.active ? "default" : "secondary"}>
-          {supplement.active ? "Activo" : "Inactivo"}
-        </Badge>
-      </div>
-      <SupplementActions
-        supplement={supplement}
-        supplementGroups={supplementGroups}
-      />
     </div>
   );
 }

@@ -45,10 +45,12 @@ model LicenseType {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  season      Season            @relation(fields: [seasonId], references: [id])
-  subtypes    LicenseSubtype[]
-  offerings   LicenseOffering[]
-  memberships Membership[]
+  season          Season                       @relation(fields: [seasonId], references: [id])
+  subtypes        LicenseSubtype[]
+  offerings       LicenseOffering[]
+  memberships     Membership[]
+  supplementLinks LicenseTypeSupplement[]
+  groupLinks      LicenseTypeSupplementGroup[]
 
   @@index([seasonId])
   @@index([lineageId])
@@ -122,9 +124,10 @@ model SupplementGroup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  season      Season                 @relation(fields: [seasonId], references: [id])
+  season      Season                       @relation(fields: [seasonId], references: [id])
   supplements Supplement[]
   groupPrices SupplementGroupPrice[]
+  typeLinks   LicenseTypeSupplementGroup[]
 
   @@index([seasonId])
   @@index([lineageId])
@@ -141,10 +144,11 @@ model Supplement {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  season                Season                 @relation(fields: [seasonId], references: [id])
-  supplementGroup       SupplementGroup?       @relation(fields: [supplementGroupId], references: [id])
+  season                Season                  @relation(fields: [seasonId], references: [id])
+  supplementGroup       SupplementGroup?        @relation(fields: [supplementGroupId], references: [id])
   prices                SupplementPrice[]
   membershipSupplements MembershipSupplement[]
+  typeLinks             LicenseTypeSupplement[]
 
   @@index([seasonId])
   @@index([lineageId])
@@ -172,6 +176,40 @@ model SupplementGroupPrice {
   group  SupplementGroup @relation(fields: [groupId], references: [id])
 
   @@unique([seasonId, groupId])
+}
+
+// ──────────────────────────────────────────────
+// Which federations offer which extras
+//
+// The unit that carries a price is the unit that carries federations: a
+// standalone supplement is linked on its own, a grouped one is never linked
+// at all because its group decides. A supplement is either standalone or
+// grouped, never both — the club creates two supplements when it wants to
+// sell the same thing inside a group and apart from it.
+//
+// No `seasonId` here: both sides already belong to one, and the only writers
+// pair rows from the same season. Links are read through the season's types.
+// ──────────────────────────────────────────────
+model LicenseTypeSupplement {
+  typeId       String
+  supplementId String
+
+  type       LicenseType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  supplement Supplement  @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+
+  @@id([typeId, supplementId])
+  @@index([supplementId])
+}
+
+model LicenseTypeSupplementGroup {
+  typeId  String
+  groupId String
+
+  type  LicenseType     @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  group SupplementGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([typeId, groupId])
+  @@index([groupId])
 }
 
 // ──────────────────────────────────────────────

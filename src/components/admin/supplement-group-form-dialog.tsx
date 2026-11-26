@@ -17,12 +17,19 @@ import {
 } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { PropagationPrompt } from "./propagation-prompt";
 import type { PropagationRequest } from "@/types/catalog-propagation";
+import {
+  LicenseTypeChecklist,
+  type SelectableLicenseType,
+} from "./license-type-checklist";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   seasonId: string;
   group?: SupplementGroup;
+  licenseTypes: SelectableLicenseType[];
+  /** The federations this group is offered in today. */
+  selectedTypeIds: string[];
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -32,6 +39,8 @@ export function SupplementGroupFormDialog({
   onOpenChange,
   seasonId,
   group,
+  licenseTypes,
+  selectedTypeIds,
 }: Props) {
   const isEditing = !!group;
 
@@ -94,6 +103,12 @@ export function SupplementGroupFormDialog({
                 minLength={2}
               />
             </div>
+            {/* The group carries the federations for every supplement in
+                it, the same way it carries their price. */}
+            <LicenseTypeChecklist
+              types={licenseTypes}
+              selectedTypeIds={selectedTypeIds}
+            />
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}

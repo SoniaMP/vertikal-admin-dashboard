@@ -75,9 +75,13 @@ async function buildClubLicensePlan({
     );
   }
 
+  // The federation goes in too: an extra is only on sale where the admin
+  // offered it, and the offering above is what proves this type is this
+  // season's.
   const { supplementsTotal, lineItems, supplements } = await resolveSupplements(
     data.supplementIds,
     seasonId,
+    data.typeId,
   );
 
   const licenseLabel = `${offering.type.name} - ${offering.subtype.name} - ${offering.category.name}`;

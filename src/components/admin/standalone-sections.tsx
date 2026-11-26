@@ -8,15 +8,18 @@ import type {
 import { CategoriesSection } from "./categories-section";
 import { SupplementGroupsSection } from "./supplement-groups-section";
 import { SupplementsSection } from "./supplements-section";
+import type { SelectableLicenseType } from "./license-type-checklist";
 
 type SupplementWithPrice = Supplement & {
   supplementGroup: SupplementGroup | null;
   prices: SupplementPrice[];
+  typeLinks: { typeId: string }[];
 };
 
 type SupplementGroupWithPrices = SupplementGroup & {
   supplements: Supplement[];
   groupPrices: SupplementGroupPrice[];
+  typeLinks: { typeId: string }[];
 };
 
 type CategoryWithCount = Category & {
@@ -27,6 +30,7 @@ type Props = {
   categories: CategoryWithCount[];
   supplements: SupplementWithPrice[];
   supplementGroups: SupplementGroupWithPrices[];
+  licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };
 
@@ -34,6 +38,7 @@ export function StandaloneSections({
   categories,
   supplements,
   supplementGroups,
+  licenseTypes,
   seasonId,
 }: Props) {
   return (
@@ -41,11 +46,13 @@ export function StandaloneSections({
       <CategoriesSection categories={categories} seasonId={seasonId} />
       <SupplementGroupsSection
         supplementGroups={supplementGroups}
+        licenseTypes={licenseTypes}
         seasonId={seasonId}
       />
       <SupplementsSection
         supplements={supplements}
         supplementGroups={supplementGroups}
+        licenseTypes={licenseTypes}
         seasonId={seasonId}
       />
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -14,32 +13,33 @@ const NO_GROUP = "__none__";
 
 type Props = {
   groups: { id: string; name: string }[];
-  /** The group the supplement is in today, or null for a new one. */
-  defaultGroupId: string | null;
+  /** The group the supplement is in, or "" for none. */
+  value: string;
+  onValueChange: (groupId: string) => void;
 };
 
 /**
  * Picks the group a supplement belongs to, or none.
  *
- * Holds its own choice and feeds it to the form through a hidden field,
- * because a Radix Select is not a form control. It lives inside the dialog
- * content on purpose: that unmounts when the dialog closes, so the next time
- * it opens the choice starts from the row again instead of from the last edit.
+ * Feeds the form through a hidden field, because a Radix Select is not a form
+ * control. The choice is held by the caller so that the federation list can
+ * react to it: a grouped supplement is offered where its group is.
  */
-export function SupplementGroupPicker({ groups, defaultGroupId }: Props) {
-  const [selected, setSelected] = useState(defaultGroupId ?? NO_GROUP);
-
+export function SupplementGroupPicker({
+  groups,
+  value,
+  onValueChange,
+}: Props) {
   if (groups.length === 0) return null;
 
   return (
     <div className="space-y-2">
       <Label>Grupo (opcional)</Label>
-      <input
-        type="hidden"
-        name="supplementGroupId"
-        value={selected === NO_GROUP ? "" : selected}
-      />
-      <Select value={selected} onValueChange={setSelected}>
+      <input type="hidden" name="supplementGroupId" value={value} />
+      <Select
+        value={value === "" ? NO_GROUP : value}
+        onValueChange={(next) => onValueChange(next === NO_GROUP ? "" : next)}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Sin grupo" />
         </SelectTrigger>

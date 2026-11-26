@@ -8,6 +8,7 @@ import { toggleSupplementActive } from "@/app/admin/(dashboard)/tipos-federacion
 import { PropagationPrompt } from "./propagation-prompt";
 import type { PropagationRequest } from "@/types/catalog-propagation";
 import { SupplementFormDialog } from "./supplement-form-dialog";
+import type { SelectableLicenseType } from "./license-type-checklist";
 
 type SupplementGroupWithSupplements = SupplementGroup & {
   supplements: Supplement[];
@@ -16,9 +17,16 @@ type SupplementGroupWithSupplements = SupplementGroup & {
 type Props = {
   supplement: Supplement;
   supplementGroups: SupplementGroupWithSupplements[];
+  licenseTypes: SelectableLicenseType[];
+  selectedTypeIds: string[];
 };
 
-export function SupplementActions({ supplement, supplementGroups }: Props) {
+export function SupplementActions({
+  supplement,
+  supplementGroups,
+  licenseTypes,
+  selectedTypeIds,
+}: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [propagation, setPropagation] = useState<PropagationRequest | null>(
@@ -65,6 +73,8 @@ export function SupplementActions({ supplement, supplementGroups }: Props) {
         seasonId={supplement.seasonId}
         supplement={supplement}
         supplementGroups={supplementGroups}
+        licenseTypes={licenseTypes}
+        selectedTypeIds={selectedTypeIds}
       />
       <PropagationPrompt
         request={propagation}
