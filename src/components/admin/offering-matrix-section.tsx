@@ -95,11 +95,16 @@ function PriceTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left">
-              <th className="pb-2 pr-3 font-medium">Categoría</th>
+              {/* The slack goes to the category column, so a price column is
+                  only as wide as the field in it. Without this the automatic
+                  layout hands the leftover width to the prices, and with a
+                  single modality the header ends up floating half a column
+                  away from the box it labels. */}
+              <th className="w-full pb-2 pr-3 font-medium">Categoría</th>
               {subtypes.map((s) => (
                 <th
                   key={s.id}
-                  className="pb-2 px-2 font-medium text-center min-w-[100px]"
+                  className="min-w-[100px] px-2 pb-2 text-center font-medium"
                 >
                   {s.name}
                 </th>
@@ -156,7 +161,9 @@ function PriceRow({
         </div>
       </td>
       {subtypes.map((sub) => (
-        <td key={sub.id} className="py-2 px-2">
+        // Centred like its header: the input is inline-block, so the cell's
+        // text alignment is what places it under the modality it prices.
+        <td key={sub.id} className="px-2 py-2 text-center">
           <Input
             name={`price-${category.id}-${sub.id}`}
             type="number"
@@ -164,7 +171,7 @@ function PriceRow({
             min="0"
             defaultValue={getDefault(sub.id)}
             placeholder="€"
-            className="h-8 w-24 text-center"
+            className="h-8 w-24 text-center tabular-nums"
           />
         </td>
       ))}
