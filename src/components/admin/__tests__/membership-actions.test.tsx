@@ -30,7 +30,7 @@ const WARNING = /pago pendiente/i;
 
 function openDeleteDialog(paymentStatus: string) {
   render(<MembershipActions membership={{ ...MEMBERSHIP, paymentStatus }} />);
-  fireEvent.click(screen.getByLabelText("Eliminar"));
+  fireEvent.click(screen.getByLabelText("Eliminar Lucía Fernández"));
 }
 
 describe("MembershipActions delete dialog", () => {

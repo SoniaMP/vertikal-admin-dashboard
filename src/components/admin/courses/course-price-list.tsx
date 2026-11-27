@@ -110,8 +110,9 @@ export function CoursePriceList({ defaultPrices = [], onChange }: Props) {
             </div>
             <Button
               type="button"
-              variant="ghost-destructive"
+              variant="ghost"
               size="icon-xs"
+              className="text-muted-foreground hover:text-foreground"
               onClick={() => removeRow(i)}
               aria-label="Eliminar precio"
             >

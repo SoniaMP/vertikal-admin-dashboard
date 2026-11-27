@@ -1,19 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ExternalLink, Pencil } from "lucide-react";
+import { DeleteRowAction } from "@/components/admin/delete-row-action";
+import { RowActionButton } from "@/components/admin/row-action-button";
+import { RowActions } from "@/components/admin/row-actions";
 import { softDeleteCourse } from "@/app/admin/(dashboard)/cursos/actions";
 import { CourseFormDialog } from "./course-form-dialog";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
@@ -25,7 +16,12 @@ type Props = {
   isInstructor?: boolean;
 };
 
-export function CourseActionsMenu({ course, courseTypes, instructors, isInstructor }: Props) {
+export function CourseActionsMenu({
+  course,
+  courseTypes,
+  instructors,
+  isInstructor,
+}: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -39,61 +35,30 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
   const canEdit = !isInstructor || isActive;
 
   return (
-    <div className="flex items-center gap-0.5 text-muted-foreground">
+    <RowActions>
       {isActive && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          asChild
-          aria-label="Ver página pública"
-        >
+        <RowActionButton asChild aria-label="Ver página pública">
           <a href={`/cursos/${course.slug}`} target="_blank" rel="noreferrer">
-            <ExternalLink className="h-4 w-4" />
+            <ExternalLink />
           </a>
-        </Button>
+        </RowActionButton>
       )}
       {canEdit && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
+        <RowActionButton
           onClick={() => setIsEditOpen(true)}
           aria-label="Editar"
         >
-          <Pencil className="h-4 w-4" />
-        </Button>
+          <Pencil />
+        </RowActionButton>
       )}
       {!isInstructor && (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={isPending}
-              aria-label="Eliminar"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                ¿Eliminar &ldquo;{course.title}&rdquo;?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                El curso se marcará como eliminado y no será visible.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete}>
-                Eliminar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DeleteRowAction
+          name={course.title}
+          onConfirm={handleDelete}
+          isPending={isPending}
+        >
+          El curso se marcará como eliminado y no será visible.
+        </DeleteRowAction>
       )}
       <CourseFormDialog
         open={isEditOpen}
@@ -103,6 +68,6 @@ export function CourseActionsMenu({ course, courseTypes, instructors, isInstruct
         instructors={instructors}
         isAdmin={!isInstructor}
       />
-    </div>
+    </RowActions>
   );
 }

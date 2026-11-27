@@ -2,6 +2,7 @@ import { Download } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { StatusPill, type PillTone } from "../status-pill";
 import { DeleteEnrolleeButton } from "./delete-enrollee-button";
+import { RowActions } from "@/components/admin/row-actions";
 import type { ParticipantRow } from "./participants-table";
 
 type Props = { participant: ParticipantRow; courseId: string };
@@ -22,16 +23,16 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
 
   return (
     <TableRow className="h-12">
-      <TableCell className="max-w-[180px] font-medium">
-        {p.firstName}
-      </TableCell>
+      <TableCell className="max-w-[180px] font-medium">{p.firstName}</TableCell>
       <TableCell className="max-w-[200px]">{p.lastName}</TableCell>
       <TableCell className="max-w-[240px] text-muted-foreground">
         {p.email}
       </TableCell>
       <TableCell className="text-muted-foreground">{p.phone ?? "—"}</TableCell>
       <TableCell className="text-muted-foreground">{p.dni ?? "—"}</TableCell>
-      <TableCell className="text-muted-foreground">{p.dateOfBirth ?? "—"}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {p.dateOfBirth ?? "—"}
+      </TableCell>
       <TableCell>{p.coursePrice.name}</TableCell>
       <TableCell>
         <StatusPill tone={payment?.tone ?? "neutral"}>
@@ -60,11 +61,13 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
         {formatDate(p.createdAt)}
       </TableCell>
       <TableCell>
-        <DeleteEnrolleeButton
-          registrationId={p.id}
-          courseId={courseId}
-          participantName={`${p.firstName} ${p.lastName}`}
-        />
+        <RowActions>
+          <DeleteEnrolleeButton
+            registrationId={p.id}
+            courseId={courseId}
+            participantName={`${p.firstName} ${p.lastName}`}
+          />
+        </RowActions>
       </TableCell>
     </TableRow>
   );

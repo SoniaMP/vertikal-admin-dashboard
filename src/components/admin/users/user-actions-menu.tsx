@@ -1,19 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Pencil } from "lucide-react";
+import { DeleteRowAction } from "@/components/admin/delete-row-action";
+import { RowActionButton } from "@/components/admin/row-action-button";
+import { RowActions } from "@/components/admin/row-actions";
 import { deleteUser } from "@/app/admin/(dashboard)/usuarios/actions";
 import { UserFormDialog, type UserFormData } from "./user-form-dialog";
 
@@ -33,51 +24,23 @@ export function UserActionsMenu({ user, isSelf }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-0.5 text-muted-foreground">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsEditOpen(true)}
-        aria-label="Editar"
+    <RowActions>
+      <RowActionButton onClick={() => setIsEditOpen(true)} aria-label="Editar">
+        <Pencil />
+      </RowActionButton>
+      <DeleteRowAction
+        name={user.name}
+        onConfirm={handleDelete}
+        disabled={isSelf || isPending}
+        reason={isSelf ? "No puedes eliminar tu propia cuenta" : undefined}
       >
-        <Pencil className="h-4 w-4" />
-      </Button>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={isSelf || isPending}
-            aria-label="Eliminar"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              ¿Eliminar a &ldquo;{user.name}&rdquo;?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción no se puede deshacer. El usuario perderá acceso al
-              panel.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        Esta acción no se puede deshacer. El usuario perderá acceso al panel.
+      </DeleteRowAction>
       <UserFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         user={user}
       />
-    </div>
+    </RowActions>
   );
 }
