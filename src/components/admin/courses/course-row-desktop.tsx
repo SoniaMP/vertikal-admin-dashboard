@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableRow } from "@/components/ui/table";
+import { DataCell } from "@/components/admin/data-cell";
 import { StatusPill } from "../status-pill";
 import { CourseActionsMenu } from "./course-actions-menu";
 import { RegistrationClosedIcon } from "./registration-closed-icon";
@@ -17,7 +18,12 @@ type Props = {
   isInstructor?: boolean;
 };
 
-export function CourseRowDesktop({ course, courseTypes, instructors, isInstructor }: Props) {
+export function CourseRowDesktop({
+  course,
+  courseTypes,
+  instructors,
+  isInstructor,
+}: Props) {
   const now = new Date();
   const spots = course.maxCapacity - course._count.registrations;
   const isPast = course.courseDate < now;
@@ -32,34 +38,31 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
       className={cn("h-12", isPast && "text-muted-foreground")}
       aria-label={isPast ? "Curso pasado" : undefined}
     >
-      <TableCell className="max-w-[260px] font-medium">
+      <DataCell className="max-w-[260px] font-medium">
         <div className="flex items-center gap-2">
           {showDraftWarning && <DraftCourseIcon />}
           {showClosedWarning && <RegistrationClosedIcon />}
-          <Link
-            href={`/admin/cursos/${course.id}`}
-            className="hover:underline"
-          >
+          <Link href={`/admin/cursos/${course.id}`} className="hover:underline">
             <TruncatedText text={course.title} />
           </Link>
         </div>
-      </TableCell>
-      <TableCell className="text-muted-foreground text-xs font-mono">
+      </DataCell>
+      <DataCell className="text-muted-foreground text-xs font-mono">
         {course.slug}
-      </TableCell>
-      <TableCell className="text-muted-foreground">
+      </DataCell>
+      <DataCell className="text-muted-foreground">
         {course.courseType.name}
-      </TableCell>
-      <TableCell className="text-right tabular-nums text-muted-foreground">
+      </DataCell>
+      <DataCell kind="date" className="text-muted-foreground">
         {formatCourseDate(course.courseDate)}
-      </TableCell>
-      <TableCell className="text-right tabular-nums text-muted-foreground">
+      </DataCell>
+      <DataCell kind="date" className="text-muted-foreground">
         {formatCourseDate(course.registrationDeadline)}
-      </TableCell>
+      </DataCell>
       {/* The count is the fact; "Lleno" is what it means, and only when it
           is true. The slash and the capacity stay grey so the number read
           down the column is the one that changes. */}
-      <TableCell className="text-right tabular-nums whitespace-nowrap">
+      <DataCell kind="number" className="whitespace-nowrap">
         {course._count.registrations}
         <span className="text-muted-foreground"> / {course.maxCapacity}</span>
         {spots <= 0 && (
@@ -67,20 +70,20 @@ export function CourseRowDesktop({ course, courseTypes, instructors, isInstructo
             <StatusPill tone="warning">Lleno</StatusPill>
           </span>
         )}
-      </TableCell>
+      </DataCell>
       {!isInstructor && (
-        <TableCell className="text-muted-foreground text-sm">
+        <DataCell className="text-muted-foreground text-sm">
           {course.instructor?.name ?? "—"}
-        </TableCell>
+        </DataCell>
       )}
-      <TableCell className="text-right">
+      <DataCell kind="actions">
         <CourseActionsMenu
           course={course}
           courseTypes={courseTypes}
           instructors={instructors}
           isInstructor={isInstructor}
         />
-      </TableCell>
+      </DataCell>
     </TableRow>
   );
 }

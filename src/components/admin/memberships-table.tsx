@@ -1,23 +1,14 @@
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
 import type { SortField, SortDirection } from "@/types/membership-filters";
+import { DataHead } from "./data-head";
 import { SortableHeader } from "./sortable-header";
 import { DesktopRow } from "./membership-row-desktop";
 import { MobileCard } from "./membership-row-mobile";
 import { EmptyState } from "./empty-state";
 
-/* 12px grey sentence case, no fill band: the header labels the data without
-   competing with it. */
-const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
-const HEAD_NUM = `${HEAD} text-right`;
 /* Email and sex fold under the name between 768 and 1024, where nine columns
    broke every name over three lines. */
-const HEAD_FOLD = `${HEAD} hidden lg:table-cell`;
+const FOLD = "hidden lg:table-cell";
 
 export type MembershipRow = {
   id: string;
@@ -74,42 +65,41 @@ export function MembershipsTable({ memberships, sortBy, sortDir }: Props) {
                 label="Nombre"
                 currentSort={sortBy}
                 currentDir={sortDir}
-                className={HEAD}
               />
               <SortableHeader
                 field="email"
                 label="Email"
                 currentSort={sortBy}
                 currentDir={sortDir}
-                className={HEAD_FOLD}
+                className={FOLD}
               />
-              <TableHead className={HEAD_FOLD}>Sexo</TableHead>
-              <TableHead className={HEAD}>Licencia</TableHead>
+              <DataHead className={FOLD}>Sexo</DataHead>
+              <DataHead>Licencia</DataHead>
               <SortableHeader
                 field="totalAmount"
                 label="Total"
                 currentSort={sortBy}
                 currentDir={sortDir}
-                className={HEAD_NUM}
+                kind="number"
               />
               <SortableHeader
                 field="status"
                 label="Pago"
                 currentSort={sortBy}
                 currentDir={sortDir}
-                className={HEAD}
+                kind="status"
               />
-              <TableHead className={HEAD}>Federativa</TableHead>
+              <DataHead>Federativa</DataHead>
               <SortableHeader
                 field="createdAt"
                 label="Alta"
                 currentSort={sortBy}
                 currentDir={sortDir}
-                className={HEAD_NUM}
+                kind="date"
               />
-              <TableHead className={HEAD_NUM}>
+              <DataHead kind="actions">
                 <span className="sr-only">Acciones</span>
-              </TableHead>
+              </DataHead>
             </TableRow>
           </TableHeader>
           <TableBody>

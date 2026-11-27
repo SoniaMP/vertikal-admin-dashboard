@@ -1,18 +1,9 @@
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataHead } from "@/components/admin/data-head";
 import { SearchX } from "lucide-react";
 import { CourseRowDesktop } from "./course-row-desktop";
 import { CourseRowMobile } from "./course-row-mobile";
 import type { CourseRow, CourseTypeOption, InstructorOption } from "./types";
-
-/* The same header voice as the members table: 12px grey, no fill band. */
-const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
-const HEAD_NUM = `${HEAD} text-right`;
 
 type Props = {
   courses: CourseRow[];
@@ -21,7 +12,12 @@ type Props = {
   isInstructor?: boolean;
 };
 
-export function CoursesTable({ courses, courseTypes, instructors, isInstructor }: Props) {
+export function CoursesTable({
+  courses,
+  courseTypes,
+  instructors,
+  isInstructor,
+}: Props) {
   if (courses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
@@ -48,16 +44,16 @@ export function CoursesTable({ courses, courseTypes, instructors, isInstructor }
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className={HEAD}>Título</TableHead>
-              <TableHead className={HEAD}>Slug</TableHead>
-              <TableHead className={HEAD}>Tipo</TableHead>
-              <TableHead className={HEAD_NUM}>Fecha</TableHead>
-              <TableHead className={HEAD_NUM}>Plazo</TableHead>
-              <TableHead className={HEAD_NUM}>Plazas</TableHead>
-              {!isInstructor && <TableHead className={HEAD}>Director</TableHead>}
-              <TableHead className={HEAD_NUM}>
+              <DataHead>Título</DataHead>
+              <DataHead>Slug</DataHead>
+              <DataHead>Tipo</DataHead>
+              <DataHead kind="date">Fecha</DataHead>
+              <DataHead kind="date">Plazo</DataHead>
+              <DataHead kind="number">Plazas</DataHead>
+              {!isInstructor && <DataHead>Director</DataHead>}
+              <DataHead kind="actions">
                 <span className="sr-only">Acciones</span>
-              </TableHead>
+              </DataHead>
             </TableRow>
           </TableHeader>
           <TableBody>

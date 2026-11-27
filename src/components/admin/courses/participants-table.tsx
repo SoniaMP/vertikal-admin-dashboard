@@ -1,17 +1,8 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { TableHead } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataHead } from "@/components/admin/data-head";
 import { SortableHeader } from "@/components/admin/sortable-header";
-
-/* 12px grey, no fill band, like every other table in the panel. */
-const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
-const HEAD_NUM = `${HEAD} text-right`;
 import { ParticipantRowDesktop } from "./participant-row-desktop";
 import { ParticipantRowMobile } from "./participant-row-mobile";
 
@@ -70,7 +61,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="lastName"
@@ -78,7 +68,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="email"
@@ -86,7 +75,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="phone"
@@ -94,7 +82,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="dni"
@@ -102,7 +89,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="dateOfBirth"
@@ -110,7 +96,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="priceName"
@@ -118,7 +103,6 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
               />
               <SortableHeader
                 field="paymentStatus"
@@ -126,26 +110,30 @@ export function ParticipantsTable({
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD}
+                kind="status"
               />
-              <TableHead className={HEAD}>Tipo licencia</TableHead>
-              <TableHead className={HEAD}>PDF</TableHead>
+              <DataHead>Tipo licencia</DataHead>
+              <DataHead>PDF</DataHead>
               <SortableHeader
                 field="createdAt"
                 label="Fecha inscripción"
                 currentSort={sortBy}
                 currentDir={sortDir}
                 basePath={basePath}
-                className={HEAD_NUM}
+                kind="date"
               />
-              <TableHead className={`${HEAD} w-12`}>
+              <DataHead kind="actions">
                 <span className="sr-only">Acciones</span>
-              </TableHead>
+              </DataHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {participants.map((p) => (
-              <ParticipantRowDesktop key={p.id} participant={p} courseId={courseId} />
+              <ParticipantRowDesktop
+                key={p.id}
+                participant={p}
+                courseId={courseId}
+              />
             ))}
           </TableBody>
         </Table>
@@ -154,7 +142,11 @@ export function ParticipantsTable({
       {/* Mobile */}
       <div className="space-y-3 md:hidden">
         {participants.map((p) => (
-          <ParticipantRowMobile key={p.id} participant={p} courseId={courseId} />
+          <ParticipantRowMobile
+            key={p.id}
+            participant={p}
+            courseId={courseId}
+          />
         ))}
       </div>
     </>

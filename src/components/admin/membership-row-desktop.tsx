@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableRow } from "@/components/ui/table";
+import { DataCell } from "./data-cell";
 import { formatPrice } from "@/helpers/price-calculator";
 import { cn } from "@/lib/utils";
 import { MEMBERSHIP_STATUS } from "@/types";
@@ -16,7 +17,7 @@ export function DesktopRow({ membership: m }: Props) {
   const isCancelled = m.status === MEMBERSHIP_STATUS.CANCELLED;
   return (
     <TableRow className={cn("h-12", isCancelled && "opacity-50")}>
-      <TableCell className="max-w-[220px]">
+      <DataCell className="max-w-[220px]">
         <Link
           href={`/admin/registros/${m.id}`}
           className="font-medium hover:underline"
@@ -27,39 +28,35 @@ export function DesktopRow({ membership: m }: Props) {
         <span className="block truncate text-xs text-muted-foreground lg:hidden">
           {m.member.email} · {m.member.sex}
         </span>
-      </TableCell>
-      <TableCell className="hidden max-w-[240px] text-muted-foreground lg:table-cell">
+      </DataCell>
+      <DataCell className="hidden max-w-[240px] text-muted-foreground lg:table-cell">
         {m.member.email}
-      </TableCell>
-      <TableCell className="hidden lg:table-cell">{m.member.sex}</TableCell>
-      <TableCell>{licenseLabel(m)}</TableCell>
-      <TableCell className="text-right tabular-nums">
-        {formatPrice(m.totalAmount)}
-      </TableCell>
-      <TableCell>
+      </DataCell>
+      <DataCell className="hidden lg:table-cell">{m.member.sex}</DataCell>
+      <DataCell>{licenseLabel(m)}</DataCell>
+      <DataCell kind="number">{formatPrice(m.totalAmount)}</DataCell>
+      <DataCell kind="status">
         <StatusBadges
           paymentStatus={m.paymentStatus}
           membershipStatus={m.status}
         />
-      </TableCell>
-      <TableCell>
+      </DataCell>
+      <DataCell>
         <FederationCell membership={m} />
-      </TableCell>
-      <TableCell className="text-right tabular-nums text-muted-foreground">
+      </DataCell>
+      <DataCell kind="date" className="text-muted-foreground">
         {formatDate(m.createdAt)}
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex items-center justify-end">
-          <MembershipActions
-            membership={{
-              ...m.member,
-              id: m.id,
-              status: m.status,
-              paymentStatus: m.paymentStatus,
-            }}
-          />
-        </div>
-      </TableCell>
+      </DataCell>
+      <DataCell kind="actions">
+        <MembershipActions
+          membership={{
+            ...m.member,
+            id: m.id,
+            status: m.status,
+            paymentStatus: m.paymentStatus,
+          }}
+        />
+      </DataCell>
     </TableRow>
   );
 }

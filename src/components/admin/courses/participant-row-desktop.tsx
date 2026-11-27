@@ -1,5 +1,6 @@
 import { Download } from "lucide-react";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableRow } from "@/components/ui/table";
+import { DataCell } from "@/components/admin/data-cell";
 import { StatusPill, type PillTone } from "../status-pill";
 import { DeleteEnrolleeButton } from "./delete-enrollee-button";
 import { RowActions } from "@/components/admin/row-actions";
@@ -23,26 +24,26 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
 
   return (
     <TableRow className="h-12">
-      <TableCell className="max-w-[180px] font-medium">{p.firstName}</TableCell>
-      <TableCell className="max-w-[200px]">{p.lastName}</TableCell>
-      <TableCell className="max-w-[240px] text-muted-foreground">
+      <DataCell className="max-w-[180px] font-medium">{p.firstName}</DataCell>
+      <DataCell className="max-w-[200px]">{p.lastName}</DataCell>
+      <DataCell className="max-w-[240px] text-muted-foreground">
         {p.email}
-      </TableCell>
-      <TableCell className="text-muted-foreground">{p.phone ?? "—"}</TableCell>
-      <TableCell className="text-muted-foreground">{p.dni ?? "—"}</TableCell>
-      <TableCell className="text-muted-foreground">
+      </DataCell>
+      <DataCell className="text-muted-foreground">{p.phone ?? "—"}</DataCell>
+      <DataCell className="text-muted-foreground">{p.dni ?? "—"}</DataCell>
+      <DataCell className="text-muted-foreground">
         {p.dateOfBirth ?? "—"}
-      </TableCell>
-      <TableCell>{p.coursePrice.name}</TableCell>
-      <TableCell>
+      </DataCell>
+      <DataCell>{p.coursePrice.name}</DataCell>
+      <DataCell kind="status">
         <StatusPill tone={payment?.tone ?? "neutral"}>
           {payment?.label ?? p.paymentStatus}
         </StatusPill>
-      </TableCell>
-      <TableCell className="text-muted-foreground">
+      </DataCell>
+      <DataCell className="text-muted-foreground">
         {p.licenseType ?? "—"}
-      </TableCell>
-      <TableCell>
+      </DataCell>
+      <DataCell>
         {p.licenseFileUrl ? (
           <a
             href={p.licenseFileUrl}
@@ -56,11 +57,11 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
         ) : (
           <span className="text-muted-foreground">—</span>
         )}
-      </TableCell>
-      <TableCell className="text-right tabular-nums text-muted-foreground">
+      </DataCell>
+      <DataCell kind="date" className="text-muted-foreground">
         {formatDate(p.createdAt)}
-      </TableCell>
-      <TableCell>
+      </DataCell>
+      <DataCell kind="actions">
         <RowActions>
           <DeleteEnrolleeButton
             registrationId={p.id}
@@ -68,7 +69,7 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
             participantName={`${p.firstName} ${p.lastName}`}
           />
         </RowActions>
-      </TableCell>
+      </DataCell>
     </TableRow>
   );
 }

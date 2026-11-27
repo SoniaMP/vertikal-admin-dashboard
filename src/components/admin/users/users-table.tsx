@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataCell } from "@/components/admin/data-cell";
+import { DataHead } from "@/components/admin/data-head";
 import { StatusPill } from "../status-pill";
 import { UserActionsMenu } from "./user-actions-menu";
 import type { UserFormData } from "./user-form-dialog";
@@ -18,9 +13,6 @@ type Props = {
   users: UserRow[];
   currentUserId: string;
 };
-
-/* The same header voice as the other two tables: 12px grey, no fill band. */
-const HEAD = "h-9 px-2 text-xs font-normal text-muted-foreground";
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administrador",
@@ -48,36 +40,33 @@ export function UsersTable({ users, currentUserId }: Props) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className={HEAD}>Nombre</TableHead>
-          <TableHead className={HEAD}>Email</TableHead>
-          <TableHead className={HEAD}>Rol</TableHead>
-          <TableHead className={`${HEAD} text-right`}>Creado</TableHead>
-          <TableHead className={`${HEAD} w-12`}>
+          <DataHead>Nombre</DataHead>
+          <DataHead>Email</DataHead>
+          <DataHead kind="status">Rol</DataHead>
+          <DataHead kind="date">Creado</DataHead>
+          <DataHead kind="actions">
             <span className="sr-only">Acciones</span>
-          </TableHead>
+          </DataHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id} className="h-12">
-            <TableCell className="max-w-[220px] font-medium">
+            <DataCell className="max-w-[220px] font-medium">
               {user.name}
-            </TableCell>
-            <TableCell className="max-w-[240px] text-muted-foreground">
+            </DataCell>
+            <DataCell className="max-w-[240px] text-muted-foreground">
               {user.email}
-            </TableCell>
-            <TableCell>
+            </DataCell>
+            <DataCell kind="status">
               <RoleBadge roleName={user.roleName} />
-            </TableCell>
-            <TableCell className="text-right tabular-nums text-muted-foreground">
+            </DataCell>
+            <DataCell kind="date" className="text-muted-foreground">
               {formatDate(user.createdAt)}
-            </TableCell>
-            <TableCell>
-              <UserActionsMenu
-                user={user}
-                isSelf={user.id === currentUserId}
-              />
-            </TableCell>
+            </DataCell>
+            <DataCell kind="actions">
+              <UserActionsMenu user={user} isSelf={user.id === currentUserId} />
+            </DataCell>
           </TableRow>
         ))}
       </TableBody>

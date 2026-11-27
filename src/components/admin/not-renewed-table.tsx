@@ -1,11 +1,6 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataCell } from "./data-cell";
+import { DataHead } from "./data-head";
 
 export type NotRenewedMember = {
   id: string;
@@ -42,25 +37,23 @@ export function NotRenewedTable({ members, previousSeasonName }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>DNI</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Teléfono</TableHead>
+              <DataHead>Nombre</DataHead>
+              <DataHead>DNI</DataHead>
+              <DataHead>Email</DataHead>
+              <DataHead>Teléfono</DataHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {members.map((m) => (
               <TableRow key={m.id}>
-                <TableCell className="max-w-[220px] font-medium">
+                <DataCell className="max-w-[220px] font-medium">
                   {m.firstName} {m.lastName}
-                </TableCell>
-                <TableCell>{m.dni}</TableCell>
-                <TableCell className="max-w-[240px] text-muted-foreground">
+                </DataCell>
+                <DataCell>{m.dni}</DataCell>
+                <DataCell className="max-w-[240px] text-muted-foreground">
                   {m.email}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {m.phone}
-                </TableCell>
+                </DataCell>
+                <DataCell className="text-muted-foreground">{m.phone}</DataCell>
               </TableRow>
             ))}
           </TableBody>

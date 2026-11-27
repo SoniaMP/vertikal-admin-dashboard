@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { TableHead } from "@/components/ui/table";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DataHead } from "./data-head";
+import type { ColumnKind } from "@/helpers/table-column-classes";
 
 type Props = {
   field: string;
@@ -11,6 +12,9 @@ type Props = {
   currentSort: string;
   currentDir: "asc" | "desc";
   basePath?: string;
+  /** What the column holds, exactly as its cells are told. */
+  kind?: ColumnKind;
+  /** Width or responsive classes only; the kind decides the alignment. */
   className?: string;
 };
 
@@ -20,6 +24,7 @@ export function SortableHeader({
   currentSort,
   currentDir,
   basePath = "/admin",
+  kind = "text",
   className,
 }: Props) {
   const router = useRouter();
@@ -51,8 +56,11 @@ export function SortableHeader({
       : "descending"
     : "none";
 
+  const readsFromTheRight = kind === "number" || kind === "date";
+
   return (
-    <TableHead
+    <DataHead
+      kind={kind}
       className={className}
       aria-sort={ariaSort as "ascending" | "descending" | "none"}
     >
@@ -65,12 +73,13 @@ export function SortableHeader({
           // In a column that reads from the right, the arrow goes on the
           // inside: trailing it would hold the right edge and leave the label
           // permanently short of the figures underneath.
-          className?.includes("text-right") && "ml-auto flex-row-reverse",
+          readsFromTheRight && "ml-auto flex-row-reverse",
+          kind === "center" && "mx-auto",
         )}
       >
         {label}
         <Icon className="h-3.5 w-3.5" />
       </button>
-    </TableHead>
+    </DataHead>
   );
 }

@@ -8,14 +8,9 @@ import type {
   Category,
 } from "@prisma/client";
 import { ChevronRight } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataCell } from "./data-cell";
+import { DataHead } from "./data-head";
 import { LicenseStateBadge } from "./license-state-badge";
 import {
   Collapsible,
@@ -27,7 +22,6 @@ import { DetailSections } from "./license-type-detail-sections";
 import { TruncatedCell } from "./truncated-cell";
 
 /* 12px grey, no fill band, like every other table in the panel. */
-const HEAD = "h-9 px-2 align-middle text-xs font-normal text-muted-foreground";
 
 export type SubtypeWithCount = LicenseSubtype & {
   _count: { memberships: number };
@@ -117,34 +111,30 @@ function DesktopRow({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className={`${HEAD} w-8`} />
-              <TableHead className={`${HEAD} w-48 min-w-48`}>Nombre</TableHead>
+              <DataHead className="w-8" />
+              <DataHead className="w-48 min-w-48">Nombre</DataHead>
               {/* The only column whose content is a sentence, so it takes
                   whatever the fixed ones leave instead of truncating at a
                   width of its own while they sit half empty. */}
-              <TableHead className={`${HEAD} w-full`}>Descripción</TableHead>
-              <TableHead
-                className={`${HEAD} w-px whitespace-nowrap text-center`}
-              >
+              <DataHead className="w-full">Descripción</DataHead>
+              <DataHead kind="center" className="w-px whitespace-nowrap">
                 Estado
-              </TableHead>
-              <TableHead
-                className={`${HEAD} w-px whitespace-nowrap text-center`}
-              >
+              </DataHead>
+              <DataHead kind="center" className="w-px whitespace-nowrap">
                 Registros
-              </TableHead>
+              </DataHead>
               {/* Room for the four buttons and the air RowActions puts
                   before them, held even on a row that shows three, so the
                   column cannot collapse under them and every row ends at the
                   same edge. */}
-              <TableHead className={`${HEAD} w-px min-w-48 text-right`}>
+              <DataHead kind="actions" className="min-w-48">
                 <span className="sr-only">Acciones</span>
-              </TableHead>
+              </DataHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell className="align-middle">
+              <DataCell>
                 <CollapsibleTrigger asChild>
                   <button
                     type="button"
@@ -156,36 +146,39 @@ function DesktopRow({
                     />
                   </button>
                 </CollapsibleTrigger>
-              </TableCell>
-              <TableCell className="w-48 min-w-48 align-middle">
+              </DataCell>
+              <DataCell className="w-48 min-w-48">
                 <TruncatedCell
                   text={lt.name}
                   className="font-medium max-w-48"
                 />
-              </TableCell>
+              </DataCell>
               {/* w-full with max-w-0 is what lets a table cell both fill the
                   row and cut its text off: without it the sentence sets the
                   column's width instead of the other way round. */}
-              <TableCell className="w-full max-w-0 align-middle">
+              <DataCell className="w-full max-w-0">
                 <TruncatedCell
                   text={lt.description}
                   className="text-muted-foreground"
                 />
-              </TableCell>
-              <TableCell className="w-px whitespace-nowrap text-center align-middle">
+              </DataCell>
+              <DataCell kind="center" className="w-px whitespace-nowrap">
                 <LicenseStateBadge license={lt} />
-              </TableCell>
-              <TableCell className="w-px whitespace-nowrap text-center align-middle tabular-nums">
+              </DataCell>
+              <DataCell
+                kind="center"
+                className="w-px whitespace-nowrap tabular-nums"
+              >
                 {lt._count.memberships}
-              </TableCell>
-              <TableCell className="w-px align-middle">
+              </DataCell>
+              <DataCell kind="actions">
                 <LicenseTypeActions
                   licenseType={lt}
                   membershipCount={lt._count.memberships}
                   categories={categories}
                   seasonName={seasonName}
                 />
-              </TableCell>
+              </DataCell>
             </TableRow>
           </TableBody>
         </Table>

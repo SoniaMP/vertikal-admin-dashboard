@@ -1,17 +1,10 @@
 import { fetchClosedSeasonPrices } from "@/lib/closed-season-prices";
 import { formatPrice } from "@/helpers/price-calculator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { DataCell } from "./data-cell";
+import { DataHead } from "./data-head";
 
 /* 12px grey, no fill band, like every other table in the panel. */
-const HEAD = "h-9 px-2 align-middle text-xs font-normal text-muted-foreground";
-const HEAD_NUM = `${HEAD} text-right`;
 const ROW = "h-12";
 
 /* A section title outranks the column labels under it, as on the open year. */
@@ -53,25 +46,25 @@ export async function ClosedSeasonCatalog({ seasonId, year }: Props) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className={HEAD}>Federativa</TableHead>
-                <TableHead className={HEAD}>Modalidad</TableHead>
-                <TableHead className={HEAD}>Categoría</TableHead>
-                <TableHead className={HEAD_NUM}>Precio</TableHead>
-                <TableHead className={HEAD_NUM}>Contratadas</TableHead>
+                <DataHead>Federativa</DataHead>
+                <DataHead>Modalidad</DataHead>
+                <DataHead>Categoría</DataHead>
+                <DataHead kind="number">Precio</DataHead>
+                <DataHead kind="number">Contratadas</DataHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {licenses.map((license) => (
                 <TableRow key={license.id} className={ROW}>
-                  <TableCell>{license.type.name}</TableCell>
-                  <TableCell>{license.subtype.name}</TableCell>
-                  <TableCell>{license.category.name}</TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <DataCell>{license.type.name}</DataCell>
+                  <DataCell>{license.subtype.name}</DataCell>
+                  <DataCell>{license.category.name}</DataCell>
+                  <DataCell kind="number">
                     {formatPrice(license.price)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-muted-foreground">
+                  </DataCell>
+                  <DataCell kind="number" className="text-muted-foreground">
                     {license._count.memberships}
-                  </TableCell>
+                  </DataCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -115,17 +108,15 @@ function PricedList({ title, rows }: { title: string; rows: Row[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className={HEAD}>Nombre</TableHead>
-            <TableHead className={HEAD_NUM}>Precio</TableHead>
+            <DataHead>Nombre</DataHead>
+            <DataHead kind="number">Precio</DataHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id} className={ROW}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {formatPrice(row.price)}
-              </TableCell>
+              <DataCell>{row.name}</DataCell>
+              <DataCell kind="number">{formatPrice(row.price)}</DataCell>
             </TableRow>
           ))}
         </TableBody>
