@@ -106,9 +106,7 @@ export function LicenseTypeFormDialog({
                 minLength={5}
               />
             </div>
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"

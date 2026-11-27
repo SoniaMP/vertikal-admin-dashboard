@@ -26,10 +26,7 @@ export function EmailBrandingForm({ branding }: EmailBrandingFormProps) {
   return (
     <form ref={formRef} action={formAction} className="max-w-sm space-y-4">
       <input type="hidden" name="logoUrl" value={logoUrl} />
-      <LogoUploader
-        currentLogoUrl={branding.logoUrl}
-        onUploaded={setLogoUrl}
-      />
+      <LogoUploader currentLogoUrl={branding.logoUrl} onUploaded={setLogoUrl} />
 
       <ColorField
         label="Color primario (cabecera/botones)"
@@ -47,9 +44,7 @@ export function EmailBrandingForm({ branding }: EmailBrandingFormProps) {
         defaultValue={branding.backgroundColor}
       />
 
-      {state.error && (
-        <p className="text-sm text-destructive">{state.error}</p>
-      )}
+      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state.success && (
         <p className="text-sm text-green-600">
           Configuración de email actualizada

@@ -39,9 +39,7 @@ export function SeasonRolloverForm({ currentDays, windowLabel }: Props) {
       </div>
 
       {state.error && <p className="text-sm text-destructive">{state.error}</p>}
-      {state.success && (
-        <p className="text-sm text-green-600">Guardado</p>
-      )}
+      {state.success && <p className="text-sm text-green-600">Guardado</p>}
 
       <Button type="submit" disabled={isPending}>
         {isPending ? "Guardando..." : "Guardar"}

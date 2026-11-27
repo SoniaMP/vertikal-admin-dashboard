@@ -10,7 +10,10 @@ type LogoUploaderProps = {
   onUploaded: (url: string) => void;
 };
 
-export function LogoUploader({ currentLogoUrl, onUploaded }: LogoUploaderProps) {
+export function LogoUploader({
+  currentLogoUrl,
+  onUploaded,
+}: LogoUploaderProps) {
   const [previewUrl, setPreviewUrl] = useState(currentLogoUrl);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +65,9 @@ export function LogoUploader({ currentLogoUrl, onUploaded }: LogoUploaderProps) 
         onChange={handleFileChange}
         disabled={isUploading}
       />
-      {isUploading && <p className="text-sm text-muted-foreground">Subiendo...</p>}
+      {isUploading && (
+        <p className="text-sm text-muted-foreground">Subiendo...</p>
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

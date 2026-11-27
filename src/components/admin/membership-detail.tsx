@@ -23,10 +23,7 @@ function PersonalDataCard({ membership: m }: Props) {
         <DetailField label="Email" value={m.member.email} />
         <DetailField label="Teléfono" value={m.member.phone} />
         <DetailField label="DNI" value={m.member.dni} />
-        <DetailField
-          label="Fecha de nacimiento"
-          value={m.member.dateOfBirth}
-        />
+        <DetailField label="Fecha de nacimiento" value={m.member.dateOfBirth} />
         <DetailField label="Sexo" value={formatSex(m.member.sex)} />
         <DetailField label="Dirección" value={m.member.address} />
         <DetailField label="Ciudad" value={m.member.city} />

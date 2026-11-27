@@ -52,7 +52,10 @@ export function SortableHeader({
     : "none";
 
   return (
-    <TableHead className={className} aria-sort={ariaSort as "ascending" | "descending" | "none"}>
+    <TableHead
+      className={className}
+      aria-sort={ariaSort as "ascending" | "descending" | "none"}
+    >
       <button
         type="button"
         onClick={handleClick}

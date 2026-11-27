@@ -21,21 +21,21 @@ export function LicensePreviewContent({ preview, seasonName }: Props) {
         {visibility === "draft"
           ? `Lo que un socio podrá contratar en ${seasonName} cuando publiques esta federativa.`
           : `Lo que un socio puede contratar ahora mismo en ${seasonName}.`}{" "}
-        Se listan todas las categorías de la temporada: las que no tengan
-        precio no se podrán elegir.
+        Se listan todas las categorías de la temporada: las que no tengan precio
+        no se podrán elegir.
       </p>
 
       {!readiness.canPublish && (
         <Warning>
-          Ningún socio vería esta federativa: no tiene ningún precio
-          configurado en la temporada activa.
+          Ningún socio vería esta federativa: no tiene ningún precio configurado
+          en la temporada activa.
         </Warning>
       )}
 
       {readiness.canPublish && visibleSubtypes.length < subtypes.length && (
         <Warning>
-          {subtypes.length - visibleSubtypes.length} modalidad(es) no
-          aparecerán porque no tienen ningún precio.
+          {subtypes.length - visibleSubtypes.length} modalidad(es) no aparecerán
+          porque no tienen ningún precio.
         </Warning>
       )}
 

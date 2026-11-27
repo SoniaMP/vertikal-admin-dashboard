@@ -52,8 +52,12 @@ export function ActiveFilterChips({ filterOptions }: Props) {
           className="cursor-pointer gap-1 pr-1"
           onClick={() => updateParam(key, "all")}
         >
-          {FILTER_LABELS[key] ?? key}: {resolveDisplayValue(key, value, filterOptions)}
-          <X className="h-3 w-3" aria-label={`Eliminar filtro ${FILTER_LABELS[key] ?? key}`} />
+          {FILTER_LABELS[key] ?? key}:{" "}
+          {resolveDisplayValue(key, value, filterOptions)}
+          <X
+            className="h-3 w-3"
+            aria-label={`Eliminar filtro ${FILTER_LABELS[key] ?? key}`}
+          />
         </Badge>
       ))}
     </div>

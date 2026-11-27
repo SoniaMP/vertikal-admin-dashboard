@@ -28,11 +28,7 @@ type Props = {
  * so it sits at the head of the row rather than beside the page's actions.
  * The membership state left this row for the tabs above it.
  */
-export function MembershipsToolbar({
-  years,
-  selectedYear,
-  activeYear,
-}: Props) {
+export function MembershipsToolbar({ years, selectedYear, activeYear }: Props) {
   const { updateParam, updateParamDebounced, clearAll, searchParams } =
     useFilterNavigation();
 

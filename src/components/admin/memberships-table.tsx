@@ -69,14 +69,44 @@ export function MembershipsTable({ memberships, sortBy, sortDir }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableHeader field="memberName" label="Nombre" currentSort={sortBy} currentDir={sortDir} className={HEAD} />
-              <SortableHeader field="email" label="Email" currentSort={sortBy} currentDir={sortDir} className={HEAD_FOLD} />
+              <SortableHeader
+                field="memberName"
+                label="Nombre"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                className={HEAD}
+              />
+              <SortableHeader
+                field="email"
+                label="Email"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                className={HEAD_FOLD}
+              />
               <TableHead className={HEAD_FOLD}>Sexo</TableHead>
               <TableHead className={HEAD}>Licencia</TableHead>
-              <SortableHeader field="totalAmount" label="Total" currentSort={sortBy} currentDir={sortDir} className={HEAD_NUM} />
-              <SortableHeader field="status" label="Pago" currentSort={sortBy} currentDir={sortDir} className={HEAD} />
+              <SortableHeader
+                field="totalAmount"
+                label="Total"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                className={HEAD_NUM}
+              />
+              <SortableHeader
+                field="status"
+                label="Pago"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                className={HEAD}
+              />
               <TableHead className={HEAD}>Federativa</TableHead>
-              <SortableHeader field="createdAt" label="Alta" currentSort={sortBy} currentDir={sortDir} className={HEAD_NUM} />
+              <SortableHeader
+                field="createdAt"
+                label="Alta"
+                currentSort={sortBy}
+                currentDir={sortDir}
+                className={HEAD_NUM}
+              />
               <TableHead className={HEAD_NUM}>
                 <span className="sr-only">Acciones</span>
               </TableHead>

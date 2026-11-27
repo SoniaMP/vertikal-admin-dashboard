@@ -36,9 +36,7 @@ export function NotificationEmailsForm({
         <EmailChipInput value={emails} onChange={setEmails} />
       </div>
 
-      {state.error && (
-        <p className="text-sm text-destructive">{state.error}</p>
-      )}
+      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state.success && (
         <p className="text-sm text-green-600">Guardado correctamente</p>
       )}

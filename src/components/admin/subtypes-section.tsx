@@ -21,11 +21,7 @@ type Props = {
   offerings: { subtypeId: string }[];
 };
 
-export function SubtypesSection({
-  licenseTypeId,
-  subtypes,
-  offerings,
-}: Props) {
+export function SubtypesSection({ licenseTypeId, subtypes, offerings }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const pricedSubtypeIds = new Set(offerings.map((o) => o.subtypeId));

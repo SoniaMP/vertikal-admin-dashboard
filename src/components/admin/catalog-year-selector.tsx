@@ -19,7 +19,11 @@ type Props = {
  * Which year's prices the screen is showing. The season is the calendar year,
  * so this is the whole of it: no names, no ranges.
  */
-export function CatalogYearSelector({ years, selectedYear, currentYear }: Props) {
+export function CatalogYearSelector({
+  years,
+  selectedYear,
+  currentYear,
+}: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

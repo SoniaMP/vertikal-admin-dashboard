@@ -45,7 +45,10 @@ export function Pagination({
   }
 
   return (
-    <nav aria-label="Paginación" className="flex items-center justify-between mt-4">
+    <nav
+      aria-label="Paginación"
+      className="flex items-center justify-between mt-4"
+    >
       <span className="text-sm text-muted-foreground">
         Mostrando {from}-{to} de {total}{" "}
         {total === 1 ? itemLabel.one : itemLabel.many}

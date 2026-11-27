@@ -25,11 +25,7 @@ type Props = {
  * control. The choice is held by the caller so that the federation list can
  * react to it: a grouped supplement is offered where its group is.
  */
-export function SupplementGroupPicker({
-  groups,
-  value,
-  onValueChange,
-}: Props) {
+export function SupplementGroupPicker({ groups, value, onValueChange }: Props) {
   if (groups.length === 0) return null;
 
   return (

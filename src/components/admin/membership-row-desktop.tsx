@@ -21,9 +21,7 @@ export function DesktopRow({ membership: m }: Props) {
           href={`/admin/registros/${m.id}`}
           className="font-medium hover:underline"
         >
-          <TruncatedText
-            text={`${m.member.firstName} ${m.member.lastName}`}
-          />
+          <TruncatedText text={`${m.member.firstName} ${m.member.lastName}`} />
         </Link>
         {/* Where the two columns fold away, they come back under the name. */}
         <span className="block truncate text-xs text-muted-foreground lg:hidden">

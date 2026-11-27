@@ -27,7 +27,8 @@ export function FederationCascadingSelects({
 }: Props) {
   const [selectedTypeId, setSelectedTypeId] = useState(defaultTypeId);
   const [selectedSubtypeId, setSelectedSubtypeId] = useState(defaultSubtypeId);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(defaultCategoryId);
+  const [selectedCategoryId, setSelectedCategoryId] =
+    useState(defaultCategoryId);
 
   const selectedType = catalog.find((t) => t.id === selectedTypeId);
 
@@ -36,13 +37,16 @@ export function FederationCascadingSelects({
     const category = selectedType.categories.find(
       (c) => c.id === selectedCategoryId,
     );
-    const cents = category?.prices.find((p) => p.subtypeId === selectedSubtypeId)?.price;
+    const cents = category?.prices.find(
+      (p) => p.subtypeId === selectedSubtypeId,
+    )?.price;
     return cents != null ? (cents / 100).toFixed(2) : null;
   }, [selectedType, selectedSubtypeId, selectedCategoryId]);
 
   const [priceOverride, setPriceOverride] = useState<string>("");
 
-  const displayPrice = priceOverride !== "" ? priceOverride : catalogPriceEuros ?? "";
+  const displayPrice =
+    priceOverride !== "" ? priceOverride : (catalogPriceEuros ?? "");
 
   function handleTypeChange(typeId: string) {
     setSelectedTypeId(typeId);
@@ -84,7 +88,8 @@ export function FederationCascadingSelects({
         selectedSubtypeId={selectedSubtypeId}
         selectedCategoryId={selectedCategoryId}
         defaultCategoryId={
-          selectedTypeId === defaultTypeId && selectedSubtypeId === defaultSubtypeId
+          selectedTypeId === defaultTypeId &&
+          selectedSubtypeId === defaultSubtypeId
             ? defaultCategoryId
             : ""
         }
@@ -157,8 +162,7 @@ function SubtypeSelect({
   defaultSubtypeId: string;
   onChange: (id: string) => void;
 }) {
-  const defaultValue =
-    selectedTypeId === defaultTypeId ? defaultSubtypeId : "";
+  const defaultValue = selectedTypeId === defaultTypeId ? defaultSubtypeId : "";
 
   return (
     <div className="space-y-1">

@@ -66,7 +66,11 @@ export function SubtypeFormDialog({
       // also reach the other open seasons is a separate question, asked after
       // the fact so that saying nothing leaves the other years alone.
       if (editedId) {
-        setPropagation({ model: "licenseSubtype", id: editedId, scope: "texts" });
+        setPropagation({
+          model: "licenseSubtype",
+          id: editedId,
+          scope: "texts",
+        });
       }
     });
   }
@@ -101,9 +105,7 @@ export function SubtypeFormDialog({
                 minLength={5}
               />
             </div>
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"

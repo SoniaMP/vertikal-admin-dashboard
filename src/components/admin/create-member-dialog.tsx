@@ -26,11 +26,7 @@ type Props = {
   catalog: LicenseCatalogType[];
 };
 
-export function CreateMemberDialog({
-  open,
-  onOpenChange,
-  catalog,
-}: Props) {
+export function CreateMemberDialog({ open, onOpenChange, catalog }: Props) {
   const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
   const [dniQuery, setDniQuery] = useState("");
@@ -108,9 +104,7 @@ export function CreateMemberDialog({
             defaultCategoryId={prefill?.categoryId}
           />
 
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex justify-end gap-2">
             <Button
               type="button"
