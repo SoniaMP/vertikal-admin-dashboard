@@ -118,11 +118,26 @@ function DesktopRow({
           <TableHeader>
             <TableRow>
               <TableHead className={`${HEAD} w-8`} />
-              <TableHead className={`${HEAD} w-48`}>Nombre</TableHead>
-              <TableHead className={`${HEAD} w-64`}>Descripción</TableHead>
-              <TableHead className={HEAD}>Estado</TableHead>
-              <TableHead className={`${HEAD} text-right`}>Registros</TableHead>
-              <TableHead className={`${HEAD} text-right`}>
+              <TableHead className={`${HEAD} w-48 min-w-48`}>Nombre</TableHead>
+              {/* The only column whose content is a sentence, so it takes
+                  whatever the fixed ones leave instead of truncating at a
+                  width of its own while they sit half empty. */}
+              <TableHead className={`${HEAD} w-full`}>Descripción</TableHead>
+              <TableHead
+                className={`${HEAD} w-px whitespace-nowrap text-center`}
+              >
+                Estado
+              </TableHead>
+              <TableHead
+                className={`${HEAD} w-px whitespace-nowrap text-center`}
+              >
+                Registros
+              </TableHead>
+              {/* Room for the four buttons and the air RowActions puts
+                  before them, held even on a row that shows three, so the
+                  column cannot collapse under them and every row ends at the
+                  same edge. */}
+              <TableHead className={`${HEAD} w-px min-w-48 text-right`}>
                 <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
@@ -142,33 +157,34 @@ function DesktopRow({
                   </button>
                 </CollapsibleTrigger>
               </TableCell>
-              <TableCell className="w-48 align-middle">
+              <TableCell className="w-48 min-w-48 align-middle">
                 <TruncatedCell
                   text={lt.name}
                   className="font-medium max-w-48"
                 />
               </TableCell>
-              <TableCell className="w-64 align-middle">
+              {/* w-full with max-w-0 is what lets a table cell both fill the
+                  row and cut its text off: without it the sentence sets the
+                  column's width instead of the other way round. */}
+              <TableCell className="w-full max-w-0 align-middle">
                 <TruncatedCell
                   text={lt.description}
-                  className="text-muted-foreground max-w-64"
+                  className="text-muted-foreground"
                 />
               </TableCell>
-              <TableCell className="align-middle">
+              <TableCell className="w-px whitespace-nowrap text-center align-middle">
                 <LicenseStateBadge license={lt} />
               </TableCell>
-              <TableCell className="text-right align-middle tabular-nums">
+              <TableCell className="w-px whitespace-nowrap text-center align-middle tabular-nums">
                 {lt._count.memberships}
               </TableCell>
-              <TableCell className="align-middle">
-                <div className="flex justify-end text-muted-foreground">
-                  <LicenseTypeActions
-                    licenseType={lt}
-                    membershipCount={lt._count.memberships}
-                    categories={categories}
-                    seasonName={seasonName}
-                  />
-                </div>
+              <TableCell className="w-px align-middle">
+                <LicenseTypeActions
+                  licenseType={lt}
+                  membershipCount={lt._count.memberships}
+                  categories={categories}
+                  seasonName={seasonName}
+                />
               </TableCell>
             </TableRow>
           </TableBody>
