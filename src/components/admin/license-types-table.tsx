@@ -120,7 +120,7 @@ function DesktopRow({
               <DataHead kind="center" className="w-px whitespace-nowrap">
                 Estado
               </DataHead>
-              <DataHead kind="number" className="w-px whitespace-nowrap">
+              <DataHead kind="center" className="w-px whitespace-nowrap">
                 Registros
               </DataHead>
               {/* Room for the four buttons and the air RowActions puts
@@ -165,7 +165,10 @@ function DesktopRow({
               <DataCell kind="center" className="w-px whitespace-nowrap">
                 <LicenseStateBadge license={lt} />
               </DataCell>
-              <DataCell kind="number" className="w-px whitespace-nowrap">
+              <DataCell
+                kind="center"
+                className="w-px whitespace-nowrap tabular-nums"
+              >
                 {lt._count.memberships}
               </DataCell>
               <DataCell kind="actions">
