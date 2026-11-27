@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Supplement, SupplementGroup } from "@prisma/client";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GroupMemberRow } from "./group-member-row";
 import { SupplementFormDialog } from "./supplement-form-dialog";
 import type { SelectableLicenseType } from "./license-type-checklist";
-
-type SupplementGroupWithSupplements = SupplementGroup & {
-  supplements: Supplement[];
-};
+import type {
+  AdminSupplement,
+  AdminSupplementGroup,
+} from "@/types/admin-catalog";
 
 type Props = {
   groupId: string;
-  supplements: Supplement[];
-  supplementGroups: SupplementGroupWithSupplements[];
+  supplements: AdminSupplement[];
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };

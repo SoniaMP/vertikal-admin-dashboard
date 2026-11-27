@@ -1,12 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type {
-  Supplement,
-  SupplementGroup,
-  SupplementPrice,
-  SupplementGroupPrice,
-} from "@prisma/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { buildAdminSellabilityLookups } from "@/helpers/admin-sellability-lookups";
 import { supplementBlockReason } from "@/helpers/supplement-block-reason";
@@ -15,22 +9,14 @@ import { SupplementGroupRow } from "./supplement-group-row";
 import { SupplementRow } from "./supplement-row";
 import { SupplementAddActions } from "./supplement-add-actions";
 import type { SelectableLicenseType } from "./license-type-checklist";
-
-type SupplementWithPrice = Supplement & {
-  supplementGroup: SupplementGroup | null;
-  prices: SupplementPrice[];
-  typeLinks: { typeId: string }[];
-};
-
-type SupplementGroupWithPrices = SupplementGroup & {
-  supplements: Supplement[];
-  groupPrices: SupplementGroupPrice[];
-  typeLinks: { typeId: string }[];
-};
+import type {
+  AdminStandaloneSupplement,
+  AdminSupplementGroup,
+} from "@/types/admin-catalog";
 
 type Props = {
-  supplements: SupplementWithPrice[];
-  supplementGroups: SupplementGroupWithPrices[];
+  supplements: AdminStandaloneSupplement[];
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };
@@ -112,7 +98,6 @@ export function SupplementsSection({
                 ),
               }}
               selectedTypeIds={supplement.typeLinks.map((link) => link.typeId)}
-              seasonId={seasonId}
             />
           ))}
           <SupplementAddActions

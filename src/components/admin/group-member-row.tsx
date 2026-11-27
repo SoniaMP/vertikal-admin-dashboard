@@ -1,17 +1,18 @@
 "use client";
 
-import type { Supplement, SupplementGroup } from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { retiredRowClass } from "@/helpers/retired-row-class";
+import { StatusPill } from "./status-pill";
 import { SupplementActions } from "./supplement-actions";
 import type { SelectableLicenseType } from "./license-type-checklist";
-
-type SupplementGroupWithSupplements = SupplementGroup & {
-  supplements: Supplement[];
-};
+import type {
+  AdminSupplement,
+  AdminSupplementGroup,
+} from "@/types/admin-catalog";
 
 type Props = {
-  supplement: Supplement;
-  supplementGroups: SupplementGroupWithSupplements[];
+  supplement: AdminSupplement;
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
 };
 
@@ -32,21 +33,27 @@ export function GroupMemberRow({
   licenseTypes,
 }: Props) {
   return (
-    <div className="flex items-center justify-between gap-3 py-1.5">
+    <div
+      className={cn(
+        "-mx-1 flex items-center justify-between gap-3 rounded-sm px-1 py-1.5",
+        retiredRowClass(supplement.active),
+      )}
+    >
       <div className="flex min-w-0 items-center gap-3">
         <span className="truncate">{supplement.name}</span>
         {/* Both states, as every other row in this panel shows them. A bare
             "Inactivo" would read quieter here, but a list that labels state
             differently from the list above it costs more than it saves. */}
-        <Badge variant={supplement.active ? "default" : "secondary"}>
+        <StatusPill tone={supplement.active ? "positive" : "neutral"}>
           {supplement.active ? "Activo" : "Inactivo"}
-        </Badge>
+        </StatusPill>
       </div>
       <SupplementActions
         supplement={supplement}
         supplementGroups={supplementGroups}
         licenseTypes={licenseTypes}
         selectedTypeIds={[]}
+        soldCount={supplement._count.membershipSupplements}
       />
     </div>
   );

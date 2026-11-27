@@ -1,25 +1,11 @@
-import type {
-  Category,
-  Supplement,
-  SupplementGroup,
-  SupplementPrice,
-  SupplementGroupPrice,
-} from "@prisma/client";
+import type { Category } from "@prisma/client";
 import { CategoriesSection } from "./categories-section";
 import { SupplementsSection } from "./supplements-section";
 import type { SelectableLicenseType } from "./license-type-checklist";
-
-type SupplementWithPrice = Supplement & {
-  supplementGroup: SupplementGroup | null;
-  prices: SupplementPrice[];
-  typeLinks: { typeId: string }[];
-};
-
-type SupplementGroupWithPrices = SupplementGroup & {
-  supplements: Supplement[];
-  groupPrices: SupplementGroupPrice[];
-  typeLinks: { typeId: string }[];
-};
+import type {
+  AdminStandaloneSupplement,
+  AdminSupplementGroup,
+} from "@/types/admin-catalog";
 
 type CategoryWithCount = Category & {
   _count: { memberships: number };
@@ -27,8 +13,8 @@ type CategoryWithCount = Category & {
 
 type Props = {
   categories: CategoryWithCount[];
-  supplements: SupplementWithPrice[];
-  supplementGroups: SupplementGroupWithPrices[];
+  supplements: AdminStandaloneSupplement[];
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   seasonId: string;
 };

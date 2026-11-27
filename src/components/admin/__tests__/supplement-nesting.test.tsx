@@ -4,9 +4,15 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { SupplementsSection } from "../supplements-section";
 import { SupplementGroupRow } from "../supplement-group-row";
 
+// Radix measures its floating parts on mount, and jsdom has no observer to
+// measure with. The dialogs under test only need to render.
+globalThis.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 vi.mock("@/app/admin/(dashboard)/tipos-federacion/actions", () => ({
-  upsertSupplementPrice: vi.fn(),
-  upsertSupplementGroupPrice: vi.fn(),
   toggleSupplementActive: vi.fn(),
   deleteSupplementGroup: vi.fn(),
   createSupplement: vi.fn(),
@@ -47,8 +53,12 @@ function supplement(
     createdAt: new Date(),
     updatedAt: new Date(),
     supplementGroup: null,
-    prices: price === null ? [] : [{ id: `p-${id}`, seasonId: SEASON, supplementId: id, price }],
+    prices:
+      price === null
+        ? []
+        : [{ id: `p-${id}`, seasonId: SEASON, supplementId: id, price }],
     typeLinks: groupId === null ? [{ typeId: FERM.id }] : [],
+    _count: { membershipSupplements: 0 },
   };
 }
 
@@ -156,10 +166,51 @@ describe("a group row", () => {
     expect(screen.getByText("Rescate ampliado")).toBeTruthy();
   });
 
-  it("asks for the price once, on the group and not on the member", () => {
+  it("reports the price once, as a figure and not as a field", () => {
+    // Nothing in the list writes to the database: the row says what the group
+    // costs, and the edit panel is where that changes.
     const { container } = renderGroup([RESCATE]);
 
-    expect(container.querySelectorAll('input[type="number"]')).toHaveLength(1);
+    expect(container.querySelectorAll("input")).toHaveLength(0);
+    expect(screen.getAllByText(/30,00/)).toHaveLength(1);
+  });
+
+  it("opens the edit panel with the price already in it", () => {
+    renderGroup([RESCATE]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Editar grupo" }));
+
+    expect(screen.getByLabelText("Precio (€)").getAttribute("value")).toBe(
+      "30.00",
+    );
+  });
+
+  it("freezes a retired group instead of letting it be edited", () => {
+    const theGroup = { ...group([RESCATE]), active: false };
+    render(
+      <SupplementGroupRow
+        group={theGroup}
+        supplementGroups={[theGroup]}
+        licenseTypes={[FERM]}
+        seasonId={SEASON}
+      />,
+    );
+
+    // The switch stays, or it could never come back; the bin stays, or a
+    // retired row could never be cleaned up.
+    expect(
+      screen
+        .getByRole("button", { name: "Editar grupo" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Activar" }).hasAttribute("disabled"),
+    ).toBe(false);
+    expect(
+      screen
+        .getByRole("button", { name: "Eliminar Espeleosocorristas" })
+        .hasAttribute("disabled"),
+    ).toBe(false);
   });
 
   it("says where it is offered once, and not again per member", () => {
@@ -193,6 +244,8 @@ describe("a group row", () => {
     expect(
       screen.getByRole("button", { name: /Añadir suplemento/ }),
     ).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /Nuevo suplemento/ })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /Nuevo suplemento/ }),
+    ).toBeNull();
   });
 });

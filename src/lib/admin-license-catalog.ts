@@ -37,13 +37,21 @@ export async function fetchAdminLicenseCatalog(seasonId: string) {
           supplementGroup: true,
           prices: { where: { seasonId } },
           typeLinks: true,
+          // What a member was charged for is history, not catalog: the panel
+          // needs the count to know whether deleting is still allowed.
+          _count: { select: { membershipSupplements: true } },
         },
         orderBy: { createdAt: "asc" },
       }),
       prisma.supplementGroup.findMany({
         where: { seasonId },
         include: {
-          supplements: true,
+          // The members carry the same sold count as the standalone rows, so a
+          // row inside a group knows on its own whether it can still be
+          // deleted.
+          supplements: {
+            include: { _count: { select: { membershipSupplements: true } } },
+          },
           groupPrices: { where: { seasonId } },
           typeLinks: true,
         },

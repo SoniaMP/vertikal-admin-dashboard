@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import type { Supplement, SupplementGroup } from "@prisma/client";
+import type { Supplement } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -19,20 +19,19 @@ import { PropagationPrompt } from "./propagation-prompt";
 import { SupplementOfferFields } from "./supplement-offer-fields";
 import type { SelectableLicenseType } from "./license-type-checklist";
 import type { PropagationRequest } from "@/types/catalog-propagation";
-
-type SupplementGroupWithSupplements = SupplementGroup & {
-  supplements: Supplement[];
-};
+import type { AdminSupplementGroup } from "@/types/admin-catalog";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   seasonId: string;
   supplement?: Supplement;
-  supplementGroups?: SupplementGroupWithSupplements[];
+  supplementGroups?: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   /** The federations this supplement is offered in today. */
   selectedTypeIds: string[];
+  /** Its own price this season, in cents; a grouped one has none. */
+  price?: number;
   /** Preselects a group when adding from inside one. */
   defaultGroupId?: string;
 };
@@ -47,6 +46,7 @@ export function SupplementFormDialog({
   supplementGroups = [],
   licenseTypes,
   selectedTypeIds,
+  price,
   defaultGroupId,
 }: Props) {
   const isEditing = !!supplement;
@@ -127,10 +127,9 @@ export function SupplementFormDialog({
                 supplement?.supplementGroupId ?? defaultGroupId ?? null
               }
               selectedTypeIds={selectedTypeIds}
+              price={price}
             />
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"

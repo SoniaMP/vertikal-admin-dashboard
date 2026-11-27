@@ -1,32 +1,22 @@
 "use client";
 
-import { useTransition } from "react";
-import type {
-  Supplement,
-  SupplementGroup,
-  SupplementPrice,
-} from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { upsertSupplementPrice } from "@/app/admin/(dashboard)/tipos-federacion/actions";
+import { StatusPill } from "./status-pill";
+import { cn } from "@/lib/utils";
+import { retiredRowClass } from "@/helpers/retired-row-class";
+import { PriceReadout } from "./price-readout";
 import { SupplementActions } from "./supplement-actions";
 import { SupplementOfferLine } from "./supplement-offer-line";
 import type { SelectableLicenseType } from "./license-type-checklist";
 import type { SupplementBlocker } from "@/helpers/supplement-block-reason";
 import type { OfferedType } from "@/helpers/offered-license-types";
-
-type SupplementWithPrice = Supplement & {
-  supplementGroup: SupplementGroup | null;
-  prices: SupplementPrice[];
-};
-
-type SupplementGroupWithSupplements = SupplementGroup & {
-  supplements: Supplement[];
-};
+import type {
+  AdminStandaloneSupplement,
+  AdminSupplementGroup,
+} from "@/types/admin-catalog";
 
 type Props = {
-  supplement: SupplementWithPrice;
-  supplementGroups: SupplementGroupWithSupplements[];
+  supplement: AdminStandaloneSupplement;
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   /** Where this extra shows up, and why it does not when it does not. */
   offer: {
@@ -34,11 +24,14 @@ type Props = {
     offeredTypes: OfferedType[];
   };
   selectedTypeIds: string[];
-  seasonId: string;
 };
 
 /**
  * One standalone supplement: its own price, its own federations.
+ *
+ * The row reports; the edit panel changes. Price, name and federations are the
+ * same decision taken in one place and saved by one button, instead of a field
+ * in the list that wrote to the database on the way past.
  *
  * A grouped one never reaches this row — it is listed inside its group, which
  * is where the price and the federations it would otherwise appear to own can
@@ -50,48 +43,31 @@ export function SupplementRow({
   licenseTypes,
   offer,
   selectedTypeIds,
-  seasonId,
 }: Props) {
-  const [isPending, startTransition] = useTransition();
   const seasonPrice = supplement.prices[0]?.price;
 
-  function handlePriceSave(value: string) {
-    const amount = parseFloat(value);
-    if (isNaN(amount) || amount <= 0) return;
-
-    startTransition(async () => {
-      await upsertSupplementPrice(
-        supplement.id,
-        seasonId,
-        Math.round(amount * 100),
-      );
-    });
-  }
-
   return (
-    <div className="rounded-md border px-3 py-2 text-sm">
+    <div
+      className={cn(
+        "rounded-md border px-3 py-2 text-sm",
+        retiredRowClass(supplement.active),
+      )}
+    >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="font-medium truncate">{supplement.name}</span>
-          <Input
-            type="number"
-            step="0.01"
-            min="0"
-            defaultValue={seasonPrice ? (seasonPrice / 100).toFixed(2) : ""}
-            placeholder="€"
-            className="h-7 w-20 text-center text-xs"
-            disabled={isPending}
-            onBlur={(event) => handlePriceSave(event.target.value)}
-          />
-          <Badge variant={supplement.active ? "default" : "secondary"}>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="truncate font-medium">{supplement.name}</span>
+          <PriceReadout price={seasonPrice} />
+          <StatusPill tone={supplement.active ? "positive" : "neutral"}>
             {supplement.active ? "Activo" : "Inactivo"}
-          </Badge>
+          </StatusPill>
         </div>
         <SupplementActions
           supplement={supplement}
           supplementGroups={supplementGroups}
           licenseTypes={licenseTypes}
           selectedTypeIds={selectedTypeIds}
+          price={seasonPrice}
+          soldCount={supplement._count.membershipSupplements}
         />
       </div>
       <SupplementOfferLine

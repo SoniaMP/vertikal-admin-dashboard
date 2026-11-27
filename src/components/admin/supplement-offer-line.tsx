@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { FederationChip } from "./federation-chip";
 import type { GroupBlocker } from "@/helpers/group-block-reason";
 import type { OfferedType } from "@/helpers/offered-license-types";
 
@@ -32,13 +32,11 @@ export function SupplementOfferLine({ blocker, offeredTypes }: Props) {
           : `No se vende · ${BLOCKER_TEXT[blocker]}`}
       </span>
       {offeredTypes.map((type) => (
-        <Badge
+        <FederationChip
           key={type.id}
-          variant="outline"
-          className={type.isRetired ? "line-through opacity-60" : undefined}
-        >
-          {type.name}
-        </Badge>
+          name={type.name}
+          isRetired={type.isRetired}
+        />
       ))}
     </div>
   );

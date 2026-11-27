@@ -1,24 +1,28 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Supplement, SupplementGroup } from "@prisma/client";
+import type { Supplement } from "@prisma/client";
 import { Pencil, Power } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toggleSupplementActive } from "@/app/admin/(dashboard)/tipos-federacion/actions";
-import { PropagationPrompt } from "./propagation-prompt";
-import type { PropagationRequest } from "@/types/catalog-propagation";
+import { DeleteRowAction } from "./delete-row-action";
+import { RowActionButton } from "./row-action-button";
+import { RowActions } from "./row-actions";
+import {
+  deleteSupplement,
+  toggleSupplementActive,
+} from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import { SupplementFormDialog } from "./supplement-form-dialog";
 import type { SelectableLicenseType } from "./license-type-checklist";
-
-type SupplementGroupWithSupplements = SupplementGroup & {
-  supplements: Supplement[];
-};
+import type { AdminSupplementGroup } from "@/types/admin-catalog";
 
 type Props = {
   supplement: Supplement;
-  supplementGroups: SupplementGroupWithSupplements[];
+  supplementGroups: AdminSupplementGroup[];
   licenseTypes: SelectableLicenseType[];
   selectedTypeIds: string[];
+  /** Its own price this season, in cents; a grouped one has none. */
+  price?: number;
+  /** How many memberships already bought it; above zero it cannot be deleted. */
+  soldCount: number;
 };
 
 export function SupplementActions({
@@ -26,47 +30,61 @@ export function SupplementActions({
   supplementGroups,
   licenseTypes,
   selectedTypeIds,
+  price,
+  soldCount,
 }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [propagation, setPropagation] = useState<PropagationRequest | null>(
-    null,
-  );
 
   function handleToggle() {
     startTransition(async () => {
-      const result = await toggleSupplementActive(supplement.id, !supplement.active);
-      // Retiring something in one year says nothing about the others, so the
-      // change stops here unless the admin says otherwise.
-      if (result.success) {
-        setPropagation({ model: "supplement", id: supplement.id, scope: "state" });
-      }
+      await toggleSupplementActive(supplement.id, !supplement.active);
     });
   }
 
+  function handleDelete() {
+    startTransition(async () => {
+      await deleteSupplement(supplement.id);
+    });
+  }
+
+  const isSold = soldCount > 0;
+
   return (
-    <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost-info"
-        size="icon"
+    <RowActions>
+      <RowActionButton
         onClick={() => setIsEditOpen(true)}
+        disabled={!supplement.active}
         aria-label="Editar suplemento"
-        className="h-7 w-7"
+        title={
+          supplement.active
+            ? "Editar"
+            : "Está inactivo: actívalo para poder editarlo"
+        }
       >
-        <Pencil className="h-3 w-3" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
+        <Pencil />
+      </RowActionButton>
+      <RowActionButton
         onClick={handleToggle}
         disabled={isPending}
         aria-label={supplement.active ? "Desactivar" : "Activar"}
-        className="h-7 w-7"
       >
-        <Power className="h-3 w-3" />
-      </Button>
+        <Power />
+      </RowActionButton>
+      <DeleteRowAction
+        name={supplement.name}
+        onConfirm={handleDelete}
+        disabled={isPending || isSold}
+        reason={
+          isSold
+            ? "No se puede eliminar: hay membresías que lo incluyen"
+            : undefined
+        }
+      >
+        Se borra para siempre, junto con su precio de esta temporada y las
+        federativas en las que se ofrecía. Para dejar de venderlo sin perderlo,
+        desactívalo.
+      </DeleteRowAction>
       <SupplementFormDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
@@ -75,12 +93,8 @@ export function SupplementActions({
         supplementGroups={supplementGroups}
         licenseTypes={licenseTypes}
         selectedTypeIds={selectedTypeIds}
+        price={price}
       />
-      <PropagationPrompt
-        request={propagation}
-        entityLabel="este suplemento"
-        onDone={() => setPropagation(null)}
-      />
-    </div>
+    </RowActions>
   );
 }

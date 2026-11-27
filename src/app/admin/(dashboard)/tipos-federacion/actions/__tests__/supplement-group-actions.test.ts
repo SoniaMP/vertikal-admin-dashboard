@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mockUpsert = vi.fn();
 const mockDeleteMany = vi.fn();
 const mockUpdateMany = vi.fn();
 const mockDelete = vi.fn();
@@ -9,14 +8,9 @@ const mockTransaction = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     season: {
-      findUnique: () =>
-        Promise.resolve({ year: new Date().getFullYear() }),
-    },
-    supplementPrice: {
-      upsert: (...args: unknown[]) => mockUpsert(...args),
+      findUnique: () => Promise.resolve({ year: new Date().getFullYear() }),
     },
     supplementGroupPrice: {
-      upsert: (...args: unknown[]) => mockUpsert(...args),
       deleteMany: (...args: unknown[]) => mockDeleteMany(...args),
     },
     supplement: {
@@ -41,8 +35,7 @@ vi.mock("@/lib/prisma", () => ({
         }),
       delete: (...args: unknown[]) => mockDelete(...args),
     },
-    $transaction: (fn: (tx: unknown) => Promise<void>) =>
-      mockTransaction(fn),
+    $transaction: (fn: (tx: unknown) => Promise<void>) => mockTransaction(fn),
   },
 }));
 
@@ -53,113 +46,6 @@ vi.mock("@/lib/auth", () => ({
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
-
-describe("upsertSupplementPrice", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockUpsert.mockResolvedValue({});
-  });
-
-  it("upserts price for valid data", async () => {
-    const { upsertSupplementPrice } = await import(
-      "../supplement-actions"
-    );
-
-    const result = await upsertSupplementPrice(
-      "supp-1",
-      "season-1",
-      1500,
-    );
-
-    expect(result).toEqual({ success: true });
-    expect(mockUpsert).toHaveBeenCalledWith({
-      where: {
-        seasonId_supplementId: {
-          seasonId: "season-1",
-          supplementId: "supp-1",
-        },
-      },
-      create: {
-        seasonId: "season-1",
-        supplementId: "supp-1",
-        price: 1500,
-      },
-      update: { price: 1500 },
-    });
-  });
-
-  it("rejects zero price", async () => {
-    const { upsertSupplementPrice } = await import(
-      "../supplement-actions"
-    );
-
-    const result = await upsertSupplementPrice("supp-1", "season-1", 0);
-
-    expect(result.success).toBe(false);
-    expect(mockUpsert).not.toHaveBeenCalled();
-  });
-
-  it("rejects negative price", async () => {
-    const { upsertSupplementPrice } = await import(
-      "../supplement-actions"
-    );
-
-    const result = await upsertSupplementPrice(
-      "supp-1",
-      "season-1",
-      -100,
-    );
-
-    expect(result.success).toBe(false);
-    expect(mockUpsert).not.toHaveBeenCalled();
-  });
-});
-
-describe("upsertSupplementGroupPrice", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockUpsert.mockResolvedValue({});
-  });
-
-  it("upserts group price for valid data", async () => {
-    const { upsertSupplementGroupPrice } = await import(
-      "../supplement-actions"
-    );
-
-    const result = await upsertSupplementGroupPrice(
-      "group-1",
-      "season-1",
-      2000,
-    );
-
-    expect(result).toEqual({ success: true });
-    expect(mockUpsert).toHaveBeenCalledWith({
-      where: {
-        seasonId_groupId: {
-          seasonId: "season-1",
-          groupId: "group-1",
-        },
-      },
-      create: { seasonId: "season-1", groupId: "group-1", price: 2000 },
-      update: { price: 2000 },
-    });
-  });
-
-  it("rejects zero price", async () => {
-    const { upsertSupplementGroupPrice } = await import(
-      "../supplement-actions"
-    );
-
-    const result = await upsertSupplementGroupPrice(
-      "group-1",
-      "season-1",
-      0,
-    );
-
-    expect(result.success).toBe(false);
-    expect(mockUpsert).not.toHaveBeenCalled();
-  });
-});
 
 describe("deleteSupplementGroup", () => {
   beforeEach(() => {
@@ -177,9 +63,8 @@ describe("deleteSupplementGroup", () => {
   });
 
   it("deletes group and cascades correctly", async () => {
-    const { deleteSupplementGroup } = await import(
-      "../supplement-actions"
-    );
+    const { deleteSupplementGroup } =
+      await import("../supplement-group-actions");
 
     const result = await deleteSupplementGroup("group-1");
 

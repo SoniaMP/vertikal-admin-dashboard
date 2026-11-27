@@ -101,9 +101,6 @@ function CatalogHeader({
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Federativas
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Los precios de cada año se guardan por separado.
-        </p>
       </div>
       <div className="flex items-center gap-2">
         <CatalogYearSelector
@@ -162,7 +159,7 @@ async function CatalogSections({
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">{finding}</p>
+      {finding && <p className="text-sm text-muted-foreground">{finding}</p>}
       <LicenseTypesTable
         licenseTypes={licenseTypes}
         categories={categories}

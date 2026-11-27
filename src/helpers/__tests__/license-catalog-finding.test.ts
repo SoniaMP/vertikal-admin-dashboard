@@ -41,7 +41,7 @@ describe("formatLicenseCatalogFinding", () => {
         ],
         "2026",
       ),
-    ).toBe("Las 2 modalidades tienen precio en la temporada 2026.");
+    ).toBeNull();
   });
 
   it("does not count modalities that do not exist", () => {

@@ -28,12 +28,15 @@ export {
   createSupplement,
   updateSupplement,
   toggleSupplementActive,
-  upsertSupplementPrice,
+  deleteSupplement,
+} from "./actions/supplement-actions";
+
+export {
   createSupplementGroup,
   updateSupplementGroup,
+  toggleSupplementGroupActive,
   deleteSupplementGroup,
-  upsertSupplementGroupPrice,
-} from "./actions/supplement-actions";
+} from "./actions/supplement-group-actions";
 
 export {
   findPropagationTargets,

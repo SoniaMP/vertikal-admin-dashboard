@@ -30,6 +30,8 @@ type Props = {
   licenseTypes: SelectableLicenseType[];
   /** The federations this group is offered in today. */
   selectedTypeIds: string[];
+  /** What the group costs this season, in cents, if it has a price yet. */
+  price?: number;
 };
 
 const INITIAL_STATE = { success: false, error: undefined };
@@ -41,6 +43,7 @@ export function SupplementGroupFormDialog({
   group,
   licenseTypes,
   selectedTypeIds,
+  price,
 }: Props) {
   const isEditing = !!group;
 
@@ -75,7 +78,11 @@ export function SupplementGroupFormDialog({
       // also reach the other open seasons is a separate question, asked after
       // the fact so that saying nothing leaves the other years alone.
       if (editedId) {
-        setPropagation({ model: "supplementGroup", id: editedId, scope: "texts" });
+        setPropagation({
+          model: "supplementGroup",
+          id: editedId,
+          scope: "texts",
+        });
       }
     });
   }
@@ -103,15 +110,27 @@ export function SupplementGroupFormDialog({
                 minLength={2}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="grp-price">Precio (€)</Label>
+              <Input
+                id="grp-price"
+                name="price"
+                type="number"
+                step="0.01"
+                min="0.01"
+                defaultValue={
+                  price === undefined ? "" : (price / 100).toFixed(2)
+                }
+                className="tabular-nums"
+              />
+            </div>
             {/* The group carries the federations for every supplement in
                 it, the same way it carries their price. */}
             <LicenseTypeChecklist
               types={licenseTypes}
               selectedTypeIds={selectedTypeIds}
             />
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
