@@ -4,7 +4,7 @@ import { type FormEvent, useState, useTransition } from "react";
 import type { LicenseOffering } from "@prisma/client";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "./status-pill";
 import { Input } from "@/components/ui/input";
 import { batchUpsertOfferings } from "@/app/admin/(dashboard)/tipos-federacion/actions";
 import type {
@@ -152,12 +152,9 @@ function PriceRow({
       <td className="py-2 pr-3">
         <div className="flex items-center gap-2">
           <span className="font-medium truncate">{category.name}</span>
-          <Badge
-            variant={category.active ? "default" : "secondary"}
-            className="text-xs"
-          >
+          <StatusPill tone={category.active ? "positive" : "neutral"}>
             {category.active ? "Activo" : "Inactivo"}
-          </Badge>
+          </StatusPill>
         </div>
       </td>
       {subtypes.map((sub) => (

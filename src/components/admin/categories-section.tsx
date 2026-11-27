@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Category } from "@prisma/client";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill } from "./status-pill";
 import { CategoryActions } from "./category-actions";
 import { CategoryFormDialog } from "./category-form-dialog";
 
@@ -70,9 +70,9 @@ function CategoryRow({ category }: { category: CategoryWithCount }) {
     <div className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
       <div className="flex items-center gap-3 min-w-0">
         <span className="font-medium truncate">{category.name}</span>
-        <Badge variant={category.active ? "default" : "secondary"}>
+        <StatusPill tone={category.active ? "positive" : "neutral"}>
           {category.active ? "Activo" : "Inactivo"}
-        </Badge>
+        </StatusPill>
       </div>
       <CategoryActions
         category={category}
