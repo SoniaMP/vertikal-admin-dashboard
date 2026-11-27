@@ -57,7 +57,7 @@ export function ParticipantRowDesktop({ participant: p, courseId }: Props) {
           <span className="text-muted-foreground">—</span>
         )}
       </TableCell>
-      <TableCell className="text-muted-foreground">
+      <TableCell className="text-right tabular-nums text-muted-foreground">
         {formatDate(p.createdAt)}
       </TableCell>
       <TableCell>

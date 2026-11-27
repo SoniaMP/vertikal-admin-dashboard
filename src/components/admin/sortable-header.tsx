@@ -62,7 +62,10 @@ export function SortableHeader({
         aria-label={`Ordenar por ${label}`}
         className={cn(
           "flex items-center gap-1 transition-colors hover:text-foreground",
-          className?.includes("text-right") && "ml-auto",
+          // In a column that reads from the right, the arrow goes on the
+          // inside: trailing it would hold the right edge and leave the label
+          // permanently short of the figures underneath.
+          className?.includes("text-right") && "ml-auto flex-row-reverse",
         )}
       >
         {label}
